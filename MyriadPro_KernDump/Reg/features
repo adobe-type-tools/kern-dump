@@ -1,0 +1,19 @@
+table head {
+	FontRevision 1.000;
+} head;
+
+include (features.family);
+
+feature kern {
+	include (features.kern);
+} kern;
+
+table OS/2 {
+	FSType 8;
+	Panose 2 11 5 3 3 4 3 2 2 4;
+	TypoAscender 750;
+	TypoDescender -250;
+	XHeight 484;
+	CapHeight 674;
+} OS/2;
+
