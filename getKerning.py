@@ -71,26 +71,54 @@ def main(fontPath):
 			# each glyph in this list will have a corresponding PairSet which will
 			# contain all the second glyphs and the kerning value in the form of PairValueRecord(s)
 			firstGlyphsList = pairPos.Coverage.glyphs
+#			print firstGlyphsList
 			
 			if pairPos.Format == 1: # glyph pair adjustment; format 2 is class pair adjustment
 			
 				# This iteration is done by index so that we have a way to reference the firstGlyphsList list
 				for pairSetIndex in range(len(pairPos.PairSet)):
+#					print 'xxx', len(pairPos.PairSet), 'xxx'
 					for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
+#						print dir(pairValueRecordItem)
 						secondGlyph = pairValueRecordItem.SecondGlyph
 						kernValue = pairValueRecordItem.Value1.XAdvance
 						
 						glyphPairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
 
+			elif pairPos.Format == 2: # class adjustment
+				print firstGlyphsList
+#				print len(pairPos.PairSet)
+#				print pairSetIndex
+				for leftGlyph in firstGlyphsList:
+					for glyph in pairPos.ClassDef2.classDefs:
+						secondGlyph = glyph
+						record = pairPos.ClassDef2.classDefs[glyph]
+						kernValue = pairPos.Class1Record[0].Class2Record[record].Value1.XAdvance
+					
+						glyphPairsList.append((leftGlyph, secondGlyph, kernValue))
+					
+					
+#					kernValue = 
+# 				print pairPos.Class1Record[0].Class2Record[1].Value1.XAdvance
+
+# 				print pairPos.ClassDef2.classDefs.items()
+# 				for i in pairPos.Class1Record:
+# 					print i.Class2Record[1].Value1.XAdvance
+#  				print pairPos.Class1Record
+# 				print pairPos.Class2Count
+#  				print pairPos.ValueFormat2
+				
+				
+	print '-' * 80
 	print len(glyphPairsList), glyphPairsList
 
 
 
-# 					membersList = inspect.getmembers(pairValueRecordItem)
-# 					for x in membersList:
-# 						print x
-# 					print
-# 					print
+# 	membersList = inspect.getmembers(pairPos)
+# 	for x in membersList:
+# 		print x
+# 	print
+# 	print
 	
 
 

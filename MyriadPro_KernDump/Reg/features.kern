@@ -1,8 +1,8 @@
 @A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
 @Y_UC_LEFT = [ Y Yacute ];
+# pos @Y_UC_LEFT @A_LC_RIGHT -50;
 
-# enum pos [T] @A_LC_RIGHT -50;
-pos @Y_UC_LEFT @A_LC_RIGHT -50;
+enum pos [T] @A_LC_RIGHT -50;
 
 # pos T a -50;
 # pos V A -80;
