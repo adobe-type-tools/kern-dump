@@ -1,0 +1,170 @@
+@Y_UC_LEFT = [ Y Yacute ];
+@A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ]; 16
+
+@O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
+@U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ]; 30
+
+@N_UC_LEFT = [ N Ntilde ];
+@I_LC_RIGHT = [ i iacute igrave icircumflex idieresis dotlessi ]; 12
+
+pos @Y_UC_LEFT @A_LC_RIGHT -50;
+pos @O_UC_LEFT @U_LC_RIGHT -10;
+pos @N_UC_LEFT @I_LC_RIGHT -30;
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ttFont sfntVersion="OTTO" ttLibVersion="2.3">
+
+  <GPOS>
+    <Version value="1.0"/>
+    <ScriptList>
+      <!-- ScriptCount=2 -->
+      <ScriptRecord index="0">
+        <ScriptTag value="DFLT"/>
+        <Script>
+          <DefaultLangSys>
+            <ReqFeatureIndex value="65535"/>
+            <!-- FeatureCount=1 -->
+            <FeatureIndex index="0" value="0"/>
+          </DefaultLangSys>
+          <!-- LangSysCount=0 -->
+        </Script>
+      </ScriptRecord>
+      <ScriptRecord index="1">
+        <ScriptTag value="latn"/>
+        <Script>
+          <DefaultLangSys>
+            <ReqFeatureIndex value="65535"/>
+            <!-- FeatureCount=1 -->
+            <FeatureIndex index="0" value="1"/>
+          </DefaultLangSys>
+          <!-- LangSysCount=0 -->
+        </Script>
+      </ScriptRecord>
+    </ScriptList>
+    <FeatureList>
+      <!-- FeatureCount=2 -->
+      <FeatureRecord index="0">
+        <FeatureTag value="kern"/>
+        <Feature>
+          <!-- LookupCount=1 -->
+          <LookupListIndex index="0" value="0"/>
+        </Feature>
+      </FeatureRecord>
+      <FeatureRecord index="1">
+        <FeatureTag value="kern"/>
+        <Feature>
+          <!-- LookupCount=1 -->
+          <LookupListIndex index="0" value="0"/>
+        </Feature>
+      </FeatureRecord>
+    </FeatureList>
+    <LookupList>
+      <!-- LookupCount=1 -->
+      <Lookup index="0">
+        <LookupType value="2"/>
+        <LookupFlag value="0"/>
+        <!-- SubTableCount=1 -->
+        <PairPos index="0" Format="2">
+          <Coverage Format="1">
+            <Glyph value="N"/>
+            <Glyph value="O"/>
+            <Glyph value="Y"/>
+            <Glyph value="Ntilde"/>
+            <Glyph value="Oacute"/>
+            <Glyph value="Ocircumflex"/>
+            <Glyph value="Odieresis"/>
+            <Glyph value="Ograve"/>
+            <Glyph value="Otilde"/>
+            <Glyph value="Yacute"/>
+          </Coverage>
+
+          <ValueFormat1 value="4"/>
+          <ValueFormat2 value="0"/>
+
+          <ClassDef1 Format="2">
+            <ClassDef glyph="N" class="2"/>
+            <ClassDef glyph="Ntilde" class="2"/>
+            <ClassDef glyph="O" class="1"/>
+            <ClassDef glyph="Oacute" class="1"/>
+            <ClassDef glyph="Ocircumflex" class="1"/>
+            <ClassDef glyph="Odieresis" class="1"/>
+            <ClassDef glyph="Ograve" class="1"/>
+            <ClassDef glyph="Otilde" class="1"/>
+          </ClassDef1>
+
+          <ClassDef2 Format="2">
+            <ClassDef glyph="a" class="1"/>
+            <ClassDef glyph="aacute" class="1"/>
+            <ClassDef glyph="acircumflex" class="1"/>
+            <ClassDef glyph="adieresis" class="1"/>
+            <ClassDef glyph="ae" class="1"/>
+            <ClassDef glyph="agrave" class="1"/>
+            <ClassDef glyph="aring" class="1"/>
+            <ClassDef glyph="atilde" class="1"/>
+            <ClassDef glyph="dotlessi" class="3"/>
+            <ClassDef glyph="i" class="3"/>
+            <ClassDef glyph="iacute" class="3"/>
+            <ClassDef glyph="icircumflex" class="3"/>
+            <ClassDef glyph="idieresis" class="3"/>
+            <ClassDef glyph="igrave" class="3"/>
+            <ClassDef glyph="u" class="2"/>
+            <ClassDef glyph="uacute" class="2"/>
+            <ClassDef glyph="ucircumflex" class="2"/>
+            <ClassDef glyph="udieresis" class="2"/>
+            <ClassDef glyph="ugrave" class="2"/>
+          </ClassDef2>
+
+          <!-- Class1Count=3 -->
+          <!-- Class2Count=4 -->
+
+          <Class1Record index="0">
+            <Class2Record index="0">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="1">
+              <Value1 XAdvance="-50"/>  <!-- kerning for Y a -->
+            </Class2Record>
+            <Class2Record index="2">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="3">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+          </Class1Record>
+
+          <Class1Record index="1">
+            <Class2Record index="0">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="1">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="2">
+              <Value1 XAdvance="-10"/>	<!-- kerning for O u -->
+            </Class2Record>
+            <Class2Record index="3">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+          </Class1Record>
+
+          <Class1Record index="2">
+            <Class2Record index="0">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="1">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="2">
+              <Value1 XAdvance="0"/>
+            </Class2Record>
+            <Class2Record index="3">
+              <Value1 XAdvance="-30"/>	<!-- kerning for N i -->
+            </Class2Record>
+          </Class1Record>
+
+        </PairPos>
+      </Lookup>
+    </LookupList>
+  </GPOS>
+
+</ttFont>

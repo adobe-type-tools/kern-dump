@@ -1,8 +1,17 @@
-@A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
 @Y_UC_LEFT = [ Y Yacute ];
-# pos @Y_UC_LEFT @A_LC_RIGHT -50;
+@O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
+@N_UC_LEFT = [ N Ntilde ];
 
-enum pos [T] @A_LC_RIGHT -50;
+@A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
+@U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ];
+@I_LC_RIGHT = [ i iacute igrave icircumflex idieresis dotlessi ];
+
+pos @Y_UC_LEFT @A_LC_RIGHT -50;
+pos @O_UC_LEFT @U_LC_RIGHT -10;
+pos @N_UC_LEFT @I_LC_RIGHT -30;
+
+
+# enum pos [T] @A_LC_RIGHT -30;
 
 # pos T a -50;
 # pos V A -80;
