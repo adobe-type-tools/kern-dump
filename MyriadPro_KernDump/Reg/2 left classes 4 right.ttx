@@ -1,10 +1,20 @@
 @Y_UC_LEFT = [ Y Yacute ];
-@O_UC_LEFT = [ Ograve Oacute Ocircumflex Otilde Odieresis ];
+@O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
+
 @A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
+@U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ];
+@I_LC_RIGHT = [ i iacute igrave icircumflex idieresis dotlessi ];
+@E_LC_RIGHT = [ e egrave eacute ecircumflex edieresis ];
 
 pos @Y_UC_LEFT @A_LC_RIGHT -50;
-pos @O_UC_LEFT @A_LC_RIGHT -10;
+pos @Y_UC_LEFT @U_LC_RIGHT -40;
+pos @Y_UC_LEFT @I_LC_RIGHT -30;
+pos @Y_UC_LEFT @E_LC_RIGHT -20;
 
+pos @O_UC_LEFT @A_LC_RIGHT -55;
+pos @O_UC_LEFT @U_LC_RIGHT -45;
+pos @O_UC_LEFT @I_LC_RIGHT -35;
+pos @O_UC_LEFT @E_LC_RIGHT -25;
 
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ttFont sfntVersion="OTTO" ttLibVersion="2.3">
@@ -61,6 +71,7 @@ pos @O_UC_LEFT @A_LC_RIGHT -10;
         <!-- SubTableCount=1 -->
         <PairPos index="0" Format="2">
           <Coverage Format="1">
+            <Glyph value="O"/>
             <Glyph value="Y"/>
             <Glyph value="Oacute"/>
             <Glyph value="Ocircumflex"/>
@@ -72,7 +83,9 @@ pos @O_UC_LEFT @A_LC_RIGHT -10;
 
           <ValueFormat1 value="4"/>
           <ValueFormat2 value="0"/>
+
           <ClassDef1 Format="2">
+            <ClassDef glyph="O" class="1"/>
             <ClassDef glyph="Oacute" class="1"/>
             <ClassDef glyph="Ocircumflex" class="1"/>
             <ClassDef glyph="Odieresis" class="1"/>
@@ -89,9 +102,26 @@ pos @O_UC_LEFT @A_LC_RIGHT -10;
             <ClassDef glyph="agrave" class="1"/>
             <ClassDef glyph="aring" class="1"/>
             <ClassDef glyph="atilde" class="1"/>
+            <ClassDef glyph="dotlessi" class="3"/>
+            <ClassDef glyph="e" class="4"/>
+            <ClassDef glyph="eacute" class="4"/>
+            <ClassDef glyph="ecircumflex" class="4"/>
+            <ClassDef glyph="edieresis" class="4"/>
+            <ClassDef glyph="egrave" class="4"/>
+            <ClassDef glyph="i" class="3"/>
+            <ClassDef glyph="iacute" class="3"/>
+            <ClassDef glyph="icircumflex" class="3"/>
+            <ClassDef glyph="idieresis" class="3"/>
+            <ClassDef glyph="igrave" class="3"/>
+            <ClassDef glyph="u" class="2"/>
+            <ClassDef glyph="uacute" class="2"/>
+            <ClassDef glyph="ucircumflex" class="2"/>
+            <ClassDef glyph="udieresis" class="2"/>
+            <ClassDef glyph="ugrave" class="2"/>
           </ClassDef2>
           <!-- Class1Count=2 -->
-          <!-- Class2Count=2 -->
+          <!-- Class2Count=5 -->
+
           <Class1Record index="0">
             <Class2Record index="0">
               <Value1 XAdvance="0"/>
@@ -99,13 +129,32 @@ pos @O_UC_LEFT @A_LC_RIGHT -10;
             <Class2Record index="1">
               <Value1 XAdvance="-50"/>
             </Class2Record>
+            <Class2Record index="2">
+              <Value1 XAdvance="-40"/>
+            </Class2Record>
+            <Class2Record index="3">
+              <Value1 XAdvance="-30"/>
+            </Class2Record>
+            <Class2Record index="4">
+              <Value1 XAdvance="-20"/>
+            </Class2Record>
           </Class1Record>
+
           <Class1Record index="1">
             <Class2Record index="0">
               <Value1 XAdvance="0"/>
             </Class2Record>
             <Class2Record index="1">
-              <Value1 XAdvance="-10"/>
+              <Value1 XAdvance="-55"/>
+            </Class2Record>
+            <Class2Record index="2">
+              <Value1 XAdvance="-45"/>
+            </Class2Record>
+            <Class2Record index="3">
+              <Value1 XAdvance="-35"/>
+            </Class2Record>
+            <Class2Record index="4">
+              <Value1 XAdvance="-25"/>
             </Class2Record>
           </Class1Record>
         </PairPos>

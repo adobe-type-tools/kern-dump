@@ -119,25 +119,38 @@ def main(fontPath):
 					lg = myLeftGlyph(leftGlyph, kernPartner)
 					firstGlyphs[leftGlyph] = lg
 					
-
+# 				print firstGlyphs
+				
 # 					print pairPos.ClassDef1.classDefs[g]
 
 				for secondGlyph in pairPos.ClassDef2.classDefs:					
  					record = pairPos.ClassDef2.classDefs[secondGlyph]
-					kernValue = pairPos.Class1Record[record-1].Class2Record[record].Value1.XAdvance
+ 					print secondGlyph, record#, pairPos.Class1Record[record]
+
+#  					for i in pairPos.Class1Record:
+#  						print pairPos.Class1Record.index(i)
+#  						print i.Class2Record[record].Value1.XAdvance
+
+#					kernValue = pairPos.Class1Record[record].Class2Record[record].Value1.XAdvance
+					kernValue = pairPos.Class1Record[0].Class2Record[record].Value1.XAdvance
 					sg = myRightGlyph(secondGlyph, record, kernValue)
+
 					if record in secondGlyphs:
 						secondGlyphs[record].append( sg )
 					else:
 						secondGlyphs[record] = [ sg ]
 				
+# 				for i in secondGlyphs:
+# 					print [j.glyphName for j in secondGlyphs[i]]
+					
 				for i in firstGlyphs:
 					kp = firstGlyphs[i].kernPartner
-					if kp in secondGlyphs:
+					if kp in secondGlyphs.keys():
 						for j in secondGlyphs[kp]:
 #	 						print firstGlyphs[i].glyphName, j.glyphName, j.kernValue
 	 						glyphPairsList.append((firstGlyphs[i].glyphName, j.glyphName, j.kernValue))
-
+					else:
+						print kp, 'not found' 
 
 #					print i.glyphName
 #					firstGlyphs[i].kernPartner
