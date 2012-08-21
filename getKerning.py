@@ -18,6 +18,16 @@ class myRightGlyph:
 		self.kernValue = kernValue
 
 
+class myLeftClass:
+	def __init__(self):
+		self.glyphs = []
+		self.class1Record = 0
+
+class myRightClass:
+	def __init__(self):
+		self.glyphs = []
+		self.class2Record = 0
+
 
 def collectUniqueKernLookupListIndexes(featureRecord):
 	uniqueKernLookupListIndexesList = []
@@ -99,105 +109,75 @@ def main(fontPath):
 						
 						glyphPairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
 
+
+			############################################
+			############################################
+			############################################
+
 			elif pairPos.Format == 2: # class adjustment
 				firstGlyphs = {}
 				secondGlyphs = {}
-				secondGlyphList = []
-#				print firstGlyphsList
 
-				# Find left glyphs kerned to Class2Record index="1".
-				# This class is weirdly mixed and has no class="X" property, that is why we have to find them that way. 
+				leftClasses = {}
+				rightClasses = {}
+				
+				# Find left class with the Class1Record index="0".
+				# This class is weirdly mixed into the "Coverage" (e.g. all left glyphs) 
+				# and has no class="X" property, that is why we have to find them that way. 
+				
+				lg0 = myLeftClass()
 				for leftGlyph in firstGlyphsList:
-					if not leftGlyph in pairPos.ClassDef1.classDefs:
-						kernPartner = 1
-						firstGlyphs[leftGlyph] = kernPartner
-						lg = myLeftGlyph(leftGlyph, kernPartner)
-						firstGlyphs[leftGlyph] = lg
+						if not leftGlyph in pairPos.ClassDef1.classDefs:
+							lg0.glyphs.append(leftGlyph)
 
+				leftClasses[lg0.class1Record] = lg0		
+				
+				# Find all the remaining left classes:
+				
  				for leftGlyph in pairPos.ClassDef1.classDefs:
- 					kernPartner = pairPos.ClassDef1.classDefs[leftGlyph] + 1
-					lg = myLeftGlyph(leftGlyph, kernPartner)
-					firstGlyphs[leftGlyph] = lg
+ 					class1Record = pairPos.ClassDef1.classDefs[leftGlyph]
+ 					if class1Record in leftClasses:
+	 					leftClasses[class1Record].glyphs.append(leftGlyph)
+	 				else:
+	 					lg = myLeftClass()
+	 					lg.class1Record = class1Record
+	 					leftClasses[class1Record] = lg
+	 					leftClasses[class1Record].glyphs.append(leftGlyph)
+
+				# Same for the right classes:
+
+				for rightGlyph in pairPos.ClassDef2.classDefs:					
+ 					class2Record = pairPos.ClassDef2.classDefs[rightGlyph]
+ 					if class2Record in rightClasses:
+	 					rightClasses[class2Record].glyphs.append(rightGlyph)
+	 				else:
+	 					rg = myRightClass()
+	 					rg.class2Record = class2Record
+	 					rightClasses[class2Record] = rg
+	 					rightClasses[class2Record].glyphs.append(rightGlyph)
+ 					
+
 					
-# 				print firstGlyphs
-				
-# 					print pairPos.ClassDef1.classDefs[g]
+# 				for i in rightClasses:
+# 					print rightClasses[i].class2Record, sorted(rightClasses[i].glyphs)
 
-				for secondGlyph in pairPos.ClassDef2.classDefs:					
- 					record = pairPos.ClassDef2.classDefs[secondGlyph]
- 					print secondGlyph, record#, pairPos.Class1Record[record]
+				for record in leftClasses:
+					for j in rightClasses:
+#					record = i #
+						if pairPos.Class1Record[record].Class2Record[j]:
+							kernValue = pairPos.Class1Record[record].Class2Record[j].Value1.XAdvance
+							if kernValue != 0:
+								for l in leftClasses[record].glyphs:
+									for r in rightClasses[j].glyphs:
+	#									print l, r, kernValue
+										glyphPairsList.append((l, r, kernValue))
+							
+						else:
+							print 'ERROR'
 
-#  					for i in pairPos.Class1Record:
-#  						print pairPos.Class1Record.index(i)
-#  						print i.Class2Record[record].Value1.XAdvance
-
-#					kernValue = pairPos.Class1Record[record].Class2Record[record].Value1.XAdvance
-					kernValue = pairPos.Class1Record[0].Class2Record[record].Value1.XAdvance
-					sg = myRightGlyph(secondGlyph, record, kernValue)
-
-					if record in secondGlyphs:
-						secondGlyphs[record].append( sg )
-					else:
-						secondGlyphs[record] = [ sg ]
-				
-# 				for i in secondGlyphs:
-# 					print [j.glyphName for j in secondGlyphs[i]]
-					
-				for i in firstGlyphs:
-					kp = firstGlyphs[i].kernPartner
-					if kp in secondGlyphs.keys():
-						for j in secondGlyphs[kp]:
-#	 						print firstGlyphs[i].glyphName, j.glyphName, j.kernValue
-	 						glyphPairsList.append((firstGlyphs[i].glyphName, j.glyphName, j.kernValue))
-					else:
-						print kp, 'not found' 
-
-#					print i.glyphName
-#					firstGlyphs[i].kernPartner
-# 					print g
-#					secondGlyphList.append(sg)
-# 					if record in secondGlyphs:
-# 						secondGlyphs[record].append(secondGlyph)
-# 					else:
-# 						secondGlyphs[record] = [secondGlyph]
-# 					record = pairPos.ClassDef2.classDefs[secondGlyph]
-# 					print secondGlyph, record
-#					kernValue = pairPos.Class1Record[record-1].Class2Record[record].Value1.XAdvance
-#					print secondGlyph, kernValue
-
-# 				for i in secondGlyphList:
-# 					print i.glyphName, i.kernValue
-				
-				
-#  				for g in pairPos.ClassDef1.classDefs:
-#  					for secondGlyph in pairPos.ClassDef2.classDefs:
-#  						record = pairPos.ClassDef2.classDefs[secondGlyph]
-#  						print g, secondGlyph, record
-
-#						print record
-# 						for i in pairPos.Class1Record:
-# 							print leftGlyph, secondGlyph, 
-# 							 Class2Record[record].Value1.XAdvance
-#						kernValue = pairPos.Class1Record[record-1].Class2Record[record].Value1.XAdvance
-#						kernValue = pairPos.Class1Record[0].Class2Record[record].Value1.XAdvance
-					
-
-#						glyphPairsList.append((leftGlyph, secondGlyph, kernValue))
-					
-					
-#					kernValue = 
-# 				print pairPos.Class1Record[0].Class2Record[1].Value1.XAdvance
-
-# 				print pairPos.ClassDef2.classDefs.items()
-# 				for i in pairPos.Class1Record:
-# 					print i.Class2Record[1].Value1.XAdvance
-#  				print pairPos.Class1Record
-# 				print pairPos.Class2Count
-#  				print pairPos.ValueFormat2
-				
-				
 	print '-' * 80
-	print len(glyphPairsList), glyphPairsList
+	print len(glyphPairsList), sorted(glyphPairsList)
+	print len(glyphPairsList)
 
 
 

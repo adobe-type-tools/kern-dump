@@ -1,6 +1,7 @@
-# 2 vs 4
+# 2 vs 4; one empty
 @Y_UC_LEFT = [ Y Yacute ];
 @O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
+@N_UC_LEFT = [ N Ntilde ];
 
 @A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
 @U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ];
