@@ -1,22 +1,10 @@
 import os, sys
 import inspect
+import string
 from fontTools import ttLib
 
 kKernFeatureTag = 'kern'
 li = []
-
-class myLeftGlyph:
-	def __init__(self, glyphName, kernPartner):
-		self.glyphName = glyphName
-		self.kernPartner = kernPartner
-
-
-class myRightGlyph:
-	def __init__(self, glyphName, kernRecord, kernValue):
-		self.glyphName = glyphName
-		self.kernRecord = kernRecord
-		self.kernValue = kernValue
-
 
 class myLeftClass:
 	def __init__(self):
@@ -27,6 +15,25 @@ class myRightClass:
 	def __init__(self):
 		self.glyphs = []
 		self.class2Record = 0
+
+def nameClass(glyphlist, flag):
+	glyphs = sorted(glyphlist)
+
+	if glyphs[0].startswith('dotless'):
+		glyphs.insert(len(glyphs), glyphs.pop(0))
+
+	name = glyphs[0]
+
+	if name in string.ascii_lowercase:
+		case = '_LC'
+	elif name in string.ascii_uppercase:
+		case = '_UC'
+	else:
+		case = ''
+
+	flag = flag
+	
+	return '@%s%s%s' % (name, flag, case)
 
 
 def collectUniqueKernLookupListIndexes(featureRecord):
@@ -49,8 +56,9 @@ def main(fontPath):
 	gposTable = font['GPOS'].table
 	
 	glyphPairsList = []
+	singlePairsList = []
+	classPairsList	= []
 	glyphPairsDict = {}
-	
 ### ScriptList ###
 # 	scriptList = gposTable.ScriptList
 
@@ -108,8 +116,8 @@ def main(fontPath):
 						secondGlyph = pairValueRecordItem.SecondGlyph
 						kernValue = pairValueRecordItem.Value1.XAdvance
 						
-#						glyphPairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
-						glyphPairsDict[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
+						singlePairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
+#						glyphPairsDict[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
 
 
 			############################################
@@ -169,32 +177,94 @@ def main(fontPath):
 						if pairPos.Class1Record[record].Class2Record[j]:
 							kernValue = pairPos.Class1Record[record].Class2Record[j].Value1.XAdvance
 							if kernValue != 0:
-								for l in leftClasses[record].glyphs:
-									for r in rightClasses[j].glyphs:
+
+								leftGlyphs = sorted(leftClasses[record].glyphs)
+								if leftGlyphs[0].startswith('dotless'):
+									leftGlyphs.insert(len(leftGlyphs), leftGlyphs.pop(0))
+
+								rightGlyphs = sorted(rightClasses[j].glyphs)
+								if rightGlyphs[0].startswith('dotless'):
+									rightGlyphs.insert(len(rightGlyphs), rightGlyphs.pop(0))
+
+								keyLeft = leftGlyphs[0]
+								keyRight = rightGlyphs[0]
+								leftClass = nameClass(leftGlyphs, '_LEFT')
+								rightClass = nameClass(rightGlyphs, '_RIGHT')
+# 								for l in leftClasses[record].glyphs:
+# 									for r in rightClasses[j].glyphs:
 	#									print l, r, kernValue
 #										glyphPairsList.append((l, r, kernValue))
-										if (l, r) in glyphPairsDict:
-											continue
-										else:
-											glyphPairsDict[(l, r)] = kernValue
+# 										if (l, r) in glyphPairsDict:
+# 											continue
+
+								classPairsList.append((leftClass, rightClass, kernValue))
 							
 						else:
 							print 'ERROR'
+
+	
+	
+	print '-' * 80
+	for i in leftClasses:
+ 		glyphs = sorted(leftClasses[i].glyphs)
+		className = nameClass(glyphs, '_LEFT')
+ 		
+ 		print '%s = [ %s ];' % (className, ' '.join(glyphs))
+
+	for i in rightClasses:
+		glyphs = sorted(rightClasses[i].glyphs)
+		className = nameClass(glyphs, '_RIGHT')
+ 		
+ 		print '%s = [ %s ];' % (className, ' '.join(glyphs))
+# 
+# 		if glyphs[0].startswith('dotless'):
+# 			glyphs.insert(len(glyphs), glyphs.pop(0))
+# 
+# 		name = glyphs[0]
+# 		flag = '_RIGHT'
+# 		
+# 		if name in string.ascii_lowercase:
+# 			case = '_LC'
+# 		elif name in string.ascii_uppercase:
+# 			case = '_UC'
+# 		else:
+# 			case = ''
+# 		
+# 		print '@%s%s%s = [ %s ];' % (name, flag, case, ' '.join(glyphs))
+	
+	print
+	print 
+	
+	for left, right, value in singlePairsList:
+		print 'pos %s %s %s;' % (left, right, value)
+
+	print
+	print 
+
+	for left, right, value in classPairsList:
+		print 'pos %s %s %s;' % (left, right, value)
+
 
 # 	print '-' * 80
 # 	for i in sorted(glyphPairsDict.keys()):
 # 		print i[0], i[1], glyphPairsDict[i]
 # 	print
 # 	print len(glyphPairsDict)
+
+
+
+
+
+
 	
-	for pair, value in glyphPairsDict.items():
-	 	li.append('/%s /%s %s' % ( pair[0], pair[1], value ))
-			
-	li.sort()
-	output = '\n'.join(li)
-	scrap = os.popen('pbcopy', 'w')
-	scrap.write(output)
-	scrap.close()
+# 	for pair, value in glyphPairsDict.items():
+# 	 	li.append('/%s /%s %s' % ( pair[0], pair[1], value ))
+# 			
+# 	li.sort()
+# 	output = '\n'.join(li)
+# 	scrap = os.popen('pbcopy', 'w')
+# 	scrap.write(output)
+# 	scrap.close()
 	print 'done'
 
 

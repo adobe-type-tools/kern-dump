@@ -1,0 +1,60 @@
+@set0 = [a b c d e f g h i j k l m n o p q r s t u v w x y z];
+@set1 = [a.one b.one c.one d.one e.one f.one g.one h.one i.one j.one k.one l.one m.one n.one o.one p.one q.one r.one s.one t.one u.one v.one w.one x.one y.one z.one];
+@set2 = [a.two b.two c.two d.two e.two f.two g.two h.two i.two j.two k.two l.two m.two n.two o.two p.two q.two r.two s.two t.two u.two v.two w.two x.two y.two z.two];
+@set3 = [a.three b.three c.three d.three e.three f.three g.three h.three i.three j.three k.three l.three m.three n.three o.three p.three q.three r.three s.three t.three u.three v.three w.three x.three y.three z.three];
+@set4 = [a.four b.four c.four d.four e.four f.four g.four h.four i.four j.four k.four l.four m.four n.four o.four p.four q.four r.four s.four t.four u.four v.four w.four x.four y.four z.four];
+@set5 = [a.five b.five c.five d.five e.five f.five g.five h.five i.five j.five k.five l.five m.five n.five o.five p.five q.five r.five s.five t.five u.five v.five w.five x.five y.five z.five];
+@set6 = [a.six b.six c.six d.six e.six f.six g.six h.six i.six j.six k.six l.six m.six n.six o.six p.six q.six r.six s.six t.six u.six v.six w.six x.six y.six z.six];
+@set7 = [a.seven b.seven c.seven d.seven e.seven f.seven g.seven h.seven i.seven j.seven k.seven l.seven m.seven n.seven o.seven p.seven q.seven r.seven s.seven t.seven u.seven v.seven w.seven x.seven y.seven z.seven];
+@set8 = [a.eight b.eight c.eight d.eight e.eight f.eight g.eight h.eight i.eight j.eight k.eight l.eight m.eight n.eight o.eight p.eight q.eight r.eight s.eight t.eight u.eight v.eight w.eight x.eight y.eight z.eight];
+@set9 = [a.nine b.nine c.nine d.nine e.nine f.nine g.nine h.nine i.nine j.nine k.nine l.nine m.nine n.nine o.nine p.nine q.nine r.nine s.nine t.nine u.nine v.nine w.nine x.nine y.nine z.nine];
+
+#http://typophile.com/node/19625 - Opentype Random Contextual Alternates
+#http://typophile.com/node/43634 - Randomized Comic Lettering Font
+
+#alpha = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+#num = ["one","two","three","four","five","six","seven","eight","nine"]
+
+#for x in alpha:
+#	for y in num:
+#		print "%s+%s=%s.%s," % (x,y,x,y)
+
+#i=1
+#for x in num:
+#	temp = []
+#	for y in alpha:
+#		str = "%s.%s" % (y,x)
+#		temp.append(str)
+#	otclass = " ".join(temp)
+#	print "@set%d = [%s];" % (i,otclass)
+#	i = i+1
+
+
+
+
+
+
+
+feature calt {
+
+#	lookup rotate {
+		sub @set0 @set0' by @set1; # 00 > 01
+		sub @set1 @set0' by @set2; # 10 > 12
+		sub @set2 @set0' by @set3; # 20 > 23
+		sub @set3 @set0' by @set4; # 30 > 34
+		sub @set4 @set0' by @set5; # 40 > 45
+		
+		sub @set0 space @set0' by @set1;
+		sub @set1 space @set0' by @set2;
+		sub @set2 space @set0' by @set3;
+		sub @set3 space @set0' by @set4;
+		sub @set4 space @set0' by @set5;
+
+} calt;
+
+
+
+
+
+
+

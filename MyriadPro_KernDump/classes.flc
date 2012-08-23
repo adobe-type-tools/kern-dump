@@ -1,0 +1,47 @@
+%%FONTLAB CLASSES
+
+%%CLASS _A_LEFT
+%%GLYPHS  A' Aacute Acircumflex Adieresis Agrave Aring Atilde
+%%KERNING L 0
+%%END
+
+%%CLASS _N_LEFT
+%%GLYPHS  N' Ntilde
+%%KERNING L 0
+%%END
+
+%%CLASS _O_LEFT
+%%GLYPHS  O' Oacute Ocircumflex Odieresis Ograve Otilde
+%%KERNING L 0
+%%END
+
+%%CLASS _Y_LEFT
+%%GLYPHS  Y' Yacute Ydieresis
+%%KERNING L 0
+%%END
+
+%%CLASS _A_RIGHT
+%%GLYPHS  A' Aacute Acircumflex Adieresis Agrave Aring Atilde
+%%KERNING R 0
+%%END
+
+%%CLASS _a_RIGHT
+%%GLYPHS  a' aacute acircumflex adieresis ae agrave aring atilde
+%%KERNING R 0
+%%END
+
+%%CLASS _e_RIGHT
+%%GLYPHS  e' eacute ecircumflex edieresis egrave
+%%KERNING R 0
+%%END
+
+%%CLASS _i_RIGHT
+%%GLYPHS  i' dotlessi iacute icircumflex idieresis igrave
+%%KERNING R 0
+%%END
+
+%%CLASS _u_RIGHT
+%%GLYPHS  u' uacute ucircumflex udieresis ugrave
+%%KERNING R 0
+%%END
+
