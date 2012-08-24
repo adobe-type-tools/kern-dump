@@ -5,6 +5,10 @@ table head {
 include (features.family);
 
 feature kern {
+#	lookup KERN useExtension {
+#		include (features.kern)
+#	} KERN;
+
 	include (features.kern);
 } kern;
 

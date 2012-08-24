@@ -84,10 +84,10 @@ def main(fontPath):
 			elif subtableItem.LookupType == 9: # extension table
 				pairPos = subtableItem.ExtSubTable
 			
-# 				if pairPos.Format not in [1]:
-# 					print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
+# 			if pairPos.Format not in [1]:
+# 				print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
 			
-			if pairPos.Coverage.Format not in [1, 2]:
+			if pairPos.Coverage.Format not in [1,2]:
 				print "WARNING: Coverage format %d is not yet supported" % pairPos.Coverage.Format
 			
 			if pairPos.ValueFormat1 not in [4]:
@@ -99,6 +99,7 @@ def main(fontPath):
 			# each glyph in this list will have a corresponding PairSet which will
 			# contain all the second glyphs and the kerning value in the form of PairValueRecord(s)
 			firstGlyphsList = pairPos.Coverage.glyphs
+#			print firstGlyphsList
 			
 			if pairPos.Format == 1: # glyph pair adjustment; format 2 is class pair adjustment
 			
@@ -190,7 +191,7 @@ def main(fontPath):
 # 	print len(glyphPairsDict)
 	
 	for pair, value in glyphPairsDict.items():
-	 	li.append('/%s /%s %s' % ( pair[0], pair[1], value ))
+	 	li.append('KPX %s %s %s' % ( pair[0], pair[1], value ))
 			
 	li.sort()
 	output = '\n'.join(li)

@@ -5,7 +5,6 @@ from fontTools import ttLib
 
 kKernFeatureTag = 'kern'
 li = []
-
 class myLeftClass:
 	def __init__(self):
 		self.glyphs = []
@@ -16,12 +15,22 @@ class myRightClass:
 		self.glyphs = []
 		self.class2Record = 0
 
-def nameClass(glyphlist, flag):
+def sortGlyphs(glyphlist):
+	# This function is sorting the glyphs in a way that glyphs in the exception list; or glyphs with 'uni' names don't get to be key glyphs.
+	# Also, an infinite loop is avoided, in case there are only glyphs matching above mentioned properties.
+	exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
+
 	glyphs = sorted(glyphlist)
+	for i in range(len(glyphs)):
+		if glyphs[0] in exceptionList or glyphs[0].startswith('uni'):
+			glyphs.insert(len(glyphs), glyphs.pop(0))
+		else:
+			pass
 
-	if glyphs[0].startswith('dotless'):
-		glyphs.insert(len(glyphs), glyphs.pop(0))
+	return glyphs
 
+def nameClass(glyphlist, flag):
+	glyphs = sortGlyphs(glyphlist)	
 	name = glyphs[0]
 
 	if name in string.ascii_lowercase:
@@ -178,18 +187,23 @@ def main(fontPath):
 							kernValue = pairPos.Class1Record[record].Class2Record[j].Value1.XAdvance
 							if kernValue != 0:
 
-								leftGlyphs = sorted(leftClasses[record].glyphs)
-								if leftGlyphs[0].startswith('dotless'):
-									leftGlyphs.insert(len(leftGlyphs), leftGlyphs.pop(0))
+# 								leftGlyphs = sorted(leftClasses[record].glyphs)
+# 								if leftGlyphs[0] in exceptionList or leftGlyphs[0].startswith('uni'):
+# 									leftGlyphs.insert(len(leftGlyphs)+1, leftGlyphs.pop(0))
+								leftGlyphs = sortGlyphs(leftClasses[record].glyphs)
 
-								rightGlyphs = sorted(rightClasses[j].glyphs)
-								if rightGlyphs[0].startswith('dotless'):
-									rightGlyphs.insert(len(rightGlyphs), rightGlyphs.pop(0))
+# 								rightGlyphs = sorted(rightClasses[j].glyphs)
+# 								if rightGlyphs[0] in exceptionList or rightGlyphs[0].startswith('uni'):
+# 									rightGlyphs.insert(len(rightGlyphs), rightGlyphs.pop(0))
+								rightGlyphs = sortGlyphs(rightClasses[j].glyphs)
 
-								keyLeft = leftGlyphs[0]
-								keyRight = rightGlyphs[0]
 								leftClass = nameClass(leftGlyphs, '_LEFT')
 								rightClass = nameClass(rightGlyphs, '_RIGHT')
+								
+# 								keyLeft = leftGlyphs[0]
+# 								keyRight = rightGlyphs[0]
+
+
 # 								for l in leftClasses[record].glyphs:
 # 									for r in rightClasses[j].glyphs:
 	#									print l, r, kernValue
@@ -204,7 +218,6 @@ def main(fontPath):
 
 	
 	
-	print '-' * 80
 	for i in leftClasses:
  		glyphs = sorted(leftClasses[i].glyphs)
 		className = nameClass(glyphs, '_LEFT')
@@ -216,21 +229,6 @@ def main(fontPath):
 		className = nameClass(glyphs, '_RIGHT')
  		
  		print '%s = [ %s ];' % (className, ' '.join(glyphs))
-# 
-# 		if glyphs[0].startswith('dotless'):
-# 			glyphs.insert(len(glyphs), glyphs.pop(0))
-# 
-# 		name = glyphs[0]
-# 		flag = '_RIGHT'
-# 		
-# 		if name in string.ascii_lowercase:
-# 			case = '_LC'
-# 		elif name in string.ascii_uppercase:
-# 			case = '_UC'
-# 		else:
-# 			case = ''
-# 		
-# 		print '@%s%s%s = [ %s ];' % (name, flag, case, ' '.join(glyphs))
 	
 	print
 	print 
@@ -245,17 +243,6 @@ def main(fontPath):
 		print 'pos %s %s %s;' % (left, right, value)
 
 
-# 	print '-' * 80
-# 	for i in sorted(glyphPairsDict.keys()):
-# 		print i[0], i[1], glyphPairsDict[i]
-# 	print
-# 	print len(glyphPairsDict)
-
-
-
-
-
-
 	
 # 	for pair, value in glyphPairsDict.items():
 # 	 	li.append('/%s /%s %s' % ( pair[0], pair[1], value ))
@@ -265,7 +252,8 @@ def main(fontPath):
 # 	scrap = os.popen('pbcopy', 'w')
 # 	scrap.write(output)
 # 	scrap.close()
-	print 'done'
+
+#	print 'done'
 
 
 # 	membersList = inspect.getmembers(pairPos.ClassDef1.classDefs)

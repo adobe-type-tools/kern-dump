@@ -1,0 +1,40 @@
+@A_UC_LEFT = [ A Agrave Aacute Acircumflex Atilde Adieresis Aring ];
+@N_UC_LEFT = [ N Ntilde ];
+@O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
+@Y_UC_LEFT = [ Y Yacute Ydieresis ];
+
+@A_UC_RIGHT = [ A Agrave Aacute Acircumflex Atilde Adieresis Aring ];
+@A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
+@U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ];
+@I_LC_RIGHT = [ i iacute igrave icircumflex idieresis dotlessi ];
+@E_LC_RIGHT = [ e egrave eacute ecircumflex edieresis ];
+
+pos T aacute 777;
+pos Yacute aacute 666;
+
+pos V C -40;
+pos L T -30;
+
+enum pos [T] @A_LC_RIGHT 600;
+enum pos [T] @U_LC_RIGHT 700;
+enum pos [Ydieresis] @A_LC_RIGHT 600;
+
+enum pos @Y_UC_LEFT [o] 800;
+enum pos @O_UC_LEFT [o] 900;
+
+pos @O_UC_LEFT @A_LC_RIGHT -55;
+pos @O_UC_LEFT @E_LC_RIGHT -25;
+pos @O_UC_LEFT @I_LC_RIGHT -35;
+pos @O_UC_LEFT @U_LC_RIGHT -45;
+
+pos @Y_UC_LEFT @A_UC_RIGHT -60;
+pos @Y_UC_LEFT @A_LC_RIGHT -50;
+pos @Y_UC_LEFT @E_LC_RIGHT -20;
+pos @Y_UC_LEFT @I_LC_RIGHT -30;
+pos @Y_UC_LEFT @U_LC_RIGHT -40;
+
+
+
+
+
+

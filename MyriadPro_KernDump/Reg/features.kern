@@ -1,40 +1,54 @@
-@A_UC_LEFT = [ A Agrave Aacute Acircumflex Atilde Adieresis Aring ];
-@N_UC_LEFT = [ N Ntilde ];
-@O_UC_LEFT = [ O Ograve Oacute Ocircumflex Otilde Odieresis ];
-@Y_UC_LEFT = [ Y Yacute Ydieresis ];
+@O_LEFT_UC = [ O Oacute Ocircumflex Odieresis Ograve Otilde ];
+@Y_LEFT_UC = [ Y Yacute Ydieresis ];
+@a_RIGHT_LC = [ a aacute acircumflex adieresis ae agrave aring atilde ];
+@e_RIGHT_LC = [ e eacute ecircumflex edieresis egrave ];
+@i_RIGHT_LC = [ dotlessi i iacute icircumflex idieresis igrave ];
+@u_RIGHT_LC = [ u uacute ucircumflex udieresis ugrave ];
+@A_RIGHT_UC = [ A Aacute Acircumflex Adieresis Agrave Aring Atilde ];
 
-@A_UC_RIGHT = [ A Agrave Aacute Acircumflex Atilde Adieresis Aring ];
-@A_LC_RIGHT = [ a agrave aacute acircumflex atilde adieresis aring ae ];
-@U_LC_RIGHT = [ u ugrave uacute ucircumflex udieresis ];
-@I_LC_RIGHT = [ i iacute igrave icircumflex idieresis dotlessi ];
-@E_LC_RIGHT = [ e egrave eacute ecircumflex edieresis ];
 
-pos T aacute 777;
-pos Yacute aacute 666;
-
-pos V C -40;
 pos L T -30;
+pos O o 900;
+pos T a 600;
+pos T u 700;
+pos T ae 600;
+pos T aacute 600;
+pos T acircumflex 600;
+pos T adieresis 600;
+pos T agrave 600;
+pos T aring 600;
+pos T atilde 600;
+pos T uacute 700;
+pos T ucircumflex 700;
+pos T udieresis 700;
+pos T ugrave 700;
+pos V C -40;
+pos Y o 800;
+pos Oacute o 900;
+pos Ocircumflex o 900;
+pos Odieresis o 900;
+pos Ograve o 900;
+pos Otilde o 900;
+pos Yacute o 800;
+pos Yacute aacute 666;
+pos Ydieresis a 600;
+pos Ydieresis o 800;
+pos Ydieresis ae 600;
+pos Ydieresis aacute 600;
+pos Ydieresis acircumflex 600;
+pos Ydieresis adieresis 600;
+pos Ydieresis agrave 600;
+pos Ydieresis aring 600;
+pos Ydieresis atilde 600;
 
-enum pos [T] @A_LC_RIGHT 600;
-enum pos [T] @U_LC_RIGHT 700;
-enum pos [Ydieresis] @A_LC_RIGHT 600;
-
-enum pos @Y_UC_LEFT [o] 800;
-enum pos @O_UC_LEFT [o] 900;
-
-pos @O_UC_LEFT @A_LC_RIGHT -55;
-pos @O_UC_LEFT @E_LC_RIGHT -25;
-pos @O_UC_LEFT @I_LC_RIGHT -35;
-pos @O_UC_LEFT @U_LC_RIGHT -45;
-
-pos @Y_UC_LEFT @A_UC_RIGHT -60;
-pos @Y_UC_LEFT @A_LC_RIGHT -50;
-pos @Y_UC_LEFT @E_LC_RIGHT -20;
-pos @Y_UC_LEFT @I_LC_RIGHT -30;
-pos @Y_UC_LEFT @U_LC_RIGHT -40;
 
 
-
-
-
-
+pos @O_LEFT_UC @a_RIGHT_LC -55;
+pos @O_LEFT_UC @e_RIGHT_LC -25;
+pos @O_LEFT_UC @i_RIGHT_LC -35;
+pos @O_LEFT_UC @u_RIGHT_LC -45;
+pos @Y_LEFT_UC @a_RIGHT_LC -50;
+pos @Y_LEFT_UC @e_RIGHT_LC -20;
+pos @Y_LEFT_UC @i_RIGHT_LC -30;
+pos @Y_LEFT_UC @u_RIGHT_LC -40;
+pos @Y_LEFT_UC @A_RIGHT_UC -60;
