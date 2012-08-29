@@ -36,13 +36,16 @@ def sortGlyphs(glyphlist):
 		if glyphs[0] in exceptionList or glyphs[0].startswith('uni'):
 			glyphs.insert(len(glyphs), glyphs.pop(0))
 		else:
-			pass
+			continue
 
 	return glyphs
 
 def nameClass(glyphlist, flag):
 	glyphs = sortGlyphs(glyphlist)	
-	name = glyphs[0]
+	if len(glyphs) == 0:
+		name = 'error!!!'
+	else:
+		name = glyphs[0]
 
 	if name in string.ascii_lowercase:
 		case = '_LC'
@@ -78,13 +81,16 @@ def main(fontPath):
 	glyphPairsList = []
 	singlePairsList = []
 	classPairsList	= []
+	# leftClasses = {}
+	# rightClasses = {}
+	allClasses = {}
 
 ### ScriptList ###
 # 	scriptList = gposTable.ScriptList
 
 ### FeatureList ###
 	featureList = gposTable.FeatureList
-# 	featureCount = featureList.FeatureCount # integer
+	# featureCount = featureList.FeatureCount # integer
 	featureRecord = featureList.FeatureRecord
 	
 	uniqueKernLookupListIndexesList = collectUniqueKernLookupListIndexes(featureRecord)
@@ -96,24 +102,37 @@ def main(fontPath):
 
 ### LookupList ###
 	lookupList = gposTable.LookupList
-	
-	for kernLookupIndex in uniqueKernLookupListIndexesList:
+	for kernLookupIndex in sorted(uniqueKernLookupListIndexesList):
 		lookup = lookupList.Lookup[kernLookupIndex]
-		
 		# Confirm this is a GPOS LookupType 2; or using an extension table (GPOS LookupType 9):
 		if lookup.LookupType not in [2, 9]:
-			print "This is not a pair adjustment positioning lookup (GPOS LookupType 2); or not using an extension table (GPOS LookupType 9)."
-			return
+			print "This is not a pair adjustment positioning lookup (GPOS LookupType 2); and not using an extension table (GPOS LookupType 9).\nInstead, it is GPOS LookupType %s!" % lookup.LookupType
+			continue
 		
 		# Step through each subtable
 		for subtableItem in lookup.SubTable:
 			if subtableItem.LookupType == 2: # normal case, not using extension table
 				pairPos = subtableItem
 			elif subtableItem.LookupType == 9: # If extension table is used
-				pairPos = subtableItem.ExtSubTable
+				if subtableItem.ExtensionLookupType == 8:
+					continue
+					# ExtensionPos == subtable!
+					
+					# those work!
+					# print subtableItem.ExtSubTable
+					# print subtableItem.ExtSubTable.convertersByName[1]['Coverage'].name
+					# print dir(subtableItem.ExtSubTable.getConverterByName)
+					# print subtableItem.ExtSubTable.getConverterByName
+					# membersList = inspect.getmembers(subtableItem.ExtSubTable.getConverterByName)
+					# for x in membersList:
+					# 	print x
+					# print
+				elif subtableItem.ExtensionLookupType == 2:
+					pairPos = subtableItem.ExtSubTable
+					
 
-# 			if pairPos.Format not in [1]:
-# 				print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
+			# if pairPos.Format not in [1]:
+			# 	print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
 			
 			if pairPos.Coverage.Format not in [1,2]:
 				print "WARNING: Coverage format %d is not yet supported" % pairPos.Coverage.Format
@@ -127,16 +146,18 @@ def main(fontPath):
 			# each glyph in this list will have a corresponding PairSet which will
 			# contain all the second glyphs and the kerning value in the form of PairValueRecord(s)
 			firstGlyphsList = pairPos.Coverage.glyphs
-			
+
 			if pairPos.Format == 1: # glyph pair adjustment; format 2 is class pair adjustment
 			
 				# This iteration is done by index so that we have a way to reference the firstGlyphsList list
 				for pairSetIndex in range(len(pairPos.PairSet)):
 					for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
+						firstGlyph = firstGlyphsList[pairSetIndex]
 						secondGlyph = pairValueRecordItem.SecondGlyph
 						kernValue = pairValueRecordItem.Value1.XAdvance
 						
-						singlePairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
+						# singlePairsList.append(('%s %s' %( kernLookupIndex, firstGlyph), secondGlyph, kernValue))
+						singlePairsList.append((firstGlyph, secondGlyph, kernValue))
 
 
 			############################################
@@ -153,14 +174,15 @@ def main(fontPath):
 				# Find left class with the Class1Record index="0".
 				# This class is weirdly mixed into the "Coverage" (e.g. all left glyphs) 
 				# and has no class="X" property, that is why we have to find them that way. 
-				
 				lg0 = myLeftClass()
 				for leftGlyph in firstGlyphsList:
-						if not leftGlyph in pairPos.ClassDef1.classDefs:
-							lg0.glyphs.append(leftGlyph)
+					if not leftGlyph in pairPos.ClassDef1.classDefs:
+						lg0.glyphs.append(leftGlyph)
+				# This mixing into the Coverage is true for makeOTF-built fonts. 
+				# There are fonts which have all the glyphs properly assgned; therefore this if-statement:
+				if not len(lg0.glyphs) == 0:
+					leftClasses[lg0.class1Record] = lg0		
 
-				leftClasses[lg0.class1Record] = lg0		
-				
 				# Find all the remaining left classes:
  				for leftGlyph in pairPos.ClassDef1.classDefs:
  					class1Record = pairPos.ClassDef1.classDefs[leftGlyph]
@@ -182,8 +204,7 @@ def main(fontPath):
 	 					rg.class2Record = class2Record
 	 					rightClasses[class2Record] = rg
 	 					rightClasses[class2Record].glyphs.append(rightGlyph)
- 					
-
+ 				
 				for record_l in leftClasses:
 					for record_r in rightClasses:
 						if pairPos.Class1Record[record_l].Class2Record[record_r]:
@@ -197,10 +218,27 @@ def main(fontPath):
 								leftClass = nameClass(leftGlyphs, '_LEFT')
 								rightClass = nameClass(rightGlyphs, '_RIGHT')
 								
-								classPairsList.append((leftClass, rightClass, kernValue))
+								if (leftClass, rightClass, kernValue) in classPairsList:
+									pass
+								else:
+									# classPairsList.append(('%s %s' % (kernLookupIndex, leftClass), rightClass, kernValue))
+									classPairsList.append((leftClass, rightClass, kernValue))
 							
 						else:
 							print 'ERROR'
+			
+				for i in leftClasses:
+			 		glyphs = sortGlyphs(leftClasses[i].glyphs)
+					className = nameClass(glyphs, '_LEFT')
+					if not className in allClasses:
+						allClasses[className] = glyphs
+				
+				for i in rightClasses:
+					glyphs = sortGlyphs(rightClasses[i].glyphs)
+					className = nameClass(glyphs, '_RIGHT')
+					if not className in allClasses:
+						allClasses[className] = glyphs
+				
 
 	
 	leftGlyphsDict = {}
@@ -212,6 +250,7 @@ def main(fontPath):
 	class_glyph = []
 	glyph_class = []
 	glyph_glyph = []
+
 	# this is not really class to class; as it will be exploded into single pairs.
 	class_class = []
 
@@ -235,6 +274,7 @@ def main(fontPath):
 	for left in leftGlyphsDict:
 		for value in leftGlyphsDict[left]:
 			right = leftGlyphsDict[left][value]
+			right = sortGlyphs(right)
 			compressedLeft.append((left, right, value))
 				
 	# same happens for the right side; including classes that have been compressed before.
@@ -253,11 +293,12 @@ def main(fontPath):
 	for right in rightGlyphsDict:
 		for value in rightGlyphsDict[right]:
  			left = rightGlyphsDict[right][value]
+			left = sortGlyphs(left)
 			compressedBoth.append((left, right.split(), value))
 
+	
+	# Splitting the compressed single-pair kerning into four different lists; organized by type:
  	for left, right, value in compressedBoth:
-		# Splitting the compressed single-pair kerning into four different lists; organized by type:
-		
  		if len(left) != 1 and len(right) != 1:
 			class_class.append('enum pos [ %s ] [ %s ] %s;' % (' '.join(left), ' '.join(right), value))
 		elif len(left) != 1 and len(right) == 1:
@@ -278,20 +319,18 @@ def main(fontPath):
 	##########################################
 	# (this needs to be heavily reorganized) #
 	##########################################
+
+	print '# kern feature dumped from %s' % os.path.basename(fontPath)
+	print '#', '-'*100
+	print
+	for i in allClasses:
+ 		glyphs = allClasses[i]
+		className = i
+	 		
+ 		print '%s = [ %s ];' % (className, ' '.join(glyphs))
 	
-	for i in leftClasses:
- 		glyphs = sorted(leftClasses[i].glyphs)
-		className = nameClass(glyphs, '_LEFT')
- 		
- 		print '%s = [ %s ];' % (className, ' '.join(glyphs))
-
-	for i in rightClasses:
-		glyphs = sorted(rightClasses[i].glyphs)
-		className = nameClass(glyphs, '_RIGHT')
- 		
- 		print '%s = [ %s ];' % (className, ' '.join(glyphs))
-
-
+	
+	
 	print
 	print
 	print '# glyph to glyph'		
@@ -316,10 +355,14 @@ def main(fontPath):
 		print i
 
 
-#	This was the old output for when we only had one single pairs list (without compression).
-# 	for left, right, value in singlePairsList:
-# 		print 'pos %s %s %s;' % (left, right, value)
+	# This was the old output for when we only had one single pairs list (without compression).
 
+	# print
+	# print '# glyph to glyph'		
+	# print '#', '-'*100
+	# for left, right, value in singlePairsList:
+	# 	print 'pos %s %s %s;' % (left, right, value)
+	
 	print	
 	print '# class to class'		
 	print '#', '-'*100

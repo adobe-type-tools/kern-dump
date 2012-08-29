@@ -5,18 +5,6 @@ from fontTools import ttLib
 kKernFeatureTag = 'kern'
 li = []
 
-class myLeftGlyph:
-	def __init__(self, glyphName, kernPartner):
-		self.glyphName = glyphName
-		self.kernPartner = kernPartner
-
-
-class myRightGlyph:
-	def __init__(self, glyphName, kernRecord, kernValue):
-		self.glyphName = glyphName
-		self.kernRecord = kernRecord
-		self.kernValue = kernValue
-
 
 class myLeftClass:
 	def __init__(self):
@@ -68,21 +56,24 @@ def main(fontPath):
 
 ### LookupList ###
 	lookupList = gposTable.LookupList
-	
-	for kernLookupIndex in uniqueKernLookupListIndexesList:
+	for kernLookupIndex in sorted(uniqueKernLookupListIndexesList):
 		lookup = lookupList.Lookup[kernLookupIndex]
 		
 		# Confirm this is a GPOS LookupType 2; or using an extension table (GPOS LookupType 9):
 		if lookup.LookupType not in [2, 9]:
 			print "This is not a pair adjustment positioning lookup (GPOS LookupType 2); or using an extension table (GPOS LookupType 9)."
-			return
+			continue
 		
 		# Step through each subtable
 		for subtableItem in lookup.SubTable:
 			if subtableItem.LookupType == 2: # normal case, not using extension table
 				pairPos = subtableItem
 			elif subtableItem.LookupType == 9: # extension table
-				pairPos = subtableItem.ExtSubTable
+				if subtableItem.ExtensionLookupType == 8:
+					continue
+				elif subtableItem.ExtensionLookupType == 2:
+					pairPos = subtableItem.ExtSubTable
+			
 			
 # 				if pairPos.Format not in [1]:
 # 					print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
@@ -191,10 +182,12 @@ def main(fontPath):
 			
 	li.sort()
 	output = '\n'.join(li)
-	scrap = os.popen('pbcopy', 'w')
-	scrap.write(output)
-	scrap.close()
-	print 'done'
+	print output
+	
+# 	scrap = os.popen('pbcopy', 'w')
+# 	scrap.write(output)
+# 	scrap.close()
+#	print 'done'
 
 
 # 	membersList = inspect.getmembers(pairPos.ClassDef1.classDefs)

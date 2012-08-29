@@ -41,6 +41,7 @@ pos Ydieresis agrave 600;
 pos Ydieresis aring 600;
 pos Ydieresis atilde 600;
 
+# pos A V' <0 0 -100 0> A;
 
 
 pos @O_LEFT_UC @a_RIGHT_LC -55;
