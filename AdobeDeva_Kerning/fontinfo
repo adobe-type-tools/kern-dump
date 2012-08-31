@@ -1,0 +1,184 @@
+IsItalicStyle	false
+IsBoldStyle	false
+PreferOS/2TypoMetrics	true
+IsOS/2WidthWeigthSlopeOnly true
+IsOS/2OBLIQUE false
+UseOldNameID4 true
+LicenseCode	ADOBE
+
+
+#------------------------------------------------------
+
+
+begin FDDict LOWERCASE
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	LcHeight 444
+	LcOvershoot 14
+	AscenderHeight 700
+	AscenderOvershoot 16
+	DescenderHeight -232
+	DescenderOvershoot -14
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict LOWERCASE
+
+
+begin FDDict UPPERLOWERCASE
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	LcHeight 444
+	LcOvershoot 14
+	AscenderHeight 700
+	AscenderOvershoot 16
+	DescenderHeight -232
+	DescenderOvershoot -14
+	CapHeight 645
+	CapOvershoot 16
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict UPPERLOWERCASE
+
+
+begin FDDict UPPERCASE
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	CapHeight 645
+	CapOvershoot 16
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict UPPERCASE
+
+
+begin FDDict CAPandSMALLCAP
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	Height5 481
+	Height5Overshoot 12
+	CapHeight 645
+	CapOvershoot 16
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict CAPandSMALLCAP
+
+
+begin FDDict SMALLCAPS
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	CapHeight 481
+	CapOvershoot 12
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict SMALLCAPS
+
+
+begin FDDict CYRILLICSMALLCAPS
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	CapHeight 516
+	CapOvershoot 14
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict CYRILLICSMALLCAPS
+
+
+begin FDDict FIGURES
+	BaselineYCoord 0
+	BaselineOvershoot -16
+	FigHeight 626
+	FigOvershoot 16
+	DominantV [82 93]
+	DominantH [30 35]
+	FlexOK false
+end FDDict FIGURES
+
+
+#------------------------------------------------------
+
+
+begin GlyphSet UPPERCASE
+	#Latin
+		^[A-Z][A-Z]?(grave|acute|circumflex|tilde|dieresis|ring|caron|slash|horn|cedilla|breve|ogonek|macron|dot|dotaccent|dotbelow|commaaccent|bar|hungarumlaut|hook|hookabove|linebelow|brevebelow)?(acute|grave|tilde|hook|dotbelow|macron|caron|.capsc)?$
+		^(Dcroat|Eth|Eng|Yogh|Germandbls|Schwa.latin)$
+	#Greek
+		^(Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega)(iotasub)?(tonos|grave|acute|dieresis|lenis|asper|breve|macron|.math)?(grave|acute|tilde)?(.alt|.altiotasub|.iotasc|.iotasub|.iotauc)?$
+	#Cyrillic
+		^(A|E|I|O|U|Schwa)(grave|breve|macron|dieresis|bar|hungarumlaut)?(.cyr|cyr|.ukran|.short)(.straight)?(stroke)?$
+		^(Be|Ve|Ghe|De|Ie|Zhe|Ze|Ka|El|Em|En|Pe|Er|Es|Te|Ef|Ha|Tse|Che|Sha|Shcha|Hard|Yeru|Soft|Yu|Ya|Io|Dje|Gje|Dze|Yi|Je|Lje|Nje|Tshe|Kje|Dzhe|Yat|Fita|Izhitsa|Shha|Palochka)(stroke|breve|grave|descender|vert|bashkir)?(.alt|.short|.ukran|.up)?$
+	#Punctuation
+		^(exclam|question)(down.cap|.cap|dbl)?$
+		^(ampersand|numero|prescription|product|summation|numbersign)$
+	#Figures and Currency
+		^(zero|one|two|three|four|five|six|seven|eight|nine)(.cap)$
+		^(dollar|sterling|yen|colonmonetary|franc|lira|naira|peseta|Euro|peso|guarani|hryvnia|cedi|hryvnia)(.cap)$
+		^(onehalf|onequarter|threequarters|onethird|twothirds|oneeighth|threeeighths|fiveeighths|seveneighths|divisionslash|slash.frac|fraction)$
+end GlyphSet UPPERCASE
+
+
+begin GlyphSet LOWERCASE
+	#Latin
+		^(dotless)?[a-z](grave|acute|circumflex|tilde|dieresis|ring|caron|slash|horn|cedilla|breve|ogonek|macron|dot|dotaccent|dotbelow|commaaccent|bar|hungarumlaut|hook|hookabove|linebelow|brevebelow|script)?(acute|grave|tilde|hook|dotbelow|macron|caron)?$
+		^(c|f|s|longs)_(b|f|h|i|j|k|l|p|t|longs)_?(b|h|i|j|k|l|t)?$
+		^(ae|oe|dz)(acute|caron)?$
+		^[iln]j$
+		^(dcroat|eth|eng|yogh|germandbls|longs|i.dot|napostrophe|kgreenlandic|schwa.latin|fi|fl)$
+	#Greek
+		^(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega)(iotasub)?(.alt|.end|.math|tonos|dieresis|lenis|asper|acute|grave|breve|macron|tilde)?(tonos|acute|grave|tilde)?$
+		^(kai|koppa|stigma|digamma|sampi)$
+		^(gamma|lambda)_(gamma|lambda)$
+	#Cyrillic
+		^(a|e|i|o|u|schwa)(grave|breve|macron|dieresis|bar|hungarumlaut)?(.cyr|cyr|.ukran|.short)(.straight)?(stroke)?$
+		^(be|ve|ghe|de|ie|zhe|ze|ka|el|em|en|pe|er|es|te|ef|ha|tse|che|sha|shcha|hard|yeru|soft|yu|ya|io|dje|gje|dze|yi|je|lje|nje|tshe|kje|dzhe|yat|fita|izhitsa|shha|palochka)(stroke|breve|grave|descender|vert|bashkir)?(.alt|.short|.ukran|.up|.ital)?$
+end GlyphSet LOWERCASE
+
+
+begin GlyphSet SMALLCAPS
+	#Latin
+		^(dotless)?[A-Za-z](grave|acute|circumflex|tilde|dieresis|ring|caron|slash|horn|cedilla|breve|ogonek|macron|dot|dotaccent|dotbelow|commaaccent|bar|hungarumlaut|hook|hookabove|linebelow|brevebelow|script)?(acute|grave|tilde|hook|dotbelow|macron|caron)?(.sc|.dotsc)$
+		^(Dcroat|dcroat|Eth|eth|Eng|eng|Yogh|yogh|Germandbls|germandbls|Schwalatin|schwalatin)(.sc)$
+		^(AE|ae|OE|oe|DZ|Dz|dz|fi|fl)(acute|caron)?(.sc)$
+		^[IiLlNn][Jj](.sc)$
+	#Greek
+		^(Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega)(iotasub)?(tonos|dieresis|lenis|asper|acute|grave|breve|macron|tilde)?(tonos|acute|grave|tilde)?(.sc|end.sc|.scalt|.sciotasc|.sciotasub)$
+	#Punctuation
+		^(exclam|question)(down.sc)$
+		^(ampersand.sc)$
+	#Figures and Currency
+		^(zero|one|two|three|four|five|six|seven|eight|nine)(.sc)$
+		^(dollar|sterling|yen|colonmonetary|franc|lira|naira|peseta|Euro|peso|guarani|hryvnia|cedi|hryvnia|percent|perthousand)(.sc)$
+end GlyphSet SMALLCAPS
+
+
+begin GlyphSet CYRILLICSMALLCAPS
+	^(A|a|E|e|I|i|O|o|U|u|Schwa|schwa)(grave|breve|macron|dieresis|bar|hungarumlaut)?(cyr|ukran|short)(straight)?(stroke)?(.sc)$
+	^(Be|be|Ve|ve|Ghe|ghe|De|de|Ie|ie|Zhe|zhe|Ze|ze|Ka|ka|El|el|Em|em|En|en|Pe|pe|Er|er|Es|es|Te|te|Ef|ef|Ha|ha|Tse|tse|Che|che|Sha|sha|Shcha|shcha|Hard|hard|Yeru|yeru|Soft|soft|Yu|yu|Ya|ya|Io|io|Dje|dje|Gje|gje|Dze|dze|Yi|yi|Je|je|Lje|lje|Nje|nje|Tshe|tshe|Kje|kje|Dzhe|dzhe|Yat|yat|Fita|fita|Izhitsa|izhitsa|Shha|shha|Palochka|palochka)(stroke|breve|grave|descender|vert|bashkir|up|ukran)?(.sc|.scalt)$
+	#Punctuation
+		^(exclam|question)(.sc)$
+	#Figures and Currency
+		^(zero|one|two|three|four|five|six|seven|eight|nine)(.sccyr)$
+		^(dollar|hryvnia)(.sccyr)$
+end GlyphSet CYRILLICSMALLCAPS
+
+
+begin GlyphSet FIGURES
+	^(zero|one|two|three|four|five|six|seven|eight|nine)(\.)?(slash)?(fitted)?$
+	^(dollar|sterling|yen|colonmonetary|franc|lira|naira|peseta|Euro|peso|guarani|hryvnia|cedi|hryvnia)(.fitted)?$
+end GlyphSet FIGURES
+
+
+begin GlyphSet UPPERLOWERCASE
+	^[DLNT][zj](caron)?$
+	^T(caron|commaaccent)?_h$
+end GlyphSet UPPERLOWERCASE
+
+
+begin GlyphSet CAPandSMALLCAP
+	^[DLN][zj](caron)?(.capsc)$
+end GlyphSet CAPandSMALLCAP
+
