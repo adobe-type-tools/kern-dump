@@ -1,5 +1,5 @@
 import os, sys
-import inspect
+#import inspect
 from fontTools import ttLib
 
 kKernFeatureTag = 'kern'

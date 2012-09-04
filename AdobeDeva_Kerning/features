@@ -17,10 +17,10 @@ languagesystem latn dflt;
 
 #--------------------------------------
 feature kern {
+	include (devanagari_classkerning8.kern);
 
 #lookup LKP0 useExtension {
 #	include (GPOS_kern_LKP0_subt.fea);
-	include (devanagari_classkerning.kern);
 #} LKP0;
 
 #lookup LKP1 useExtension {
