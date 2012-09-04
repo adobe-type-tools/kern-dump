@@ -108,8 +108,6 @@ def main(fontPath):
 	singlePairsList = []
 	allPairsList = []
 	classPairsList	= []
-	# leftClasses = {}
-	# rightClasses = {}
 	allClasses = {}
 
 ### ScriptList ###
@@ -187,9 +185,6 @@ def main(fontPath):
 						singlePairsList.append((firstGlyph, secondGlyph, kernValue))
 						allPairsList.append((firstGlyph, secondGlyph))
 
-			############################################
-			############################################
-			############################################
 
 			elif pairPos.Format == 2: # class adjustment
 				firstGlyphs = {}
@@ -291,10 +286,11 @@ def main(fontPath):
 	Filling dicts created above; creating a list of glyphs that are kerned to their kern partner _value_.
 	This creates dictionaries like this:
 	
-	q 
+	q:	{
 		-61: ['quoteright.latn', 'quoteright.latn', 'quotedblright.latn'], 
 		-57: ['quoteleft.latn', 'quoteleft.latn', 'quotedblleft.latn'],
-	
+		}
+
 	Same is happening for the right side; where the kerning needs to be imagined in reverse.
 	"""
 	
@@ -316,7 +312,7 @@ def main(fontPath):
 
 
 	" Sorting aforementioned lists of glyphs; adding them to a list that contains all the right/left classes found via above method. "
-	" This is not the final list. "
+	" This will not be the final list of classes, just all possible ones. "
 
 	for leftGlyph in leftGlyphsDict:
 		for kernValue in leftGlyphsDict[leftGlyph]:
@@ -328,7 +324,9 @@ def main(fontPath):
 			kernClass = sortGlyphs(rightGlyphsDict[rightGlyph][kernValue])
 			allLeftClasses.append(kernClass)
 
+
 	" Counting occurrence and length of those classes; throwing out the ones that have length == 1 or occur only once. "
+
 	for c in allRightClasses:
 		occurrence = allRightClasses.count(c)
 		if occurrence > 1 and len(c) > 1:
@@ -351,6 +349,7 @@ def main(fontPath):
 
 	" Creating lists of keyGlyphs. The glyphs have been sorted with sortGlyphs() before, which leaves important glyphs at the first position in the list. "
 	" Like that, similar classes are flagged, and can later be compared to find out which classes have an intersection. "
+
 	for i in potentialRightClasses:
 		keyGlyph = i[1][0]
 		if not keyGlyph in leftKeyGlyphs:
@@ -360,12 +359,16 @@ def main(fontPath):
 		keyGlyph = i[1][0]
 		if not keyGlyph in rightKeyGlyphs:
 			rightKeyGlyphs.append(keyGlyph)
+
 	
 	" Taking out the occurrence information. This ranking is now stored in the order of keyGlyphs. "
+
 	potentialRightClasses = sorted([i[1] for i in potentialRightClasses])
 	potentialLeftClasses = sorted([i[1] for i in potentialLeftClasses])
 
+
 	" Going through the keyglyphs, which are sorted by occurrence. Building classes. "
+
 	allRightGlyphsInClass = []
 	for keyGlyph in leftKeyGlyphs:
 		l = []
@@ -381,6 +384,7 @@ def main(fontPath):
 				final = l[i]
 		final = sortGlyphs(final)
 
+
 		" Going through the class, removing glyphs that have already previously been assigned to another class. "
 		" This happens in reverse order, as otherwise we run into problems during removal. " 
 
@@ -395,7 +399,7 @@ def main(fontPath):
 			continue
 		else:
 			finalRightClasses.append(final)
-			# print nameClass(final, '_RIGHT'), final
+
 
 	" Same for the other side. "
 	
@@ -415,8 +419,9 @@ def main(fontPath):
 
 		final = sortGlyphs(final)
 			
-		" Going through the class, removing glyphs that have already previously been assigned to another class. "
-		" This happens in reverse order, as otherwise we run into problems during removal. " 
+
+		" Step 2 for the other side. "
+
 		for glyph in final[::-1]:
 			if len(final) > 1:
 				if not glyph in allLeftGlyphsInClass:
@@ -428,18 +433,11 @@ def main(fontPath):
 			continue
 		else:
 			finalLeftClasses.append(final)
-			# print nameClass(final, '_LEFT'), final
-
-	
-	# print len(finalLeftClasses), finalLeftClasses
-	# print len(finalRightClasses), finalRightClasses
 	
 	explodedClasses = []
 	for leftClass, rightClass in list(itertools.product(finalLeftClasses, finalRightClasses)):
 		explodedClasses.extend(list(itertools.product(leftClass, rightClass)))
 		
-	# 19319 to 2630/555: 
-	# 16689 pairs saved!
 
 	" In some cases, glyphs are not consitenly kerned, although the classing in other cases might suggest so. "
 	" Therefore, we here analyze the kerning classes created, and sort them by occurrence. "
@@ -466,6 +464,7 @@ def main(fontPath):
 	
 			singlePairsList.remove((left, right, value))
 	
+
 	" Creating a ranking of kerning class combinations: "
 	ranking = []
 	for i in classKerningStorage:
@@ -474,37 +473,22 @@ def main(fontPath):
 	ranking.sort()
 	ranking.reverse()
 	
-	# " This filterlist is identifying kerning class combinations which occur twice in the ranking and have an equal occurrence value "
-	# filterList = [(i[0], i[1][:2]) for i in ranking]
-	# for i in filterList[::-1]:
-	# 	if filterList.count(i) == 1:
-	# 		filterList.remove(i)
-	# 
-	# filterList = list(set(filterList))
-		
+
 	" After the sorting; we don't need the count any more, therefore it is stripped. "
 	ranking = [i[1] for i in ranking]
-	# filterList = [i[1] for i in filterList]
-	
-	output = [ ]
 	
 	for left, right, value in ranking:
 	
-		# if (left, right) in filterList:
-		# 	singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
-		# 	# print left, right, value, 'split into', classKerningStorage[(left, right, value)].pairs
-		# 	continue
-		# 	
-		# else:
-	
-			if not (left, right) in classKerning: 
-				classKerning.append((left, right))
-				classKerningExport.append((left, right, value))
-			else:
-				" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
-				singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
+		if not (left, right) in classKerning: 
+			classKerning.append((left, right))
+			classKerningExport.append((left, right, value))
+		else:
+			" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
+			singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
 				
-		
+	" Everything is ready for the output. "
+	output = [ ]
+
 	for i in finalLeftClasses:
 		output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
 	output.append('')
