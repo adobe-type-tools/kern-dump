@@ -3,7 +3,7 @@ import inspect
 import string
 import itertools
 import time
-from operator import itemgetter
+# from operator import itemgetter
 from fontTools import ttLib
 
 
@@ -90,9 +90,18 @@ def collectUniqueKernLookupListIndexes(featureRecord):
 	return uniqueKernLookupListIndexesList
 
 
+def outputFile(path, suffix):
+ 	return '%s.%s' % (os.path.splitext(fontPath)[0], suffix)
+
+
+def write2file(path, list):
+	o = open(path, 'w')
+	o.write('\n'.join(list))
+	o.close()
+
+
 def main(fontPath):
 	font = ttLib.TTFont(fontPath)
-	
 	gposTable = font['GPOS'].table
 	
 	glyphPairsList = []
@@ -237,7 +246,7 @@ def main(fontPath):
 								rightClass = nameClass(rightGlyphs, '_RIGHT')
 								
 								if (leftClass, rightClass, kernValue) in classPairsList:
-									pass
+									continue
 								else:
 									# classPairsList.append(('%s %s' % (kernLookupIndex, leftClass), rightClass, kernValue))
 									classPairsList.append((leftClass, rightClass, kernValue))
@@ -456,7 +465,7 @@ def main(fontPath):
 				classKerningStorage[classKernPair].pairs.append((left, right, value))
 	
 			singlePairsList.remove((left, right, value))
-
+	
 	" Creating a ranking of kerning class combinations: "
 	ranking = []
 	for i in classKerningStorage:
@@ -477,16 +486,17 @@ def main(fontPath):
 	ranking = [i[1] for i in ranking]
 	# filterList = [i[1] for i in filterList]
 	
+	output = [ ]
 	
 	for left, right, value in ranking:
-
+	
 		# if (left, right) in filterList:
 		# 	singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
 		# 	# print left, right, value, 'split into', classKerningStorage[(left, right, value)].pairs
 		# 	continue
 		# 	
 		# else:
-
+	
 			if not (left, right) in classKerning: 
 				classKerning.append((left, right))
 				classKerningExport.append((left, right, value))
@@ -496,22 +506,27 @@ def main(fontPath):
 				
 		
 	for i in finalLeftClasses:
-		print '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i))
-	print
+		output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
+	output.append('')
 	
 	for i in finalRightClasses:
-		print '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i))
-	print
+		output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
+	output.append('')
 		
 	
 	for left, right, value in singlePairsList:
-		print 'pos %s %s %s;' % (left, right, value)
-	print
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
 	
 	for left, right, value in classKerningExport:
-		print 'pos %s %s %s;' % (left, right, value)
-	print
-			
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	
+
+	outputFileName = outputFile(fontPath, 'kern')
+	write2file(outputFileName, output)
+	
+	print 'done'
 
 
 if __name__ == "__main__":
