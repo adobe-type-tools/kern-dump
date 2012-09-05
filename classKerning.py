@@ -1,12 +1,8 @@
 import os, sys
-import inspect
-import string
 import itertools
 import time
-from modules import fromGPOS
-# from operator import itemgetter
+from modules.fromGPOS import *
 from fontTools import ttLib
-
 
 __doc__ ='''\
 
@@ -29,45 +25,9 @@ class collectClasses:
 		self.pairs = []
 		self.count = 0
 		
+
 def explode(leftClass, rightClass):
 	return list(itertools.product(leftClass, rightClass))
-
-def sortGlyphs(glyphlist):
-	# This function is sorting the glyphs in a way that glyphs from the exception list or glyphs starting with 'uni' names don't get 
-	# to be key (first) glyphs. Also, an infinite loop is avoided, in case there are only glyphs matching above mentioned properties.
-	exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
-	glyphs = sorted(glyphlist)
-
-	# sorting the strings by length and then alphabetically
-	# good idea, but this results in fewer matched classes.
-	
-	# sort_key = lambda s: (len(s), s)
-	# glyphs.sort(key=sort_key)
-	
-	for i in range(len(glyphs)):
-		if glyphs[0] in exceptionList or glyphs[0].startswith('uni') or '_' in glyphs[0]:
-			glyphs.insert(len(glyphs), glyphs.pop(0))
-		else:
-			continue
-
-	return glyphs
-
-def nameClass(glyphlist, flag):
-	glyphs = sortGlyphs(glyphlist)	
-	if len(glyphs) == 0:
-		name = 'error!!!'
-	else:
-		name = glyphs[0]
-
-	if name in string.ascii_lowercase:
-		case = '_LC'
-	elif name in string.ascii_uppercase:
-		case = '_UC'
-	else:
-		case = ''
-
-	return '@%s%s%s' % (name, flag, case)
-
 
 
 def outputFile(path, suffix):
@@ -81,9 +41,8 @@ def write2file(path, list):
 
 
 def main(fontPath):
-	singlePairsList = fromGPOS.getSinglePairs(fontPath)
+	singlePairsList = getSinglePairs(fontPath)
 
-	
 	leftGlyphsDict = {}
 	rightGlyphsDict = {}
 	allLeftClasses = []
@@ -245,7 +204,6 @@ def main(fontPath):
 		for i in potentialRightClasses:
 			if i[0] == keyGlyph:
 				l.append(i)
-		print l
 		for i in range(len(l)):
 			if len(l) > 1:
 				baseSet = set(l[0])
@@ -253,8 +211,6 @@ def main(fontPath):
 			else:
 				final = l[i]
 		final = sortGlyphs(final)
-		print final
-		print
 	
 		" Going through the class, removing glyphs that have already previously been assigned to another class. "
 		" This happens in reverse order, as otherwise we run into problems during removal. " 
@@ -309,83 +265,83 @@ def main(fontPath):
 	# finalRightClasses = buildFinalClasses('right')
 	# finalLeftClasses = buildFinalClasses('left')
 	
-	# explodedClasses = []
-	# for leftClass, rightClass in list(itertools.product(finalLeftClasses, finalRightClasses)):
-	# 	explodedClasses.extend(list(itertools.product(leftClass, rightClass)))
-	# 	
-	# 
-	# " In some cases, glyphs are not consistenly kerned, although the classing in other cases might suggest so. "
-	# " Therefore, we here analyze the kerning classes created, and sort them by occurrence. "
-	# " If the same kerning class pair exists twice or more with different kerning values, the pair that has the highest occurrence is preferred. "
-	# 
-	# classKerning = []
-	# classKerningExport = []
-	# classKerningStorage = {}
-	# for left, right, value in singlePairsList[::-1]:
-	# 	if (left, right) in explodedClasses:
-	# 		leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
-	# 		rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
-	# 		classKernPair = leftClass, rightClass, value
-	# 		
-	# 		if not classKernPair in classKerningStorage:
-	# 			c = collectClasses()
-	# 			c.count = 1
-	# 			c.pairs.append((left, right, value))
-	# 			classKerningStorage[classKernPair] = c
-	# 			
-	# 		else:
-	# 			classKerningStorage[classKernPair].count += 1
-	# 			classKerningStorage[classKernPair].pairs.append((left, right, value))
-	# 
-	# 		singlePairsList.remove((left, right, value))
-	# 
-	# 
-	# " Creating a ranking of kerning class combinations: "
-	# ranking = []
-	# for i in classKerningStorage:
-	# 	ranking.append((classKerningStorage[i].count, i))
-	# 
-	# ranking.sort()
-	# ranking.reverse()
-	# 
-	# 
-	# " After the sorting; we don't need the count any more, therefore it is stripped. "
-	# ranking = [i[1] for i in ranking]
-	# 
-	# for left, right, value in ranking:
-	# 
-	# 	if not (left, right) in classKerning: 
-	# 		classKerning.append((left, right))
-	# 		classKerningExport.append((left, right, value))
-	# 	else:
-	# 		" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
-	# 		singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
-	# 			
-	# " Everything is ready for the output. "
-	# output = [ ]
-	# 
-	# for i in finalLeftClasses:
-	# 	output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
-	# output.append('')
-	# 
-	# for i in finalRightClasses:
-	# 	output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
-	# output.append('')
-	# 	
-	# 
-	# for left, right, value in singlePairsList:
-	# 	output.append( 'pos %s %s %s;' % (left, right, value) )
-	# output.append('')
-	# 
-	# for left, right, value in classKerningExport:
-	# 	output.append( 'pos %s %s %s;' % (left, right, value) )
-	# output.append('')
-	# 
-	# 
-	# outputFileName = outputFile(fontPath, 'kern')
-	# write2file(outputFileName, output)
-	# 
-	# print 'done'
+	explodedClasses = []
+	for leftClass, rightClass in list(itertools.product(finalLeftClasses, finalRightClasses)):
+		explodedClasses.extend(list(itertools.product(leftClass, rightClass)))
+		
+	
+	" In some cases, glyphs are not consistenly kerned, although the classing in other cases might suggest so. "
+	" Therefore, we here analyze the kerning classes created, and sort them by occurrence. "
+	" If the same kerning class pair exists twice or more with different kerning values, the pair that has the highest occurrence is preferred. "
+	
+	classKerning = []
+	classKerningExport = []
+	classKerningStorage = {}
+	for left, right, value in singlePairsList[::-1]:
+		if (left, right) in explodedClasses:
+			leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
+			rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
+			classKernPair = leftClass, rightClass, value
+			
+			if not classKernPair in classKerningStorage:
+				c = collectClasses()
+				c.count = 1
+				c.pairs.append((left, right, value))
+				classKerningStorage[classKernPair] = c
+				
+			else:
+				classKerningStorage[classKernPair].count += 1
+				classKerningStorage[classKernPair].pairs.append((left, right, value))
+	
+			singlePairsList.remove((left, right, value))
+	
+	
+	" Creating a ranking of kerning class combinations: "
+	ranking = []
+	for i in classKerningStorage:
+		ranking.append((classKerningStorage[i].count, i))
+	
+	ranking.sort()
+	ranking.reverse()
+	
+	
+	" After the sorting; we don't need the count any more, therefore it is stripped. "
+	ranking = [i[1] for i in ranking]
+	
+	for left, right, value in ranking:
+	
+		if not (left, right) in classKerning: 
+			classKerning.append((left, right))
+			classKerningExport.append((left, right, value))
+		else:
+			" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
+			singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
+				
+	" Everything is ready for the output. "
+	output = [ ]
+	
+	for i in finalLeftClasses:
+		output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
+	output.append('')
+	
+	for i in finalRightClasses:
+		output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
+	output.append('')
+		
+	
+	for left, right, value in singlePairsList:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	
+	for left, right, value in classKerningExport:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	
+	
+	outputFileName = outputFile(fontPath, 'kern')
+	write2file(outputFileName, output)
+	
+	print 'done'
 
 
 if __name__ == "__main__":
