@@ -212,7 +212,7 @@ def getClassPairs(fontPath, option=None):
 					allClasses[className] = glyphs
 				
 	if not option:
-		return classPairsList, 
+		return classPairsList 
 
 	else:
 		return allClasses

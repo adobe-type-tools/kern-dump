@@ -19,17 +19,12 @@ def askForClass(glyph, classes):
 			return singleClass
 			break
 
-
 class collectClasses:
 	def __init__(self):
 		self.pairs = []
 		self.count = 0
 		
-
-def explode(leftClass, rightClass):
-	return list(itertools.product(leftClass, rightClass))
-
-
+		
 def outputFile(path, suffix):
  	return '%s.%s' % (os.path.splitext(fontPath)[0], suffix)
 
@@ -114,7 +109,7 @@ def main(fontPath):
 			occurrence = allClasses.count(c)
 			
 			# the occurrence value could be higher; probably this would increase accuracy in the end.
-			if occurrence > 1 and len(c) > 1:
+			if occurrence > 3 and len(c) > 1:
 			 	if (occurrence, c) not in potentialClasses:
 			 		potentialClasses.append((occurrence, c))
 
@@ -122,86 +117,79 @@ def main(fontPath):
 		" Sorting the potential right and left classes by occurrence; so we can parse them by importance. "
 		potentialClasses.sort()
 		potentialClasses.reverse()
-		print flag
-		for i in potentialClasses:
-			print i
-		print
+		# print flag
+		# for i in potentialClasses:
+		# 	print i
+		# print
 		return potentialClasses
 
 	potentialRightClasses = reduceClasses('right')
 	potentialLeftClasses = reduceClasses('left')
 
+	print potentialLeftClasses
 
-	" Creating lists of keyGlyphs. The glyphs have been sorted with sortGlyphs() before, which leaves important glyphs at the first position in the list. "
-	" Like that, similar classes are flagged, and can later be compared to find out which classes have an intersection. "
+	def makeFinalClasses(potentialClasses):
+		""" 
+		The potential classes are sorted by occurrence.
+		In this function, we parse the list of classes over and over again, removing the higher-ranked class
+		from all the remaining classes below, to come up with classes that have the highest probability. 
+		"""
+		finalClasses = []
+		for i in potentialClasses:
+			classIndex = potentialClasses.index(i)
+			glyphs = i[1]
 
-	# This is the weak point! Find better compare flag!!
+			for k in potentialClasses[classIndex:]:
+				targetIndex = potentialClasses.index(k)
+				otherglyphs = k[1]
+				k = (k[0], list(set(otherglyphs) - set(glyphs)))
+				potentialClasses[targetIndex] = k
 
-	for i in potentialRightClasses:
-		keyGlyph = i[1][0]
-		if not keyGlyph in leftKeyGlyphs:
-			leftKeyGlyphs.append(keyGlyph)
-
-	for i in potentialLeftClasses:
-		keyGlyph = i[1][0]
-		if not keyGlyph in rightKeyGlyphs:
-			rightKeyGlyphs.append(keyGlyph)
-
+			if len( glyphs ) > 1:
+				finalClasses.append(glyphs)
+		return finalClasses
+		
+	finalRightClasses = makeFinalClasses(potentialRightClasses)
+	finalLeftClasses = makeFinalClasses(potentialLeftClasses)
 	
-	" Taking out the occurrence information. This ranking is now stored in the order of keyGlyphs. "
+	print
+	for i in finalLeftClasses:
+		print '/%s' % ' /'.join(i)
+#		for i in range(potentialRightClasses.index(i),len(potentialRightClasses)):
+			
+
+		# print list(set(a) & set(b))
+		# print glyphs
+		# print list(set(glyphs) & set(glyphs))
+		# print
+		
+		# if not keyGlyph in leftKeyGlyphs:
+		# 	leftKeyGlyphs.append(keyGlyph)
+
+
+	# " Creating lists of keyGlyphs. The glyphs have been sorted with sortGlyphs() before, which leaves important glyphs at the first position in the list. "
+	# " Like that, similar classes are flagged, and can later be compared to find out which classes have an intersection. "
+	# 
+	# # This is the weak point! Find better compare flag!!
+	# 
+	# for i in potentialRightClasses:
+	# 	keyGlyph = i[1][0]
+	# 	print keyGlyph
+	# 	if not keyGlyph in leftKeyGlyphs:
+	# 		leftKeyGlyphs.append(keyGlyph)
+	# 
+	# for i in potentialLeftClasses:
+	# 	keyGlyph = i[1][0]
+	# 	if not keyGlyph in rightKeyGlyphs:
+	# 		rightKeyGlyphs.append(keyGlyph)
+	# 
+	# 
+	# " Taking out the occurrence information. This ranking is now stored in the order of keyGlyphs. "
 	# 
 	# potentialRightClasses = sorted([i[1] for i in potentialRightClasses])
 	# potentialLeftClasses = sorted([i[1] for i in potentialLeftClasses])
 	# 
 	# 
-	# # def buildFinalClasses(side):
-	# # 	
-	# # 	" Going through the keyglyphs, which are sorted by occurrence. Building classes. "
-	# # 	if side == 'left':
-	# # 		keyGlyphs = leftKeyGlyphs
-	# # 		potentialPartnerClasses = potentialRightClasses
-	# # 		
-	# # 	if side == 'right':
-	# # 		keyGlyphs = rightKeyGlyphs
-	# # 		potentialPartnerClasses = potentialLeftClasses
-	# # 
-	# # 
-	# # 	finalClasses = []
-	# # 	allGlyphsInClass = []
-	# # 
-	# # 	for keyGlyph in keyGlyphs:
-	# # 		l = []
-	# # 		for i in potentialPartnerClasses:
-	# # 			if i[0] == keyGlyph:
-	# # 				l.append(i)
-	# # 
-	# # 		for i in range(len(l)):
-	# # 			if len(l) > 1:
-	# # 				baseSet = set(l[0])
-	# # 			 	final = list(baseSet.intersection(l[i]))
-	# # 			else:
-	# # 				final = l[i]
-	# # 		
-	# # 		final = sortGlyphs(final)
-	# # 
-	# # 
-	# # 		" Going through the class, removing glyphs that have already previously been assigned to another class. "
-	# # 		" This happens in reverse order, as otherwise we run into problems during removal. " 
-	# # 
-	# # 		for glyph in final[::-1]:
-	# # 			if len(final) > 1:
-	# # 				if not glyph in allGlyphsInClass:
-	# # 					allGlyphsInClass.append(glyph)
-	# # 				else:
-	# # 					final.remove(glyph)
-	# # 
-	# # 		if len(final) == 1:
-	# # 			continue
-	# # 		else:
-	# # 			finalClasses.append(final)
-	# # 	return finalClasses
-	# # 			
-	# # 
 	# 
 	# " Going through the keyglyphs, which are sorted by occurrence. Building classes. "
 	# 

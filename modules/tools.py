@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import string
+import itertools
 
 def sortGlyphs(glyphlist):
 	# This function is sorting the glyphs in a way that glyphs from the exception list or glyphs starting with 'uni' names don't get 
@@ -40,3 +41,8 @@ def nameClass(glyphlist, flag):
 	flag = flag
 	
 	return '@%s%s%s' % (name, flag, case)
+
+
+def explode(leftClass, rightClass):
+	return list(itertools.product(leftClass, rightClass))
+
