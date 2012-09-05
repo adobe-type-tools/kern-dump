@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os, sys, string, time
 from fontTools import ttLib
 from tools import *
@@ -124,7 +125,12 @@ def getSinglePairs(fontPath):
 
 	return singlePairsList
 
-def getClassPairs(fontPath, option = None):
+
+def getClassPairs(fontPath, option=None):
+	# two functions in one, which are split via the option.
+	# if option == None; kerning class pairs will be returned.
+	# in any other case, kerning class definitions will be returned.
+
 	classPairsList	= []
 	allClasses = {}
 
