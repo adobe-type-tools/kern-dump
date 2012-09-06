@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<glyph name="aring" format="1">
-  <advance width="482"/>
-  <outline>
-    <component base="a"/>
-    <component base="ring" xOffset="98"/>
-  </outline>
-</glyph>
