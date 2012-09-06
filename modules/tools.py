@@ -9,10 +9,9 @@ def sortGlyphs(glyphlist):
 
 	glyphs = sorted(glyphlist)
 	# sorting the strings by length and then alphabetically
-	# good idea, but this results in fewer matched classes.
 
-	# sort_key = lambda s: (len(s), s)
-	# glyphs.sort(key=sort_key)
+	sort_key = lambda s: (len(s), s)
+	glyphs.sort(key=sort_key)
 
 	for i in range(len(glyphs)):
 		if glyphs[0] in exceptionList or glyphs[0].startswith('uni') or '_' in glyphs[0]:

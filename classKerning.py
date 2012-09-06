@@ -126,8 +126,6 @@ def main(fontPath):
 	potentialRightClasses = reduceClasses('right')
 	potentialLeftClasses = reduceClasses('left')
 
-	print potentialLeftClasses
-
 	def makeFinalClasses(potentialClasses):
 		""" 
 		The potential classes are sorted by occurrence.
@@ -146,7 +144,7 @@ def main(fontPath):
 				potentialClasses[targetIndex] = k
 
 			if len( glyphs ) > 1:
-				finalClasses.append(glyphs)
+				finalClasses.append(sortGlyphs(glyphs))
 		return finalClasses
 		
 	finalRightClasses = makeFinalClasses(potentialRightClasses)
@@ -154,14 +152,58 @@ def main(fontPath):
 	
 	
 	explodedClasses = []
-	for leftClass, rightClass in list(itertools.product(finalLeftClasses, finalRightClasses)):
-		explodedClasses.extend(list(itertools.product(leftClass, rightClass)))
+	for leftClass, rightClass in explode(finalLeftClasses, finalRightClasses):
+		explodedClasses.extend( explode (leftClass, rightClass))
+	
+	singlePairsDict = {}
+	# a dictionary that organizes the single pairs by kern value.
+	for left, right, value in singlePairsList:
+		if not value in singlePairsDict:
+			singlePairsDict[value] = [(left, right)]
+		else:
+			singlePairsDict[value].append((left,right))
+	
+	
+	cK = []
+	for left, right, value in singlePairsList[::-1]:
+
+ 			if (left, right) in explodedClasses:
+				combinations = explode(askForClass(left, finalLeftClasses), askForClass(right, finalRightClasses))
+			# print singlePairsDict[value]
+			# print left, right
+				if set(combinations).issubset(set(singlePairsDict[value])):
+					# if all combinations within that class pair are covered by the same kern value
+					leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
+					rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
+					classKernPair = leftClass, rightClass, value
+					if not classKernPair in cK:
+						cK.append(classKernPair)
+					singlePairsList.remove((left, right, value))
+				
+	print len(cK), len(singlePairsList)
+
 		
-	print explodedClasses
+	# singlePairsList = singlePairsList[:30]	
+	# result = []
+	# kernValues = [j[2] for j in singlePairsList]
+	# for i in set(singlePairsList):
+	# 	result.append((i, kernValues.count(i[2])))
+	# result.sort(key = lambda x: -x[-1])
 	# 
-	# " In some cases, glyphs are not consistenly kerned, although the classing in other cases might suggest so. "
-	# " Therefore, we here analyze the kerning classes created, and sort them by occurrence. "
-	# " If the same kerning class pair exists twice or more with different kerning values, the pair that has the highest occurrence is preferred. "
+	# singlePairsList = [i[0] for i in result]
+	# 
+	# for i in singlePairsList:
+	# 	print i
+	
+	
+	# for left, right, value in singlePairsList[::-1]:
+ 	# 		if (left, right) in explodedClasses:
+
+	# """
+	# In some cases, glyphs are not consistenly kerned, although the classing in other cases might suggest so.
+	# Therefore, we here analyze the kerning classes created, and sort them by occurrence.
+	# If the same kerning class pair exists twice or more with different kerning values, the pair that has the highest occurrence is preferred. 
+	# """
 	# 
 	# classKerning = []
 	# classKerningExport = []
@@ -206,31 +248,31 @@ def main(fontPath):
 	# 		" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
 	# 		singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
 	# 			
-	# " Everything is ready for the output. "
-	# output = [ ]
-	# 
-	# for i in finalLeftClasses:
-	# 	output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
-	# output.append('')
-	# 
-	# for i in finalRightClasses:
-	# 	output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
-	# output.append('')
-	# 	
-	# 
-	# for left, right, value in singlePairsList:
-	# 	output.append( 'pos %s %s %s;' % (left, right, value) )
-	# output.append('')
-	# 
-	# for left, right, value in classKerningExport:
-	# 	output.append( 'pos %s %s %s;' % (left, right, value) )
-	# output.append('')
-	# 
-	# 
-	# outputFileName = outputFile(fontPath, 'kern')
-	# write2file(outputFileName, output)
-	# 
-	# print 'done'
+	" Everything is ready for the output. "
+	output = [ ]
+	
+	for i in finalLeftClasses:
+		output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
+	output.append('')
+	
+	for i in finalRightClasses:
+		output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
+	output.append('')
+		
+	
+	for left, right, value in singlePairsList:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	
+	for left, right, value in cK:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	
+	
+	outputFileName = outputFile(fontPath, 'kern')
+	write2file(outputFileName, output)
+	
+	print 'done'
 
 
 if __name__ == "__main__":
