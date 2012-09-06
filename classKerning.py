@@ -13,17 +13,31 @@ __doc__ ='''\
 
 	'''
 
-def askForClass(glyph, classes):
+class kerningClass(object):
+	def __init__(self):
+		self.glyphs = []
+		self.name = ''
+		self.side = ''
+		
+# def askForClass(glyph, classes):
+# 	for singleClass in classes:
+# 		if glyph in singleClass:
+# 			return singleClass
+# 			break
+
+def askForClassName(glyph, side, classes):
 	for singleClass in classes:
-		if glyph in singleClass:
-			return singleClass
+		if glyph in singleClass.glyphs and singleClass.side == side:
+			return singleClass.name
 			break
 
-class collectClasses:
-	def __init__(self):
-		self.pairs = []
-		self.count = 0
-		
+def askForClassGlyphs(glyph, side, classes):
+	for singleClass in classes:
+		if glyph in singleClass.glyphs and singleClass.side == side:
+			return singleClass.glyphs
+			break
+
+
 		
 def outputFile(path, suffix):
  	return '%s.%s' % (os.path.splitext(fontPath)[0], suffix)
@@ -142,10 +156,21 @@ def main(fontPath):
 			if len( glyphs ) > 0:
 				finalClasses.append(sortGlyphs(glyphs))
 		return sorted(finalClasses)
-		
+	
 	finalRightClasses = makeFinalClasses(potentialRightClasses)
 	finalLeftClasses = makeFinalClasses(potentialLeftClasses)
 	
+	classes = [] # the final container in which kerning classes are stored as python classes
+	def storeClasses(inputfile, flag):
+		for i in inputfile:
+			c = kerningClass()
+			c.glyphs = i
+			c.side = flag
+			c.name = nameClass(i, flag)
+			classes.append(c)
+	
+	storeClasses(finalRightClasses, 'RIGHT')
+	storeClasses(finalLeftClasses, 'LEFT')
 	
 	explodedClasses = []
 	for leftClass, rightClass in explode(finalLeftClasses, finalRightClasses):
@@ -163,19 +188,19 @@ def main(fontPath):
 	classKerning = []
 	for left, right, value in singlePairsList[::-1]:
 		# First step: checking if the pair is in possible class kerning pairs with classes as we have them (explodedClasses).
-
+	
 		if (left, right) in explodedClasses:
 			# get the class names for both sides
-			leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
-			rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
+			leftClass = askForClassName(left, 'LEFT', classes)
+			rightClass = askForClassName(right, 'RIGHT', classes)
 			classKernPair = leftClass, rightClass, value
-
+	
 			if classKernPair in classKerning:
 				# remove the pair if it exists
 				singlePairsList.remove((left, right, value))
 				continue
 			else:
-				combinations = explode(askForClass(left, finalLeftClasses), askForClass(right, finalRightClasses))
+				combinations = explode(askForClassGlyphs(left, 'LEFT', classes), askForClassGlyphs(right, 'RIGHT', classes))
 				# if the pair does not exist, we look at the classes for left and right glyphs, and all possible 
 				# combinations between the two. (exploding both sides against each other)
 			
@@ -186,18 +211,16 @@ def main(fontPath):
 					classKerning.append(classKernPair)
 					singlePairsList.remove((left, right, value))
 				
-	# print len(classKerning), len(singlePairsList)
-	
 		
 	" Everything is ready for the output. "
 	output = [ ]
 	
-	for i in finalLeftClasses:
-		output.append( '%s = [ %s ];' % (nameClass(i, '_LEFT'), ' '.join(i)) )
+	for i in sorted(finalLeftClasses):
+		output.append( '%s = [ %s ];' % (nameClass(i, 'LEFT'), ' '.join(i)) )
 	output.append('')
 	
-	for i in finalRightClasses:
-		output.append( '%s = [ %s ];' % (nameClass(i, '_RIGHT'), ' '.join(i)) )
+	for i in sorted(finalRightClasses):
+		output.append( '%s = [ %s ];' % (nameClass(i, 'RIGHT'), ' '.join(i)) )
 	output.append('')
 		
 	
