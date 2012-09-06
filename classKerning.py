@@ -139,9 +139,9 @@ def main(fontPath):
 				k = (k[0], list(set(otherglyphs) - set(glyphs)))
 				potentialClasses[targetIndex] = k
 
-			if len( glyphs ) > 1:
+			if len( glyphs ) > 0:
 				finalClasses.append(sortGlyphs(glyphs))
-		return finalClasses
+		return sorted(finalClasses)
 		
 	finalRightClasses = makeFinalClasses(potentialRightClasses)
 	finalLeftClasses = makeFinalClasses(potentialLeftClasses)
@@ -162,24 +162,32 @@ def main(fontPath):
 	
 	classKerning = []
 	for left, right, value in singlePairsList[::-1]:
-			# First step: checking if the pair is in possible class kerning pairs with classes as we have them.
+		# First step: checking if the pair is in possible class kerning pairs with classes as we have them (explodedClasses).
 
- 			if (left, right) in explodedClasses:
+		if (left, right) in explodedClasses:
+			# get the class names for both sides
+			leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
+			rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
+			classKernPair = leftClass, rightClass, value
+
+			if classKernPair in classKerning:
+				# remove the pair if it exists
+				singlePairsList.remove((left, right, value))
+				continue
+			else:
 				combinations = explode(askForClass(left, finalLeftClasses), askForClass(right, finalRightClasses))
-				# If this is the case, we look at the classes for left and right glyphs, and all possible combinations between the two.
-				
+				# if the pair does not exist, we look at the classes for left and right glyphs, and all possible 
+				# combinations between the two. (exploding both sides against each other)
+			
 				if set(combinations).issubset(set(singlePairsDict[value])):
-					# If all those combinations are a subset of combinations as covered in singlePairsDict[value], it is safe to assume this pair can be replaced by classkerning.
-				
-					leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
-					rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
-					classKernPair = leftClass, rightClass, value
-					if not classKernPair in classKerning:
-						classKerning.append(classKernPair)
+					# If all those combinations are a subset of combinations as covered in singlePairsDict[value], 
+					# it is safe to assume this pair can be replaced by classkerning.
+			
+					classKerning.append(classKernPair)
 					singlePairsList.remove((left, right, value))
 				
-	print len(classKerning), len(singlePairsList)
-
+	# print len(classKerning), len(singlePairsList)
+	
 		
 	" Everything is ready for the output. "
 	output = [ ]
