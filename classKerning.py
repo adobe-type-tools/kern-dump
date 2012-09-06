@@ -117,10 +117,6 @@ def main(fontPath):
 		" Sorting the potential right and left classes by occurrence; so we can parse them by importance. "
 		potentialClasses.sort()
 		potentialClasses.reverse()
-		# print flag
-		# for i in potentialClasses:
-		# 	print i
-		# print
 		return potentialClasses
 
 	potentialRightClasses = reduceClasses('right')
@@ -164,90 +160,27 @@ def main(fontPath):
 			singlePairsDict[value].append((left,right))
 	
 	
-	cK = []
+	classKerning = []
 	for left, right, value in singlePairsList[::-1]:
+			# First step: checking if the pair is in possible class kerning pairs with classes as we have them.
 
  			if (left, right) in explodedClasses:
 				combinations = explode(askForClass(left, finalLeftClasses), askForClass(right, finalRightClasses))
-			# print singlePairsDict[value]
-			# print left, right
+				# If this is the case, we look at the classes for left and right glyphs, and all possible combinations between the two.
+				
 				if set(combinations).issubset(set(singlePairsDict[value])):
-					# if all combinations within that class pair are covered by the same kern value
+					# If all those combinations are a subset of combinations as covered in singlePairsDict[value], it is safe to assume this pair can be replaced by classkerning.
+				
 					leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
 					rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
 					classKernPair = leftClass, rightClass, value
-					if not classKernPair in cK:
-						cK.append(classKernPair)
+					if not classKernPair in classKerning:
+						classKerning.append(classKernPair)
 					singlePairsList.remove((left, right, value))
 				
-	print len(cK), len(singlePairsList)
+	print len(classKerning), len(singlePairsList)
 
 		
-	# singlePairsList = singlePairsList[:30]	
-	# result = []
-	# kernValues = [j[2] for j in singlePairsList]
-	# for i in set(singlePairsList):
-	# 	result.append((i, kernValues.count(i[2])))
-	# result.sort(key = lambda x: -x[-1])
-	# 
-	# singlePairsList = [i[0] for i in result]
-	# 
-	# for i in singlePairsList:
-	# 	print i
-	
-	
-	# for left, right, value in singlePairsList[::-1]:
- 	# 		if (left, right) in explodedClasses:
-
-	# """
-	# In some cases, glyphs are not consistenly kerned, although the classing in other cases might suggest so.
-	# Therefore, we here analyze the kerning classes created, and sort them by occurrence.
-	# If the same kerning class pair exists twice or more with different kerning values, the pair that has the highest occurrence is preferred. 
-	# """
-	# 
-	# classKerning = []
-	# classKerningExport = []
-	# classKerningStorage = {}
-	# for left, right, value in singlePairsList[::-1]:
-	# 	if (left, right) in explodedClasses:
-	# 		leftClass = nameClass(askForClass(left, finalLeftClasses), '_LEFT')
-	# 		rightClass = nameClass(askForClass(right, finalRightClasses), '_RIGHT')
-	# 		classKernPair = leftClass, rightClass, value
-	# 		
-	# 		if not classKernPair in classKerningStorage:
-	# 			c = collectClasses()
-	# 			c.count = 1
-	# 			c.pairs.append((left, right, value))
-	# 			classKerningStorage[classKernPair] = c
-	# 			
-	# 		else:
-	# 			classKerningStorage[classKernPair].count += 1
-	# 			classKerningStorage[classKernPair].pairs.append((left, right, value))
-	# 
-	# 		singlePairsList.remove((left, right, value))
-	# 
-	# 
-	# " Creating a ranking of kerning class combinations: "
-	# ranking = []
-	# for i in classKerningStorage:
-	# 	ranking.append((classKerningStorage[i].count, i))
-	# 
-	# ranking.sort()
-	# ranking.reverse()
-	# 
-	# 
-	# " After the sorting; we don't need the count any more, therefore it is stripped. "
-	# ranking = [i[1] for i in ranking]
-	# 
-	# for left, right, value in ranking:
-	# 
-	# 	if not (left, right) in classKerning: 
-	# 		classKerning.append((left, right))
-	# 		classKerningExport.append((left, right, value))
-	# 	else:
-	# 		" Pairs are thrown back into the single pairs list, and will be exceptions from the highest-ranked kerning class. "
-	# 		singlePairsList.extend(classKerningStorage[(left, right, value)].pairs)
-	# 			
 	" Everything is ready for the output. "
 	output = [ ]
 	
@@ -264,7 +197,7 @@ def main(fontPath):
 		output.append( 'pos %s %s %s;' % (left, right, value) )
 	output.append('')
 	
-	for left, right, value in cK:
+	for left, right, value in classKerning:
 		output.append( 'pos %s %s %s;' % (left, right, value) )
 	output.append('')
 	
