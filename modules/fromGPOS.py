@@ -127,9 +127,11 @@ def getSinglePairs(fontPath):
 
 
 def getClassPairs(fontPath, option=None):
-	# two functions in one, which are split via the option.
-	# if option == None; kerning class pairs will be returned.
-	# in any other case, kerning class definitions will be returned.
+	"""\
+	two functions in one, which are split via the option.
+	if option == None; kerning class pairs will be returned.
+	in any other case, kerning class definitions will be returned.
+	"""
 
 	classPairsList	= []
 	allClasses = {}
@@ -187,8 +189,8 @@ def getClassPairs(fontPath, option=None):
 		
 							rightGlyphs = sortGlyphs(rightClasses[record_r].glyphs)
 		
-							leftClass = nameClass(leftGlyphs, '_LEFT')
-							rightClass = nameClass(rightGlyphs, '_RIGHT')
+							leftClass = nameClass(leftGlyphs, 'LEFT')
+							rightClass = nameClass(rightGlyphs, 'RIGHT')
 							
 							if (leftClass, rightClass, kernValue) in classPairsList:
 								continue
@@ -201,13 +203,13 @@ def getClassPairs(fontPath, option=None):
 		
 			for i in leftClasses:
 		 		glyphs = sortGlyphs(leftClasses[i].glyphs)
-				className = nameClass(glyphs, '_LEFT')
+				className = nameClass(glyphs, 'LEFT')
 				if not className in allClasses:
 					allClasses[className] = glyphs
 			
 			for i in rightClasses:
 				glyphs = sortGlyphs(rightClasses[i].glyphs)
-				className = nameClass(glyphs, '_RIGHT')
+				className = nameClass(glyphs, 'RIGHT')
 				if not className in allClasses:
 					allClasses[className] = glyphs
 				
@@ -217,17 +219,12 @@ def getClassPairs(fontPath, option=None):
 	else:
 		return allClasses
 	
+	
 def getClasses(fontPath):
 	return getClassPairs(fontPath, 'option')
 
-# if __name__ == "__main__":
-# 	startTime = time.time()
-# 	
-# 	if len(sys.argv) == 2:
-# 		if os.path.exists(sys.argv[1]):
-# 			fontPath = sys.argv[1]
-#     		single(fontPath)
-# 	else:
-# 		print "No valid font provided."
-# 	endTime = round(time.time() - startTime, 2)
-# 	print endTime, 'seconds'
+
+def getGlyphNames(fontPath):
+	font = ttLib.TTFont(fontPath)
+	return font.getGlyphNames()
+	

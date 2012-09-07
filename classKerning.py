@@ -1,8 +1,9 @@
 import os, sys
-import itertools
+# import itertools
 import time
 from modules.fromGPOS import *
-from fontTools import ttLib
+# from fontTools import ttLib
+import operator
 
 __doc__ ='''\
 
@@ -12,33 +13,7 @@ __doc__ ='''\
 	usage: python getKerning font.otf > outputfile
 
 	'''
-
-class kerningClass(object):
-	def __init__(self):
-		self.glyphs = []
-		self.name = ''
-		self.side = ''
-		
-# def askForClass(glyph, classes):
-# 	for singleClass in classes:
-# 		if glyph in singleClass:
-# 			return singleClass
-# 			break
-
-def askForClassName(glyph, side, classes):
-	for singleClass in classes:
-		if glyph in singleClass.glyphs and singleClass.side == side:
-			return singleClass.name
-			break
-
-def askForClassGlyphs(glyph, side, classes):
-	for singleClass in classes:
-		if glyph in singleClass.glyphs and singleClass.side == side:
-			return singleClass.glyphs
-			break
-
-
-		
+	
 def outputFile(path, suffix):
  	return '%s.%s' % (os.path.splitext(fontPath)[0], suffix)
 
@@ -49,131 +24,40 @@ def write2file(path, list):
 	o.close()
 
 
-def main(fontPath):
-	singlePairsList = getSinglePairs(fontPath)
+def output(classes, singlePairsList, classKerning):
+	output = [ ]
 
-	leftKeyGlyphs = []
-	rightKeyGlyphs = []
-	finalLeftClasses = []
-	finalRightClasses = []
-	
+	leftClasses = [i for i in classes if i.side == 'LEFT']
+	rightClasses = [i for i in classes if i.side == 'RIGHT']
 
-	def makeGlyphValueDict(flag):
-		" Creating dictionaries filled with dictionaries, for all the and right and left glyphs that are in a flat kerning pair. "
-		" Those are containers used in the next loop. "
-		
-		glyphsDict = {}
-	 	
-		for left, right, value in singlePairsList:
-			 # the same function can be used for right-left kerning pairs; for the sake of simplicity; the variables are just flipped.
-			if flag == 'right':
-				left, right = right, left
-			if not left in glyphsDict:
-				glyphsDict[left] = {}
+	def sortClass(classList):
+		return sorted(classList, key=operator.attrgetter('name'))
 
-			""" 
-			Filling dicts created above; creating a list of glyphs that are kerned to their kern partner _value_.
-			This creates dictionaries like this:
-	
-			q:	{
-				-61: ['quoteright.latn', 'quoteright.latn', 'quotedblright.latn'], 
-				-57: ['quoteleft.latn', 'quoteleft.latn', 'quotedblleft.latn'],
-				}
+	for i in sortClass(leftClasses):
+		output.append( '%s = [ %s ];' % (i.name, ' '.join(i.glyphs) ))
+	output.append('')
 
-			Same is happening for the right side; where the kerning needs to be imagined in reverse (right glyph to left glyph: value).
-			"""
+	for i in sortClass(rightClasses):
+		output.append( '%s = [ %s ];' % (i.name, ' '.join(i.glyphs) ))
+	output.append('')
 
-		for left, right, value in singlePairsList:
-			if flag == 'right':
-				left, right = right, left
-				
-			if not value in glyphsDict[left]:
-				glyphsDict[left][value] = []
-				glyphsDict[left][value].append(right)
-			else:
-				if not left in glyphsDict[left][value]:
-					glyphsDict[left][value].append(right)
+	for left, right, value in singlePairsList:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
 
-		return glyphsDict
-		
-		
-	leftGlyphsDict = makeGlyphValueDict('left')
-	rightGlyphsDict = makeGlyphValueDict('right')
-
-	def reduceClasses(flag):
-		" Sorting aforementioned lists of glyphs; adding them to a list that contains all the right/left classes found via above method. "
-		" This will not be the final list of classes, just all possible ones. "
-		
-		if flag == 'right':
-			glyphsDict = leftGlyphsDict
-		if flag == 'left':
-			glyphsDict = rightGlyphsDict
-
-		allClasses = []
-		potentialClasses = []
-
-		for glyph in glyphsDict:
-			for kernValue in glyphsDict[glyph]:
-				kernClass = sortGlyphs(glyphsDict[glyph][kernValue])
-				allClasses.append(kernClass)
-
-		" Counting occurrence and length of those classes; throwing out the ones that have length == 1 or occur only once. "
-
-		for c in allClasses:
-			occurrence = allClasses.count(c)
-			
-			# the occurrence value could be higher; probably this would increase accuracy in the end.
-			if occurrence > 3 and len(c) > 1:
-			 	if (occurrence, c) not in potentialClasses:
-			 		potentialClasses.append((occurrence, c))
+	for left, right, value in classKerning:
+		output.append( 'pos %s %s %s;' % (left, right, value) )
+	output.append('')
+	return output
 
 
-		" Sorting the potential right and left classes by occurrence; so we can parse them by importance. "
-		potentialClasses.sort()
-		potentialClasses.reverse()
-		return potentialClasses
+def makeSafeKernFeature(fontPath, singlePairsList, classes):
 
-	potentialRightClasses = reduceClasses('right')
-	potentialLeftClasses = reduceClasses('left')
-
-	def makeFinalClasses(potentialClasses):
-		""" 
-		The potential classes are sorted by occurrence.
-		In this function, we parse the list of classes over and over again, removing the higher-ranked class
-		from all the remaining classes below, to come up with classes that have the highest probability. 
-		"""
-		finalClasses = []
-		for i in potentialClasses:
-			classIndex = potentialClasses.index(i)
-			glyphs = i[1]
-
-			for k in potentialClasses[classIndex:]:
-				targetIndex = potentialClasses.index(k)
-				otherglyphs = k[1]
-				k = (k[0], list(set(otherglyphs) - set(glyphs)))
-				potentialClasses[targetIndex] = k
-
-			if len( glyphs ) > 0:
-				finalClasses.append(sortGlyphs(glyphs))
-		return sorted(finalClasses)
-	
-	finalRightClasses = makeFinalClasses(potentialRightClasses)
-	finalLeftClasses = makeFinalClasses(potentialLeftClasses)
-	
-	classes = [] # the final container in which kerning classes are stored as python classes
-	def storeClasses(inputfile, flag):
-		for i in inputfile:
-			c = kerningClass()
-			c.glyphs = i
-			c.side = flag
-			c.name = nameClass(i, flag)
-			classes.append(c)
-	
-	storeClasses(finalRightClasses, 'RIGHT')
-	storeClasses(finalLeftClasses, 'LEFT')
-	
+	leftClassGlyphs = [i.glyphs for i in classes if i.side == 'LEFT']
+	rightClassGlyphs = [i.glyphs for i in classes if i.side == 'RIGHT']
 	explodedClasses = []
-	for leftClass, rightClass in explode(finalLeftClasses, finalRightClasses):
+
+	for leftClass, rightClass in explode(leftClassGlyphs, rightClassGlyphs):
 		explodedClasses.extend( explode (leftClass, rightClass))
 	
 	singlePairsDict = {}
@@ -212,42 +96,119 @@ def main(fontPath):
 					singlePairsList.remove((left, right, value))
 				
 		
-	" Everything is ready for the output. "
-	output = [ ]
-	
-	for i in sorted(finalLeftClasses):
-		output.append( '%s = [ %s ];' % (nameClass(i, 'LEFT'), ' '.join(i)) )
-	output.append('')
-	
-	for i in sorted(finalRightClasses):
-		output.append( '%s = [ %s ];' % (nameClass(i, 'RIGHT'), ' '.join(i)) )
-	output.append('')
-		
-	
-	for left, right, value in singlePairsList:
-		output.append( 'pos %s %s %s;' % (left, right, value) )
-	output.append('')
-	
-	for left, right, value in classKerning:
-		output.append( 'pos %s %s %s;' % (left, right, value) )
-	output.append('')
-	
-	
+	data = output(classes, singlePairsList, classKerning)
 	outputFileName = outputFile(fontPath, 'kern')
-	write2file(outputFileName, output)
+	write2file(outputFileName, data)
 	
 	print 'done'
+
+
+
+def makeExperimentalKernFeature(fontPath, singlePairsList, classes):
+	
+	'Removing glyphs that might be in the kerning class file imported, but are not in the target font.'
+ 	availableGlyphs = getGlyphNames(fontPath)
+	for kerningClass in classes:
+		for glyph in kerningClass.glyphs[::-1]:
+			if not glyph in availableGlyphs:
+				kerningClass.glyphs.remove(glyph)
+
+	leftClassGlyphs = [i.glyphs for i in classes if i.side == 'LEFT']
+	rightClassGlyphs = [i.glyphs for i in classes if i.side == 'RIGHT']
+	explodedClasses = []
+	
+	for leftClass, rightClass in explode(leftClassGlyphs, rightClassGlyphs):
+		explodedClasses.extend( explode (leftClass, rightClass))
+
+
+	singlePairsDict = {}
+	# a dictionary that organizes the single pairs by kern value.
+	for left, right, value in singlePairsList:
+		if not value in singlePairsDict:
+			singlePairsDict[value] = [(left, right)]
+		else:
+			singlePairsDict[value].append((left,right))
+	
+	
+	classKerning = []
+	classPairs = {}
+	for left, right, value in singlePairsList[::-1]:
+		# First step: checking if the pair is in possible class kerning pairs with classes as we have them (explodedClasses).
+	
+		if (left, right) in explodedClasses:
+			# get the class names for both sides
+			leftClass = askForClassName(left, 'LEFT', classes)
+			rightClass = askForClassName(right, 'RIGHT', classes)
+			classPair = leftClass, rightClass
+			if not classPair in classPairs:
+				classPairs[classPair] = {}
+				classPairs[classPair][value] = 1
+			else:
+				if value in classPairs[classPair]:
+					classPairs[classPair][value] += 1
+				else:
+					classPairs[classPair][value] = 1
+
+	for pair in classPairs:
+		print pair, classPairs[pair]
+		
+
+
+	# 
+	# 		if classKernPair in classKerning:
+	# 			# remove the pair if it exists
+	# 			singlePairsList.remove((left, right, value))
+	# 			continue
+	# 		else:
+	# 			combinations = explode(askForClassGlyphs(left, 'LEFT', classes), askForClassGlyphs(right, 'RIGHT', classes))
+	# 			# if the pair does not exist, we look at the classes for left and right glyphs, and all possible 
+	# 			# combinations between the two. (exploding both sides against each other)
+	# 
+	# 			if set(combinations).issubset(set(singlePairsDict[value])):
+	# 				# If all those combinations are a subset of combinations as covered in singlePairsDict[value], 
+	# 				# it is safe to assume this pair can be replaced by classkerning.
+	# 
+	# 				classKerning.append(classKernPair)
+	# 				singlePairsList.remove((left, right, value))
+	# 
+	# 
+	# # data = output(classes, singlePairsList, classKerning)
+	# # outputFileName = outputFile(fontPath, 'kern')
+	# # write2file(outputFileName, data)
+	# 
+	# print 'done'
+
+
+
 
 
 if __name__ == "__main__":
 	startTime = time.time()
 	
-	if len(sys.argv) == 2:
-		if os.path.exists(sys.argv[1]):
-			fontPath = sys.argv[1]
-    		main(fontPath)
+	option = sys.argv[1]
+
+	if option == '-font':
+		if os.path.exists(sys.argv[-1]):
+			fontPath = sys.argv[-1]
+			singlePairsList = getSinglePairs(fontPath)
+			classes = makeKerningClasses(singlePairsList)
+	   		makeSafeKernFeature(fontPath, singlePairsList, classes)
+		else:
+			print "No valid font provided."
+
+	elif option == '-file':
+		fontPath = sys.argv[-1]
+		filePath = sys.argv[2]
+		singlePairsList = getSinglePairs(fontPath)
+		classes = readKerningClasses(filePath)
+		makeExperimentalKernFeature(fontPath, singlePairsList, classes)
+		
 	else:
-		print "No valid font provided."
+		print 'no option used'
+	
+	
+	# if len(sys.argv) == 2:
+
 	endTime = round(time.time() - startTime, 2)
-	print endTime, 'seconds'
+	print 'It took %s seconds to run this script.' % endTime
 	
