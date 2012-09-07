@@ -150,7 +150,7 @@ def makeExperimentalKernFeature(fontPath, singlePairsList, classes):
 					classPairs[classPair][value] = 1
 
 	for pair in classPairs:
-		print pair, classPairs[pair]
+		print pair, len(classPairs[pair])
 		
 
 
