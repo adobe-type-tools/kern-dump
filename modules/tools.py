@@ -213,7 +213,7 @@ def readKerningClasses(path):
 	classes = []
 	for name, glyphs in allClassesList:
 		c = kerningClass()
-		c.name = name
+		c.name = '@%s' % name
 		c.glyphs = glyphs.split()
 
 		if name.split('_')[-1] == 'LEFT':
