@@ -235,31 +235,9 @@ def readKerningClasses(path):
 	return classes
 	
 def readKerningPairs(path):
-
 	kernPairsString = readFile(path)
-	allPairsList = re.findall(r"pos\s*([@A-Za-z0-9_.]+?)\s*([@A-Za-z0-9_.]+?)\s*(-?\d+?);", kernPairsString)
-
-	# classes = []
-	# for name, glyphs in allClassesList:
-	# 	c = kerningClass()
-	# 	c.name = '@%s' % name
-	# 	c.glyphs = glyphs.split()
-	# 
-	# 	if name.split('_')[-1] == 'LEFT':
-	# 		c.side = 'LEFT'
-	# 		classes.append(c)
-	# 	elif name.split('_')[-1] == 'RIGHT':
-	# 		c.side = 'RIGHT'
-	# 		classes.append(c)
-	# 	else:
-	# 		c.side = 'LEFT'
-	# 		classes.append(c)
-	# 
-	# 		d = kerningClass()
-	# 		d.name = c.name
-	# 		d.glyphs = c.glyphs
-	# 		d.side = 'RIGHT'
-	# 		classes.append(d)
+	# allPairsList = re.findall(r"pos\s*([@A-Za-z0-9_.]+?)\s*([@A-Za-z0-9_.]+?)\s*(-?\d+?);", kernPairsString)
+	allPairsList = re.findall(r"pos\s*\[?([@A-Za-z0-9_.]+?)\]?\s*\[?([@A-Za-z0-9_.]+?)\]?\s*(-?\d+?);", kernPairsString)
 		
 	return allPairsList
 	

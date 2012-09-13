@@ -228,7 +228,8 @@ def makeExperimentalKernFeature(fontPath, singlePairsList, classes):
 	print "Let me show you how it's done. It took",
 
 
-
+def test(fontPath, singlePairsList):
+	print singlePairsList
 
 
 if __name__ == "__main__":
@@ -252,6 +253,12 @@ if __name__ == "__main__":
 		classes = readKerningClasses(filePath)
 		makeExperimentalKernFeature(fontPath, singlePairsList, classes)
 		
+	elif option == '-test':
+		fontPath = sys.argv[-1]
+		singlePairsList = getSinglePairs(fontPath)
+		test(fontPath, singlePairsList)
+
+	
 	else:
 		print 'no option used'
 	
