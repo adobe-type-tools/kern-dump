@@ -3,9 +3,13 @@ import string
 import itertools
 import re
 
-def readFile(filePath):
+def readFile(filePath, option=None):
 	file = open(filePath, 'r')
-	fileLinesString = file.read()
+
+	if not option:
+		fileLinesString = file.read()
+	else:
+		fileLinesString = file.read().splitlines()
 	file.close()
 	return fileLinesString
 
@@ -207,8 +211,17 @@ def makeKerningClasses(singlePairsList):
 
 def readKerningClasses(path):
 
-	kernClassesString = readFile(path)
-	allClassesList = re.findall(r"@(\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", kernClassesString)
+	kernClassesList = readFile(path, 'split')
+	allClassesList = []
+
+	for line in kernClassesList:
+		match = re.match(r"@(\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", line)
+		if match:
+			allClassesList.append((match.group(1), match.group(2)))
+
+	# This line would match commented lines of a source file; and it is difficult to exclude them from a long string.
+	# Therefore, another matching method was chosen.
+	# allClassesList = re.findall(r"@(\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", kernClassesString)
 
 	classes = []
 	for name, glyphs in allClassesList:
@@ -237,7 +250,7 @@ def readKerningClasses(path):
 def readKerningPairs(path):
 	kernPairsString = readFile(path)
 	# allPairsList = re.findall(r"pos\s*([@A-Za-z0-9_.]+?)\s*([@A-Za-z0-9_.]+?)\s*(-?\d+?);", kernPairsString)
-	allPairsList = re.findall(r"pos\s*\[?([@A-Za-z0-9_.]+?)\]?\s*\[?([@A-Za-z0-9_.]+?)\]?\s*(-?\d+?);", kernPairsString)
+	allPairsList = re.findall(r"[^# \t]pos\s*\[?([@A-Za-z0-9_.]+?)\]?\s*\[?([@A-Za-z0-9_.]+?)\]?\s*(-?\d+?);", kernPairsString)
 		
 	return allPairsList
 	

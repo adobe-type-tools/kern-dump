@@ -210,17 +210,20 @@ for groupName, glyphList in sorted(font.groups.items()):
 		print '%s = [%s %s];' % (adobeName(groupName), getKeyGlyph(groupName), ' '.join(getOtherGlyphs(groupName)))
 
 
-print
-print
-print '\n# exceptions:\n'
-print dict2pos(exceptions)
-print '\n# glyph, glyph:\n'
-print dict2pos(g_g_dict)
-print '\n# group, glyph:\n'
-print dict2pos(gr_g_dict)
-print '\n# glyph, group:\n'
-print dict2pos(g_gr_dict)
-print '\n# group, group:\n'
-print dict2pos(gr_gr_dict)
+if len(exceptions) > 0:
+	print '\n# exceptions:'
+	print dict2pos(exceptions)
+if len(g_g_dict) > 0:
+	print '\n# glyph, glyph:'
+	print dict2pos(g_g_dict)
+if len(gr_g_dict) > 0:
+	print '\n# group, glyph:'
+	print dict2pos(gr_g_dict)
+if len(g_gr_dict) > 0:
+	print '\n# glyph, group:'
+	print dict2pos(g_gr_dict)
+if len(gr_gr_dict) > 0:
+	print '\n# group, group:'
+	print dict2pos(gr_gr_dict)
 
 
