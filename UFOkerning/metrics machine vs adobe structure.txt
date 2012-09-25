@@ -1,0 +1,71 @@
+feature kern{
+	@CLASSES
+    @MMK_L_CYR_LC_a.cyr = [a.cyr abrevecyr acyr.begin1];
+
+    # glyph, glyph
+    pos Alpha.swash1 alpha.begin1 20;
+    pos Alpha.swash1 alphalatin 30;
+    pos Alpha.swash1 iota.begin1 10;
+    pos Alpha.swash1 lambda.begin1 -150;
+
+    # glyph, group exceptions
+    enum pos Lcaron [quotedblright quoteright] 150;
+    enum pos dcroat [quotedblleft quoteleft] 130;
+
+    # group exceptions, glyph
+    enum pos [Ghe Ghestroke Gje] tshe.begin1 30;
+    enum pos [K Kcommaaccent] abrevegrave 30;
+    enum pos [K Kcommaaccent] abrevetilde 40;
+    enum pos [K Kcommaaccent] acircumflextilde 40;
+    enum pos [K Kcommaaccent] ecircumflexgrave 40;
+    enum pos [N Nacute Ncaron Ncommaaccent Ncommaaccent.locl Ncommaaccent.ss03 Ndotaccent Ndotbelow Nlinebelow Ntilde] ecircumflexgrave 20;
+
+    # glyph, group
+    pos A.swash2 @MMK_R_colon 25;
+    pos A.swash2 @MMK_R_comma 30;
+    pos A.swash2 @MMK_R_hyphen 35;
+
+    # group, glyph
+    pos @MMK_L_CYR_LC_be che.begin1 -20;
+    pos @MMK_L_CYR_LC_be che.begin4 -20;
+    pos @MMK_L_CYR_LC_be de.alt1 -10;
+    pos @MMK_L_CYR_LC_be de.alt10 -10;
+
+    # group, group
+    pos @MMK_L_CYR_LC_be @MMK_R_CYR_LC_a.cyr -10;
+    pos @MMK_L_CYR_LC_be @MMK_R_CYR_LC_de -10;
+    pos @MMK_L_CYR_LC_be @MMK_R_CYR_LC_dje 10;
+
+} kern;
+
+----------------
+
+# CLASSES
+@a.cyr_LC_LEFT_CYR = [a.cyr abrevecyr acyr.begin1];
+
+
+# glyph, glyph
+pos Alpha.swash1 alpha.begin1 20;
+pos Alpha.swash1 alphalatin 30;
+pos Alpha.swash1 iota.begin1 10;
+pos Alpha.swash1 lambda.begin1 -150;
+
+# group, glyph
+enum pos @A_UC_LEFT_LAT [B] 74;
+enum pos @A_UC_LEFT_LAT [F] 49;
+enum pos @A_UC_LEFT_LAT [P] 49;
+enum pos @A_UC_LEFT_LAT [Q] 55;
+
+# glyph, group
+enum pos [A.swash2] @colon_RIGHT 25;
+enum pos [A.swash2] @comma_RIGHT 30;
+enum pos [A.swash2] @hyphen_RIGHT 35;
+enum pos [A.swash2] @quoteright_RIGHT 70;
+enum pos [A.swash2] @quotesingle_RIGHT 70;
+enum pos [Alpha.swash1] @alpha_LC_RIGHT_GRK 30;
+
+# group, group
+pos @A_UC_LEFT_LAT @A_UC_RIGHT_LAT 100;
+pos @A_UC_LEFT_LAT @C_UC_RIGHT_LAT 74;
+pos @A_UC_LEFT_LAT @D_UC_RIGHT_LAT 86;
+pos @A_UC_LEFT_LAT @E_UC_RIGHT_LAT 43;

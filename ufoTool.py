@@ -103,14 +103,19 @@ def appendKerning(ufo, classes, pairs):
 	f.save()
 	
 	
-def other(ufo):
+def stripClasses(ufo):
 	f = Font(ufo)
-	print f.groups.keys()
- 		
-	# f.kerning.clear()
-	# f.groups.clear()
-	# f.save()
+	for name, group in f.groups.items()[::-1]:
+		if len(group) == 0:
+			del f.groups[name]
+	f.save()
 
+def madLib(ufo, orderFile):
+	f = Font(ufo)
+	enc = readFile(orderFile)
+	print enc.split()
+	f.lib['public.glyphOrder'] = enc.split()
+	f.save()
 def renameGlyphs(ufo):
 	proportional = 'guOne.pnum guSix.pnum guTwo.pnum guSeven.pnum guEight.pnum guZero.pnum guNine.pnum guFour.pnum guThree.pnum guFive.pnum'.split()
 	tabular = 'guOne guSix guTwo guSeven guEight guZero guNine guFour guThree guFive'.split()
@@ -146,12 +151,15 @@ if __name__ == "__main__":
 	startTime = time.time()
 	# option = sys.argv[1]
 	ufo = sys.argv[-1]
-	filePath = sys.argv[1]
-	classes = readKerningClasses(filePath)
-	pairs = readKerningPairs(filePath)
+ 	orderFile = sys.argv[1]
+ 	madLib(ufo, orderFile)
+	
+# 	filePath = sys.argv[1]
+# 	classes = readKerningClasses(filePath)
+# 	pairs = readKerningPairs(filePath)
 # 	renameGlyphs(ufo)
 	endTime = round(time.time() - startTime, 2)
 	print '%s seconds.' % endTime
 	# 
-	replaceKerning(ufo, classes, pairs)
+# 	replaceKerning(ufo, classes, pairs)
 	
