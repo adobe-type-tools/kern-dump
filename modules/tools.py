@@ -219,7 +219,7 @@ def readKerningClasses(path):
 		if match:
 			allClassesList.append((match.group(1), match.group(2)))
 
-	# This line would match commented lines of a source file; and it is difficult to exclude them from a long string.
+	# This line would match commented lines; and it is difficult to exclude those from a long string.
 	# Therefore, another matching method was chosen.
 	# allClassesList = re.findall(r"@(\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", kernClassesString)
 
