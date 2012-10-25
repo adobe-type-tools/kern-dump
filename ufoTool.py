@@ -34,6 +34,51 @@ def madLib(ufo, orderFile):
 	f.lib['public.glyphOrder'] = enc.split()
 	f.save()
 
+
+def cleanupMarkColors(ufo):
+	f = Font(ufo)
+	colors = f.lib['com.typesupply.MetricsMachine4.groupColors']
+	for groupName in colors.keys():
+		if not groupName in f.groups.keys():
+			del colors[groupName]
+			print 'MM group color info for non-existent group %s deleted.' % groupName
+	f.save()
+
+
+def appendFlagToClasses(ufo):
+	'Appends _LEFT and _RIGHT flag to class names which do not have it.'
+	f = Font(ufo)
+	for name, group in f.groups.items():
+		spName = name.split('_')
+		if spName[1] == 'R' and spName[-1] != 'RIGHT':
+			spName.append('RIGHT')
+			newName = '_'.join(spName)
+			del f.groups[name]
+			f.groups[newName] = group
+			# if name in [kernPair[1] for kernPair in f.kerning.keys]:
+			# 	f.kerning[(kernPair[0], newName)] = f.kerning[kernPair]
+			# 	del f.kerning[kernPair]
+		if spName[1] == 'L' and spName[-1] != 'LEFT':
+			spName.append('LEFT')
+			newName = '_'.join(spName)
+			del f.groups[name]
+			f.groups[newName] = group
+	f.save()
+	cleanupMarkColors(ufo)
+
+def k(ufo): ############ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Not good! 
+	f = Font(ufo)
+	name = '@MMK_L_Z_UC'
+	spName = name.split('_')
+	if spName[1] == 'L' and spName[-1] != 'LEFT':
+		spName.append('RIGHT')
+		if name in [kernPair[0] for kernPair in f.kerning.keys()]:
+			print kernPair, f.kerning[kernPair]
+			# f.kerning[(kernPair[0], newName)] = f.kerning[kernPair]
+			# del f.kerning[kernPair]
+#	print f.kerning.keys()
+
+
 def renameGlyphs(ufo):
 	proportional = 'guOne.pnum guSix.pnum guTwo.pnum guSeven.pnum guEight.pnum guZero.pnum guNine.pnum guFour.pnum guThree.pnum guFive.pnum'.split()
 	tabular = 'guOne guSix guTwo guSeven guEight guZero guNine guFour guThree guFive'.split()
@@ -51,6 +96,12 @@ def renameGlyphs(ufo):
 		else:
 			continue
 
+
+def getKerning(ufo):
+	f = Font(ufo)
+	print f.kerning.items()
+	
+
 def makePairlist(ufo):
 	pairlist = ['#KPL:P: noName']
 	f = Font(ufo)
@@ -65,6 +116,7 @@ def makePairlist(ufo):
 			r = right
 		pairlist.append('%s %s' % (l,r))
 	return pairlist
+	
 # 	for left, right in f.kerning.keys():
 # 		if left in swapdict:
 # 			print left, right, '->',
@@ -83,10 +135,13 @@ if __name__ == "__main__":
 	startTime = time.time()
 	# option = sys.argv[1]
 	ufo = sys.argv[-1]
- 	orderFile = sys.argv[1]
-# 	madLib(ufo, orderFile)
-	desktop = os.path.expanduser('~/Desktop')
-	write2file(os.sep.join((desktop, 'pL.txt')), makePairlist(ufo))
+ 	# orderFile = sys.argv[1]
+	# madLib(ufo, orderFile)
+
+	getKerning(ufo)
+	# cleanupMarkColors(ufo)
+	# desktop = os.path.expanduser('~/Desktop')
+	# write2file(os.sep.join((desktop, 'pL.txt')), makePairlist(ufo))
 # 	filePath = sys.argv[1]
 # 	classes = readKerningClasses(filePath)
 # 	pairs = readKerningPairs(filePath)
