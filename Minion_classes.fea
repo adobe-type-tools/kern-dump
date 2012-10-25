@@ -37,12 +37,16 @@
 
 @HMN_LC_LEFT = [h hbar hcircumflex m mcircumflex n ntilde eng nacute ncaron ncommaaccent ncircumflex napostrophe T_h Tcaron_h Tcommaaccent_h c_h f_f_h f_h longs_h ghmacronbelow hdieresisbelow hdotbelow hlinebelow khmacronbelow mcandrabindu mdotaccent mdotbelow ncandrabindu ndotaccent ndotbelow nlinebelow Ghmacronbelow Khmacronbelow ];
 @HKL_LC_RIGHT = [h hbar hcircumflex k kcommaaccent l lacute lcaron lcommaaccent ldot thorn hdotbelow hlinebelow hdieresisbelow klinebelow kdotbelow ldieresisbelow llinebelow ldotbelow lringbelow khmacronbelow];
-@JPTU_LC_RIGHT = [j jcircumflex dotlessj p t tcaron tcommaaccent tcedilla u uacute ucircumflex udieresis ugrave ubreve uhungarumlaut umacron uogonek uring utilde udotbelow uhook];
+@J_LC_RIGHT = [j jcircumflex dotlessj];
+@P_LC_RIGHT = [p];
+@U_LC_RIGHT = [u uacute ucircumflex udieresis ugrave ubreve uhungarumlaut umacron uogonek uring utilde udotbelow uhook];
+@T_LC_RIGHT = [t tcaron tcommaaccent tcedilla tdieresisbelow tdotbelow];
 @JQ_LC_LEFT = [j jcircumflex dotlessj q i_j f_f_j f_f_k f_j];
 @K_LC_LEFT = [k kcommaaccent c_k f_k longs_k kdotbelow klinebelow];
-@T_LC_LEFT = [t tcaron tcommaaccent tcedilla c_t f_f_t f_t longs_t s_t];
+@T_LC_LEFT = [t tcaron tcommaaccent tcedilla tdieresisbelow tdotbelow c_t f_f_t f_t longs_t s_t];
 @DILU_LC_LEFT = [d dcaron i dotlessi iacute icircumflex idieresis igrave ibreve imacron iogonek itilde ihook idotbelow i.dot l lacute lcaron lcommaaccent ldot u uacute ucircumflex udieresis ugrave ubreve uhungarumlaut umacron uogonek uring utilde udotbelow uhook f_i f_l f_f_i f_f_l fl fi longs_i longs_l longs_longs_i longs_longs_l ddotbelow ldieresisbelow ldotbelow llinebelow lringbelow];
-@FIMNR_LC_RIGHT = [f longs longs_longs i dotlessi iacute icircumflex idieresis igrave ibreve imacron iogonek itilde ihook idotbelow i.dot m mcircumflex n ntilde eng nacute ncaron ncommaaccent ncircumflex r racute rcaron rcommaaccent f_i f_l germandbls f_f f_f_i f_f_l i_j fl fi f_b f_f_b f_f_h f_f_j f_f_k f_f_t f_h f_j f_k f_t longs_b longs_h longs_i longs_k longs_l longs_longs_i longs_longs_l longs_t mdotaccent mcandrabindu mdotbelow ndotaccent ncandrabindu nlinebelow ndotbelow rdotbelowmacron rringbelowmacron rbreve rdotaccent rlinebelow rdotbelow rringbelow];
+@FIMNR_LC_RIGHT = [f longs longs_longs i dotlessi iacute icircumflex idieresis igrave ibreve imacron iogonek itilde ihook idotbelow i.dot f_i f_l germandbls f_f f_f_i f_f_l i_j fl fi f_b f_f_b f_f_h f_f_j f_f_k f_f_t f_h f_j f_k f_t longs_b longs_h longs_i longs_k longs_l longs_longs_i longs_longs_l longs_t];
+@MNR_LC_RIGHT = [m mcircumflex n ntilde eng nacute ncaron ncommaaccent ncircumflex r racute rcaron rcommaaccent mdotaccent mcandrabindu mdotbelow ndotaccent ncandrabindu nlinebelow ndotbelow rdotbelowmacron rringbelowmacron rbreve rdotaccent rlinebelow rdotbelow rringbelow];
 @ROUND_LC_LEFT = [b o oslash oslashacute oacute ocircumflex odieresis ograve otilde obreve ohungarumlaut omacron odotbelow ohook ocircumflexacute ocircumflexgrave ocircumflexhook ocircumflextilde ocircumflexdotbelow p thorn longs_b s_p];
 @ROUND_LC_RIGHT = [c ccedilla cacute ccaron ccircumflex cdotaccent d ddotbelow dcaron e eacute ecircumflex edieresis egrave ebreve ecaron edotaccent emacron eogonek edotbelow ehook etilde ecircumflexacute ecircumflexgrave ecircumflexhook ecircumflextilde ecircumflexdotbelow o oslash oslashacute oacute ocircumflex odieresis ograve otilde obreve ohungarumlaut omacron odotbelow ohook ocircumflexacute ocircumflexgrave ocircumflexhook ocircumflextilde ocircumflexdotbelow ohorn ohornacute ohorngrave ohornhook ohorntilde ohorndotbelow q oe eth dcroat c_h c_k c_t];
 @A_LC_LEFT = [a amacronbreve aacute acircumflex adieresis agrave aring atilde abreve amacron aogonek adotbelow ahook acircumflexacute acircumflexgrave acircumflexhook acircumflextilde acircumflexdotbelow abreveacute abrevegrave abrevehook abrevetilde abrevedotbelow aringacute];
@@ -67,7 +71,7 @@
 @ROUND_UC_LEFT = [D Ddotbelow Dcaron O Oslash Oacute Ocircumflex Odieresis Ograve Otilde Obreve Ohungarumlaut Omacron Oslashacute Odotbelow Ohook Ocircumflexacute Ocircumflexgrave Ocircumflexhook Ocircumflextilde Ocircumflexdotbelow Q Eth Dcroat];
 @ROUND_UC_RIGHT = [C Ccedilla Cacute Ccaron Ccircumflex Cdotaccent G Gmacronbelow Gdotbelowcomb GHmacronbelow Ghmacronbelow Gbreve Gcircumflex Gcommaaccent Gdotaccent Gtilde O Oslash Oacute Ocircumflex Odieresis Ograve Otilde Obreve Ohungarumlaut Omacron Oslashacute Odotbelow Ohook Ocircumflexacute Ocircumflexgrave Ocircumflexhook Ocircumflextilde Ocircumflexdotbelow Ohorn Ohornacute Ohorngrave Ohornhook Ohorntilde Ohorndotbelow Q OE];
 @STRAIGHT_UC_LEFT = [H Hbar Hcircumflex I Iacute Icircumflex Idieresis Igrave Ibreve Imacron Iogonek Itilde Idotaccent Ihook Idotbelow GHmacronbelow Hdieresisbelow Hdotbelow Hmacronbelow KHmacronbelow ];
-@STRAIGHT_UC_RIGHT = [B D Ddotbelow Dcaron E Eacute Ecircumflex Edieresis Egrave Ebreve Ecaron Edotaccent Emacron Eogonek Edotbelow Ehook Etilde Ecircumflexacute Ecircumflexgrave Ecircumflexhook Ecircumflextilde Ecircumflexdotbelow F H Hbar Hcircumflex I Iacute Icircumflex Idieresis Igrave Ibreve Imacron Iogonek Itilde Idotaccent Ihook Idotbelow K Kcommaaccent L Lacute Lcaron Lcommaaccent Ldot N Ntilde Eng Nacute Ncaron Ncommaaccent Ncircumflex Ndotaccent Ncandrabindu Nlinebelow Ndotbelow P R Racute Rcaron Rcommaaccent Thorn I_J Hdotbelow Hdieresisbelow Hmacronbelow Klinebelow Kdotbelow Ldieresisbelow Llinebelow Ldotbelow Lringbelow Rdotbelowmacron Rringbelowmacron Rbreve Rdotaccent Rlinebelow Rdotbelow Rringbelow KHmacronbelow Khmacronbelow ];
+@STRAIGHT_UC_RIGHT = [B D Ddotbelow Dcaron E Eacute Ecircumflex Edieresis Egrave Ebreve Ecaron Edotaccent Emacron Eogonek Edotbelow Ehook Etilde Ecircumflexacute Ecircumflexgrave Ecircumflexhook Ecircumflextilde Ecircumflexdotbelow F H Hbar Hcircumflex I Iacute Icircumflex Idieresis Igrave Ibreve Imacron Iogonek Itilde Idotaccent Ihook Idotbelow K Kcommaaccent L Lacute Lcaron Lcommaaccent Ldot N Ntilde Eng Nacute Ncaron Ncommaaccent Ncircumflex Ndotaccent Ncandrabindu Nlinebelow Ndotbelow P R Racute Rcaron Rcommaaccent Thorn I_J Hdotbelow Hdieresisbelow Hmacronbelow Klinebelow Kdotbelow Ldieresisbelow Llinebelow Ldotbelow Lringbelow Rdotbelowmacron Rringbelowmacron Rbreve Rdotaccent Rlinebelow Rdotbelow Rringbelow KHmacronbelow Khmacronbelow];
 @A_UC_LEFT = [A Aacute Acircumflex Adieresis Agrave Aring Atilde Abreve Amacron Aogonek Adotbelow Ahook Acircumflexacute Acircumflexgrave Acircumflexhook Acircumflextilde Acircumflexdotbelow Abreveacute Abrevegrave Abrevehook Abrevetilde Abrevedotbelow Aringacute Amacronbreve];
 @A_UC_RIGHT = [A Amacronbreve Aacute Acircumflex Adieresis Agrave Aring Atilde Abreve Amacron Aogonek Adotbelow Ahook Acircumflexacute Acircumflexgrave Acircumflexhook Acircumflextilde Acircumflexdotbelow Abreveacute Abrevegrave Abrevehook Abrevetilde Abrevedotbelow Aringacute AE AEacute];
 @B_UC_LEFT = [B];
@@ -85,8 +89,8 @@
 @OHORN_UC_LEFT = [Ohorn Ohornacute Ohorngrave Ohornhook Ohorntilde Ohorndotbelow];
 @P_UC_LEFT = [P];
 @R_UC_LEFT = [R Racute Rcaron Rcommaaccent Rbreve Rdotaccent Rdotbelow Rdotbelowmacron Rlinebelow Rringbelow Rringbelowmacron ];
-@S_UC = [S Scaron Sacute Scedilla Scommaaccent Scircumflex Scedilla.dup Sdieresisbelow Sdotbelow ];
-@T_UC_LEFT = [T Tcaron Tcommaaccent Tcedilla Tdieresisbelow Tdotbelow ];
+@S_UC = [S Scaron Sacute Scedilla Scommaaccent Scircumflex Sdieresisbelow Sdotbelow ];
+@T_UC_LEFT = [T Tcaron Tcommaaccent Tcedilla Tdieresisbelow Tdotbelow];
 @T_UC_RIGHT = [T Tcaron Tcommaaccent Tcedilla T_h Tcaron_h Tcommaaccent_h Tdieresisbelow Tdotbelow];
 @U_UC_LEFT = [U Uacute Ucircumflex Udieresis Ugrave Ubreve Uhungarumlaut Umacron Uogonek Uring Utilde Udotbelow Uhook];
 @U_UC_RIGHT = [U Uacute Ucircumflex Udieresis Ugrave Ubreve Uhungarumlaut Umacron Uogonek Uring Utilde Udotbelow Uhook Uhorn Uhornacute Uhorngrave Uhornhook Uhorntilde Uhorndotbelow];
