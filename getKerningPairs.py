@@ -3,7 +3,8 @@ import os, sys
 from fontTools import ttLib
 
 kKernFeatureTag = 'kern'
-li = []
+kGPOStableName = 'GPOS'
+finalList = []
 
 
 class myLeftClass:
@@ -34,7 +35,11 @@ def collectUniqueKernLookupListIndexes(featureRecord):
 def main(fontPath):
 	font = ttLib.TTFont(fontPath)
 	
-	gposTable = font['GPOS'].table
+	if kGPOStableName not in font:
+		print "The font has no %s table" % kGPOStableName
+		return
+	
+	gposTable = font[kGPOStableName].table
 	
 	glyphPairsList = []
 	glyphPairsDict = {}
@@ -51,7 +56,7 @@ def main(fontPath):
 	
 	# Make sure a 'kern' feature was found
 	if not len(uniqueKernLookupListIndexesList):
-		print "The font has no 'kern' feature"
+		print "The font has no %s feature" % kKernFeatureTag
 		return
 
 ### LookupList ###
@@ -75,13 +80,10 @@ def main(fontPath):
 					pairPos = subtableItem.ExtSubTable
 			
 			
-# 				if pairPos.Format not in [1]:
-# 					print "WARNING: PairPos format %d is not yet supported" % pairPos.Format
-			
 			if pairPos.Coverage.Format not in [1, 2]:
 				print "WARNING: Coverage format %d is not yet supported" % pairPos.Coverage.Format
 			
-			if pairPos.ValueFormat1 not in [4]:
+			if pairPos.ValueFormat1 not in [0, 4, 5]:
 				print "WARNING: ValueFormat1 format %d is not yet supported" % pairPos.ValueFormat1
 			
 			if pairPos.ValueFormat2 not in [0]:
@@ -98,7 +100,16 @@ def main(fontPath):
 #					print 'xxx', len(pairPos.PairSet), 'xxx'
 					for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
 						secondGlyph = pairValueRecordItem.SecondGlyph
-						kernValue = pairValueRecordItem.Value1.XAdvance
+						valueFormat = pairPos.ValueFormat1
+						if valueFormat == 5: # RTL kerning
+							kernValue = "<%d 0 %d 0>" % (pairValueRecordItem.Value1.XPlacement, pairValueRecordItem.Value1.XAdvance)
+						elif valueFormat == 0: # RTL pair with value <0 0 0 0>
+							kernValue = "<0 0 0 0>"
+						elif valueFormat == 4: # LTR kerning
+							kernValue = pairValueRecordItem.Value1.XAdvance
+						else:
+							print "\tValueFormat1 = %d" % valueFormat
+							continue # skip the rest
 						
 #						glyphPairsList.append((firstGlyphsList[pairSetIndex], secondGlyph, kernValue))
 						glyphPairsDict[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
@@ -158,7 +169,16 @@ def main(fontPath):
 				for record_l in leftClasses:
 					for record_r in rightClasses:
 						if pairPos.Class1Record[record_l].Class2Record[record_r]:
-							kernValue = pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance
+							valueFormat = pairPos.ValueFormat1
+							
+							if valueFormat in [4, 5]:
+								kernValue = pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance
+							elif valueFormat == 0: # valueFormat zero is caused by a value of <0 0 0 0> on a class-class pair; skip these
+								continue
+							else:
+								print "\tValueFormat1 = %d" % valueFormat
+								continue # skip the rest
+							
 							if kernValue != 0:
 								for l in leftClasses[record_l].glyphs:
 									for r in rightClasses[record_r].glyphs:
@@ -166,6 +186,9 @@ def main(fontPath):
 											# if the kerning pair has already been assigned in pair-to-pair kerning
 											continue
 										else:
+											if valueFormat == 5: # RTL kerning
+												kernValue = "<%d 0 %d 0>" % (pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XPlacement, pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance)
+											
 											glyphPairsDict[(l, r)] = kernValue
 							
 						else:
@@ -178,10 +201,10 @@ def main(fontPath):
 # 	print len(glyphPairsDict)
 	
 	for pair, value in glyphPairsDict.items():
-	 	li.append('/%s /%s %s' % ( pair[0], pair[1], value ))
+	 	finalList.append('/%s /%s %s' % ( pair[0], pair[1], value ))
 			
-	li.sort()
-	output = '\n'.join(li)
+	finalList.sort()
+	output = '\n'.join(finalList)
 	print output
 	
 # 	scrap = os.popen('pbcopy', 'w')
