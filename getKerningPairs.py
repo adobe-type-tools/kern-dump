@@ -2,6 +2,11 @@ import os, sys
 #import inspect
 from fontTools import ttLib
 
+'''
+Gets all possible kerning pairs within font.
+Supports RTL.
+'''
+
 kKernFeatureTag = 'kern'
 kGPOStableName = 'GPOS'
 finalList = []

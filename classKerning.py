@@ -6,12 +6,11 @@ from modules.fromGPOS import *
 import operator
 
 __doc__ ='''\
-
-	This script is capable of extracting a viable features.kern file from a compiled font.
-	To be expanded with multiple options; e.g. AFM-export; and export of all possible (exploded) pairs.
-
-	usage: python getKerning font.otf > outputfile
-
+	
+	Was probably used to export a 'safe' kern feature from Adobe Devanagari.
+	This script makes classes for a font which does only have flat kerning pairs (for whatever reason that may be).
+	
+	
 	'''
 	
 def outputFile(path, suffix):

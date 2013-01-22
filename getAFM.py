@@ -2,6 +2,11 @@ import os, sys
 import inspect
 from fontTools import ttLib
 
+'''
+Gets AFM kerning information from OTF.
+Copies resulting data to clipboard.
+'''
+
 kKernFeatureTag = 'kern'
 li = []
 
@@ -198,7 +203,7 @@ def main(fontPath):
 	scrap = os.popen('pbcopy', 'w')
 	scrap.write(output)
 	scrap.close()
-	print 'done'
+	print 'Done. AFM copied to clipboard.'
 
 
 # 	membersList = inspect.getmembers(pairPos.ClassDef1.classDefs)

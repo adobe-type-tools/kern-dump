@@ -6,9 +6,12 @@ from fontTools import ttLib
 
 __doc__ ='''\
 
-	This script is capable of extracting a viable features.kern file from a compiled font.
+	This script extracts a viable features.kern file from a compiled font.
 	To be expanded with multiple options; e.g. AFM-export; and export of all possible (exploded) pairs.
-
+	(Momentarily, those are separate scripts.)
+	
+	ATTENTION: writes old-style (wrong enum) kern feature.
+	
 	usage: python getKerning font.otf > outputfile
 
 	'''

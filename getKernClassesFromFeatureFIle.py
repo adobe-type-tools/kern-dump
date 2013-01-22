@@ -1,12 +1,19 @@
 import sys, re
 
+'''
+
+Takes feature file, returns python KerningClass class for each kern class found within that file.
+KerningClass object has .glyphs, .side, .name options.
+
+'''
+
 def readFile(filePath):
 	file = open(filePath, 'r')
 	fileLinesString = file.read()
 	file.close()
 	return fileLinesString
 
-class kerningClass(object):
+class KerningClass(object):
 	def __init__(self):
 		self.glyphs = []
 		self.name = ''
@@ -18,7 +25,7 @@ allClassesList = re.findall(r"@(\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", kernClass
 
 classes = []
 for name, glyphs in allClassesList:
-	c = kerningClass()
+	c = KerningClass()
 	c.name = name
 	c.glyphs = glyphs.split()
 
@@ -32,9 +39,12 @@ for name, glyphs in allClassesList:
 		c.side = 'LEFT'
 		classes.append(c)
 
-		d = kerningClass()
+		d = KerningClass()
 		d.name = c.name
 		d.glyphs = c.glyphs
 		d.side = 'RIGHT'
 		classes.append(d)
 		
+
+for i in classes:
+	print i.name, i.side, i.glyphs

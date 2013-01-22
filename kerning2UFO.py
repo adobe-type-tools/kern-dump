@@ -4,7 +4,10 @@ from modules.fromGPOS import *
 import operator
 from defcon import Font
 
-	
+
+'''Various disconnected functions, which do stuff with UFOs.'''
+
+
 def outputFile(path, suffix):
  	return '%s.%s' % (os.path.splitext(fontPath)[0], suffix)
 
@@ -111,7 +114,7 @@ def other(ufo):
 	# f.groups.clear()
 	# f.save()
 
-def renameGlyphs(ufo):
+def renameGlyphsInKerning(ufo):
 	proportional = 'guOne.pnum guSix.pnum guTwo.pnum guSeven.pnum guEight.pnum guZero.pnum guNine.pnum guFour.pnum guThree.pnum guFive.pnum'.split()
 	tabular = 'guOne guSix guTwo guSeven guEight guZero guNine guFour guThree guFive'.split()
 	swapdict = dict(zip(tabular, proportional))
@@ -149,7 +152,7 @@ if __name__ == "__main__":
 	filePath = sys.argv[1]
 	classes = readKerningClasses(filePath)
 	pairs = readKerningPairs(filePath)
-# 	renameGlyphs(ufo)
+# 	renameGlyphsInKerning(ufo)
 	endTime = round(time.time() - startTime, 2)
 	print '%s seconds.' % endTime
 	# 

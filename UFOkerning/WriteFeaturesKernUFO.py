@@ -2,6 +2,10 @@ from defcon import Font
 import re, sys, os, time
 
 
+'''
+Obsolete with the new kern feature generator; wich supports both VFB and UFO input formats.
+'''
+
 class UFOkernData(object):
 	def __init__(self, font):
 		self.font = Font(font)
