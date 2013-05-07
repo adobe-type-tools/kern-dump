@@ -1,6 +1,6 @@
 # writes FLC-style classes from UFO
 # Don't forget to delete Metrics Machine reference groups!
-from defcon import Font
+from defcon import Font as defconFont
 import re, os, sys
 
 
@@ -11,10 +11,12 @@ else:
 	sys.exit()
 	
 if os.path.exists(input):
-	font = Font(input)
+	font = defconFont(input)
 else:
 	print 'No UFO file provided.'
 	sys.exit()
+
+filePath = GetFile("Pick UFO...")
 
 	
 def getKeyGlyph(groupName):
@@ -115,7 +117,7 @@ counter = 0
 for g in font.groups.keys():
 	if re.search(rex, g): counter += 1
 if counter > len(font.groups.keys())/2:
-	alt_mode = True
+	alt_mode = False
 
 
 # mode1 = False  # this is for groups named 'LAT_LC_a', 'CYR_LC_a.cyr' etc.

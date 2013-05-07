@@ -5,6 +5,11 @@ from fontTools import ttLib
 '''
 Gets all possible kerning pairs within font.
 Supports RTL.
+
+2013-01-22:
+Working with Bickham Script pro 3 and its many subtables, it was discovered that 
+the script reports many more pairs than actually exist. Investigate!
+
 '''
 
 kKernFeatureTag = 'kern'
