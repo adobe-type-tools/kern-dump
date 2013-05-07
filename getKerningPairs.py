@@ -142,8 +142,8 @@ def main(fontPath):
 				
 				lg0 = myLeftClass()
 				for leftGlyph in firstGlyphsList:
-						if not leftGlyph in pairPos.ClassDef1.classDefs:
-							lg0.glyphs.append(leftGlyph)
+					if not leftGlyph in pairPos.ClassDef1.classDefs:
+						lg0.glyphs.append(leftGlyph)
 
 				leftClasses[lg0.class1Record] = lg0		
 				
