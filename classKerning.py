@@ -10,6 +10,9 @@ __doc__ ='''\
 	Was probably used to export a 'safe' kern feature from Adobe Devanagari.
 	This script makes classes for a font which does only have flat kerning pairs (for whatever reason that may be).
 	
+	Usage:
+	python classKerning.py -font <path_to_OTF_or_TTF>
+	python classKerning.py -file <path_to_OTF_or_TTF> <path_to_FEA_file_with_kerning_classes>
 	
 	'''
 	
@@ -210,10 +213,15 @@ def makeExperimentalKernFeature(fontPath, singlePairsList, classes):
 	
 	decoration = ' >^.^< ' * 10
 	print decoration
-	print "Unclassy glyphs remaining on left side:\n%s" % (', '.join(sorted(remainingLeft)))
-	print
+	if len(remainingLeft):
+		print "Unclassy glyphs remaining on left side:\n%s" % (', '.join(sorted(remainingLeft)))
+	else:
+		print "CONGRATULATIONS!! All left side glyphs are classy."
 	print decoration
-	print "Unclassy glyphs remaining on right side:\n%s" % (', '.join(sorted(remainingRight)))
+	if len(remainingRight):
+		print "Unclassy glyphs remaining on right side:\n%s" % (', '.join(sorted(remainingRight)))
+	else:
+		print "CONGRATULATIONS!! All right side glyphs are classy."
 	print decoration
 	print	
 	
@@ -237,8 +245,8 @@ if __name__ == "__main__":
 	option = sys.argv[1]
 
 	if option == '-font':
-		if os.path.exists(sys.argv[-1]):
-			fontPath = sys.argv[-1]
+		if os.path.exists(sys.argv[2]):
+			fontPath = sys.argv[2]
 			singlePairsList = getSinglePairs(fontPath)
 			classes = makeKerningClasses(singlePairsList)
 	   		makeSafeKernFeature(fontPath, singlePairsList, classes)
@@ -246,14 +254,14 @@ if __name__ == "__main__":
 			print "No valid font provided."
 
 	elif option == '-file':
-		fontPath = sys.argv[-1]
-		filePath = sys.argv[2]
+		fontPath = sys.argv[2]
+		filePath = sys.argv[3]
 		singlePairsList = getSinglePairs(fontPath)
 		classes = readKerningClasses(filePath)
 		makeExperimentalKernFeature(fontPath, singlePairsList, classes)
 		
 	elif option == '-test':
-		fontPath = sys.argv[-1]
+		fontPath = sys.argv[2]
 		singlePairsList = getSinglePairs(fontPath)
 		test(fontPath, singlePairsList)
 
