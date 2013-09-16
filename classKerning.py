@@ -7,7 +7,7 @@ import operator
 
 __doc__ ='''\
 	
-	Was probably used to export a 'safe' kern feature from Adobe Devanagari.
+	Was used to export a 'safe' kern feature from Adobe Devanagari.
 	This script makes classes for a font which does only have flat kerning pairs (for whatever reason that may be).
 	
 	Usage:
