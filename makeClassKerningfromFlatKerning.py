@@ -1,5 +1,4 @@
 import os, sys
-# import itertools
 import time
 from modules.fromGPOS import *
 # from fontTools import ttLib
@@ -11,8 +10,8 @@ __doc__ ='''\
 	This script makes classes for a font which does only have flat kerning pairs (for whatever reason that may be).
 	
 	Usage:
-	python classKerning.py -font <path_to_OTF_or_TTF>
-	python classKerning.py -file <path_to_OTF_or_TTF> <path_to_FEA_file_with_kerning_classes>
+	python makeClassKerningfromFlatKerning.py -font <path_to_OTF_or_TTF>
+	python makeClassKerningfromFlatKerning.py -file <path_to_OTF_or_TTF> <path_to_FEA_file_with_kerning_classes>
 	
 	'''
 	
