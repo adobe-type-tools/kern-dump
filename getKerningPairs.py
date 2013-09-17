@@ -15,6 +15,7 @@ the script reports many more pairs than actually exist. Investigate!
 kKernFeatureTag = 'kern'
 kGPOStableName = 'GPOS'
 finalList = []
+AFMlist = []
 
 
 class myLeftClass:
@@ -212,11 +213,19 @@ def main(fontPath):
 	
 	for pair, value in glyphPairsDict.items():
 	 	finalList.append('/%s /%s %s' % ( pair[0], pair[1], value ))
-			
+		# AFMlist.append('KPX %s %s %s' % ( pair[0], pair[1], value ))
+		
 	finalList.sort()
+	# AFMlist.sort()
 	output = '\n'.join(finalList)
 	print output
-	
+
+	# AFMoutput = '\n'.join(AFMlist)
+	# scrap = os.popen('pbcopy', 'w')
+	# scrap.write(AFMoutput)
+	# scrap.close()
+	# print 'Done. AFM copied to clipboard.'
+
 # 	scrap = os.popen('pbcopy', 'w')
 # 	scrap.write(output)
 # 	scrap.close()

@@ -40,6 +40,8 @@ feature kern{
 
 ----------------
 
+wrong, old way of writing features:
+
 # CLASSES
 @a.cyr_LC_LEFT_CYR = [a.cyr abrevecyr acyr.begin1];
 
