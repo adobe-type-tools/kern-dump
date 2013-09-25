@@ -58,7 +58,6 @@ class Analyze(object):
             print "The font has no %s table" % kGPOStableName
             self.goodbye()
 
-
         self.analyzeFont()
         self.findKerningLookups()
         self.getPairPos()
@@ -184,7 +183,7 @@ class Analyze(object):
 
 
     def getClassPairs(self):
-        for pairPos in self.pairPosList:
+        for loop, pairPos in enumerate(self.pairPosList):
             if pairPos.Format == 2: 
                 # class pair adjustment
 
@@ -207,28 +206,30 @@ class Analyze(object):
                 # list of all glyphs contained within left-sided kerning classes:
                 allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys()
 
+                allLeftGlyphs.sort()
+                allLeftClassGlyphs.sort()
                 lg0.glyphs = list(set(allLeftGlyphs) - set(allLeftClassGlyphs))
                 lg0.glyphs.sort()
 
                 leftClasses[lg0.class1Record] = lg0
 
-
-                                
-
-
                 # Find all the remaining left classes:
                 for leftGlyph in pairPos.ClassDef1.classDefs:
                     class1Record = pairPos.ClassDef1.classDefs[leftGlyph]
-                    if class1Record in leftClasses:
-                        leftClasses[class1Record].glyphs.append(leftGlyph)
-                    else:
-                        lg = myLeftClass()
-                        lg.class1Record = class1Record
-                        leftClasses[class1Record] = lg
-                        leftClasses[class1Record].glyphs.append(leftGlyph)
+                    lg = myLeftClass()
+                    lg.class1Record = class1Record
+                    if class1Record != 0: # this was the crucial line.
+                        leftClasses.setdefault(class1Record, lg).glyphs.append(leftGlyph)
+
+                    # if class1Record in leftClasses:
+                    #     leftClasses[class1Record].glyphs.append(leftGlyph)
+                    # else:
+                    #     lg = myLeftClass()
+                    #     lg.class1Record = class1Record
+                    #     leftClasses[class1Record] = lg
+                    #     leftClasses[class1Record].glyphs.append(leftGlyph)
 
                 # Same for the right classes:
-
                 for rightGlyph in pairPos.ClassDef2.classDefs:                    
                     class2Record = pairPos.ClassDef2.classDefs[rightGlyph]
                     if class2Record in rightClasses:
@@ -238,7 +239,12 @@ class Analyze(object):
                         rg.class2Record = class2Record
                         rightClasses[class2Record] = rg
                         rightClasses[class2Record].glyphs.append(rightGlyph)
-                    
+                
+                # for cl in leftClasses:
+                #     print cl, leftClasses[cl].glyphs
+                #     print loop
+                #     print
+
 
                 for record_l in leftClasses:
                     for record_r in rightClasses:
@@ -296,7 +302,7 @@ if __name__ == "__main__":
             finalList.sort()
 
             output = '\n'.join(finalList)
-            print output
+            # print output
 
             print len(f.kerningPairs)
             # print len(f.singlePairs)
