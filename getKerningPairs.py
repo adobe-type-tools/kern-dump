@@ -10,6 +10,10 @@ Supports RTL.
 Working with Bickham Script pro 3 and its many subtables, it was discovered that 
 the script reports many more pairs than actually exist. Investigate!
 
+2013-09-25
+Above problem resolved.
+Still remaining to find out what happens with class1Record 0 (comment # this was the crucial line.)
+
 '''
 
 kKernFeatureTag = 'kern'
@@ -18,16 +22,19 @@ finalList = []
 # AFMlist = []
 
 
+
 class myLeftClass:
     def __init__(self):
         self.glyphs = []
         self.class1Record = 0
 
 
+
 class myRightClass:
     def __init__(self):
         self.glyphs = []
         self.class2Record = 0
+
 
 
 def collectUniqueKernLookupListIndexes(featureRecord):
@@ -50,8 +57,6 @@ class Analyze(object):
         self.font = ttLib.TTFont(fontPath)
         self.kerningPairs = {}
         self.singlePairs = {}
-        # self.firstGlyphsList = []
-        # self.firstGlyphsDict = {} # contains the first glyph of the pair, has two pairPosFormat keys, one for class kerning, the other for pair kerning
         self.pairPosList = []
 
         if kGPOStableName not in self.font:
@@ -112,7 +117,11 @@ class Analyze(object):
             '''
 
             if lookup.LookupType not in [2, 9]:
-                print "This is not a pair adjustment positioning lookup (GPOS LookupType 2); or using an extension table (GPOS LookupType 9)."
+                print '''
+                Info: GPOS LookupType %s found.
+                This type is neither a pair adjustment positioning lookup (GPOS LookupType 2), 
+                nor using an extension table (GPOS LookupType 9), which are the only supported ones.
+                ''' % lookup.LookupType
                 continue
             self.lookups.append(lookup)
 
@@ -148,8 +157,6 @@ class Analyze(object):
                 
                 # Each glyph in this list will have a corresponding PairSet which will
                 # contain all the second glyphs and the kerning value in the form of PairValueRecord(s)
-                # self.firstGlyphsDict[pairPos.Format] = pairPos.Coverage.glyphs
-
                 # self.firstGlyphsList.extend(pairPos.Coverage.glyphs)
 
 
@@ -165,6 +172,7 @@ class Analyze(object):
                     for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
                         secondGlyph = pairValueRecordItem.SecondGlyph
                         valueFormat = pairPos.ValueFormat1
+
                         if valueFormat == 5: # RTL kerning
                             kernValue = "<%d 0 %d 0>" % (pairValueRecordItem.Value1.XPlacement, pairValueRecordItem.Value1.XAdvance)
                         elif valueFormat == 0: # RTL pair with value <0 0 0 0>
@@ -178,47 +186,38 @@ class Analyze(object):
                         self.kerningPairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
                         self.singlePairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
 
-                        # self.kerningPairs[(self.firstGlyphsDict[pairPos.Format][pairSetIndex], secondGlyph)] = kernValue
-                        # self.singlePairs[(self.firstGlyphsDict[pairPos.Format][pairSetIndex], secondGlyph)] = kernValue
-
 
     def getClassPairs(self):
-        for loop, pairPos in enumerate(self.pairPosList):
+        for pairPos in self.pairPosList:
             if pairPos.Format == 2: 
                 # class pair adjustment
 
                 firstGlyphsList = pairPos.Coverage.glyphs
 
-                firstGlyphs = {}
-                secondGlyphs = {}
-
                 leftClasses = {}
                 rightClasses = {}
-                
+
 
                 # Find left class with the Class1Record index="0".
                 # This first class is mixed into the "Coverage" table (e.g. all left glyphs)
-                # and has no class="X" property, that is why we have to find them that way. 
+                # and has no class="X" property, that is why we have to find the glyphs in that way. 
                 
                 lg0 = myLeftClass()
-                # list of all glyphs kerned to the left of a pair, including all glyphs contained within kerning classes:
-                allLeftGlyphs = firstGlyphsList
-                # list of all glyphs contained within left-sided kerning classes:
-                allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys()
+                
+                allLeftGlyphs = firstGlyphsList # list of all glyphs kerned to the left of a pair, including all glyphs contained within kerning classes:
+                allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys() # list of all glyphs contained within left-sided kerning classes:
 
-                allLeftGlyphs.sort()
-                allLeftClassGlyphs.sort()
                 lg0.glyphs = list(set(allLeftGlyphs) - set(allLeftClassGlyphs))
                 lg0.glyphs.sort()
-
                 leftClasses[lg0.class1Record] = lg0
 
                 # Find all the remaining left classes:
                 for leftGlyph in pairPos.ClassDef1.classDefs:
                     class1Record = pairPos.ClassDef1.classDefs[leftGlyph]
-                    lg = myLeftClass()
-                    lg.class1Record = class1Record
+                    
                     if class1Record != 0: # this was the crucial line.
+                        lg = myLeftClass()
+                        lg.class1Record = class1Record
                         leftClasses.setdefault(class1Record, lg).glyphs.append(leftGlyph)
 
                     # if class1Record in leftClasses:
@@ -302,7 +301,7 @@ if __name__ == "__main__":
             finalList.sort()
 
             output = '\n'.join(finalList)
-            # print output
+            print output
 
             print len(f.kerningPairs)
             # print len(f.singlePairs)
