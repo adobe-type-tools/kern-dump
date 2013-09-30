@@ -14,6 +14,8 @@ the script reports many more pairs than actually exist. Investigate!
 Above problem resolved.
 Still remaining to find out what happens with class1Record 0 (comment # this was the crucial line.)
 
+2013-09-29
+Finally all is fixed. Seems to work.
 '''
 
 kKernFeatureTag = 'kern'
@@ -58,6 +60,8 @@ class Analyze(object):
         self.kerningPairs = {}
         self.singlePairs = {}
         self.pairPosList = []
+        self.allLeftClasses = {}
+        self.allRightClasses = {}
 
         if kGPOStableName not in self.font:
             print "The font has no %s table" % kGPOStableName
@@ -167,11 +171,12 @@ class Analyze(object):
 
                 firstGlyphsList = pairPos.Coverage.glyphs
 
-                # This iteration is done by index so that we have a way to reference the firstGlyphsList list
+                # This iteration is done by index so that there is a way to reference the firstGlyphsList list:
                 for pairSetIndex, pairSetInstance in enumerate(pairPos.PairSet):
                     for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
                         secondGlyph = pairValueRecordItem.SecondGlyph
                         valueFormat = pairPos.ValueFormat1
+
 
                         if valueFormat == 5: # RTL kerning
                             kernValue = "<%d 0 %d 0>" % (pairValueRecordItem.Value1.XPlacement, pairValueRecordItem.Value1.XAdvance)
@@ -188,28 +193,37 @@ class Analyze(object):
 
 
     def getClassPairs(self):
-        for pairPos in self.pairPosList:
+        for loop, pairPos in enumerate(self.pairPosList):
             if pairPos.Format == 2: 
-                # class pair adjustment
-
-                firstGlyphsList = pairPos.Coverage.glyphs
 
                 leftClasses = {}
                 rightClasses = {}
 
 
-                # Find left class with the Class1Record index="0".
-                # This first class is mixed into the "Coverage" table (e.g. all left glyphs)
-                # and has no class="X" property, that is why we have to find the glyphs in that way. 
+                # # Find left class with the Class1Record index="0".
+                # # This first class is mixed into the "Coverage" table (e.g. all left glyphs)
+                # # and has no class="X" property, that is why we have to find the glyphs in that way. 
                 
                 lg0 = myLeftClass()
                 
-                allLeftGlyphs = firstGlyphsList # list of all glyphs kerned to the left of a pair, including all glyphs contained within kerning classes:
+                allLeftGlyphs = pairPos.Coverage.glyphs # list of all glyphs kerned to the left of a pair
                 allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys() # list of all glyphs contained within left-sided kerning classes:
 
-                lg0.glyphs = list(set(allLeftGlyphs) - set(allLeftClassGlyphs))
+                singleGlyphs = []
+                classGlyphs = []
+
+                for gName, classID in pairPos.ClassDef1.classDefs.iteritems():
+                    if classID == 0:
+                        singleGlyphs.append(gName)
+                    else:
+                        classGlyphs.append(gName)
+
+                # lg0.glyphs =  list(set(allLeftGlyphs) - set(allLeftClassGlyphs)) # coverage glyphs minus glyphs in a class (including class 0)
+                lg0.glyphs = list(set(allLeftGlyphs) - set(classGlyphs)) # coverage glyphs minus glyphs in real class (without class 0)
+
                 lg0.glyphs.sort()
                 leftClasses[lg0.class1Record] = lg0
+                self.allLeftClasses["class_%s_%s" % (loop, lg0.class1Record)] = lg0.glyphs
 
                 # Find all the remaining left classes:
                 for leftGlyph in pairPos.ClassDef1.classDefs:
@@ -219,30 +233,15 @@ class Analyze(object):
                         lg = myLeftClass()
                         lg.class1Record = class1Record
                         leftClasses.setdefault(class1Record, lg).glyphs.append(leftGlyph)
-
-                    # if class1Record in leftClasses:
-                    #     leftClasses[class1Record].glyphs.append(leftGlyph)
-                    # else:
-                    #     lg = myLeftClass()
-                    #     lg.class1Record = class1Record
-                    #     leftClasses[class1Record] = lg
-                    #     leftClasses[class1Record].glyphs.append(leftGlyph)
+                        self.allLeftClasses.setdefault("class_%s_%s" % (loop, lg.class1Record), lg.glyphs)
 
                 # Same for the right classes:
                 for rightGlyph in pairPos.ClassDef2.classDefs:                    
                     class2Record = pairPos.ClassDef2.classDefs[rightGlyph]
-                    if class2Record in rightClasses:
-                        rightClasses[class2Record].glyphs.append(rightGlyph)
-                    else:
-                        rg = myRightClass()
-                        rg.class2Record = class2Record
-                        rightClasses[class2Record] = rg
-                        rightClasses[class2Record].glyphs.append(rightGlyph)
-                
-                # for cl in leftClasses:
-                #     print cl, leftClasses[cl].glyphs
-                #     print loop
-                #     print
+                    rg = myRightClass()
+                    rg.class2Record = class2Record
+                    rightClasses.setdefault(class2Record, rg).glyphs.append(rightGlyph)
+                    self.allRightClasses.setdefault("class_%s_%s" % (loop, rg.class2Record), rg.glyphs)
 
 
                 for record_l in leftClasses:
@@ -284,16 +283,6 @@ if __name__ == "__main__":
             fontPath = sys.argv[1]
             f = Analyze(fontPath)
 
-            # for c in f.leftClasses:
-            #     print 'leftClass:', c, f.leftClasses[c].glyphs
-
-            # for c in f.rightClasses:
-            #     print 'rightClass:', c, f.rightClasses[c].glyphs
-
-
-            # for x in f.lookups:
-            #     print x
-
             finalList = []
             for pair, value in f.kerningPairs.items():
                 finalList.append('/%s /%s %s' % ( pair[0], pair[1], value ))
@@ -304,7 +293,8 @@ if __name__ == "__main__":
             print output
 
             print len(f.kerningPairs)
-            # print len(f.singlePairs)
+            # for i in sorted(f.allLeftClasses):
+            #     print i, f.allLeftClasses[i]
 
     else:
         print "No valid font provided."

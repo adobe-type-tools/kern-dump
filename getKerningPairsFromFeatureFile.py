@@ -59,8 +59,14 @@ class KernFeatureReader(object):
 
 
     def readFile(self, filePath):
+        # removes raw file minus commented lines
+        lineList = []
         inputfile = open(filePath, 'r')
-        fileLinesString = inputfile.read()
+        for line in inputfile:
+            if not line.strip().startswith('#'):
+                lineList.append(line)
+        fileLinesString = '\n'.join(lineList)
+        
         inputfile.close()
         return fileLinesString
 
@@ -68,7 +74,16 @@ class KernFeatureReader(object):
     def convertNames(self, pairDict):
         newPairDict = {}
         for (left, right), value in pairDict.items():
-            newPair = (self.glyphNameDict.get(left), self.glyphNameDict.get(right))
+            newLeft = self.glyphNameDict.get(left)
+            newRight = self.glyphNameDict.get(right)
+
+            # in case the glyphs are not in the GOADB:
+            if not newLeft:
+                newLeft = left
+            if not newRight:
+                newRight = right
+            
+            newPair = (newLeft, newRight)
             newPairDict[newPair] = value
             # print left, right, value
         return newPairDict
@@ -115,6 +130,7 @@ class KernFeatureReader(object):
 
     def makePairDicts(self):
         givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
+        # reads commented lines!! Fix!
         allKerningPairs = {}
         for loop, (enum, left, right, value) in enumerate(givenKerningPairs):
             leftGlyphs = [left]
