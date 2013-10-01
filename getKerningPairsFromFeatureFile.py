@@ -3,27 +3,19 @@ import os
 import re
 import itertools
 
+
+__doc__ = '''\
+
+Prints a list of all kerning pairs to be expected from a kern feature file; which has to be passed to the script as an argument.
+Has the ability to use a GlyphOrderAndAliasDB file for translation of working glyph names to final glyph names.
+
+Usage:
+------
+python getKerningPairsFromFeatureFile.py <path to kern feature file>
+python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> <path to kern feature file>
+
+
 '''
-
-Takes feature file, returns python KerningClass class for each kern class found within that file.
-KerningClass object has .glyphs, .side, .name attributes.
-
----------
-2013-09-25 
-Added support to read all kerning pairs from feature file.
-This is a first, quite rough implementation since it does not care for kern values assigned in duplicate, or about enumerated pairs.
-
-2013-09-26
-More detailed version, taking care of enum, GOADB.
-
-'''
-
-
-class KerningClass(object):
-    def __init__(self):
-        self.glyphs = []
-        self.name = ''
-        self.side = ''
 
 
 class KernFeatureReader(object):
@@ -51,15 +43,15 @@ class KernFeatureReader(object):
             self.allKerningPairs = self.convertNames(self.allKerningPairs)
 
 
-        self.outputlist = []
+        self.output = []
         for (left, right), value in self.allKerningPairs.items():
-            self.outputlist.append('/%s /%s %s' % (left, right, value))
-        self.outputlist.sort()
+            self.output.append('/%s /%s %s' % (left, right, value))
+        self.output.sort()
 
 
 
     def readFile(self, filePath):
-        # removes raw file minus commented lines
+        # reads raw file, removes commented lines
         lineList = []
         inputfile = open(filePath, 'r')
         for line in inputfile:
@@ -85,7 +77,7 @@ class KernFeatureReader(object):
             
             newPair = (newLeft, newRight)
             newPairDict[newPair] = value
-            # print left, right, value
+
         return newPairDict
 
 
@@ -96,27 +88,6 @@ class KernFeatureReader(object):
         for name, glyphs in allClassesList:
             classes[name] = glyphs.split()
 
-            # c = KerningClass()
-            # c.name = name
-            # c.glyphs = glyphs.split()
-
-            # if name.split('_')[-1] == 'LEFT':
-            #     c.side = 'LEFT'
-            #     classes[c.name] = c
-            # elif name.split('_')[-1] == 'RIGHT':
-            #     c.side = 'RIGHT'
-            #     classes[c.name] = c
-
-            # else:
-            #     c.side = 'BOTH'
-            #     classes[c.name] = c
-
-            #     # d = KerningClass()
-            #     # d.name = c.name
-            #     # d.glyphs = c.glyphs
-            #     # d.side = 'RIGHT'
-            #     # classes[d.name] = d
-            
         return classes
 
 
@@ -130,12 +101,8 @@ class KernFeatureReader(object):
 
     def makePairDicts(self):
         givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
-        # reads commented lines!! Fix!
         allKerningPairs = {}
         for loop, (enum, left, right, value) in enumerate(givenKerningPairs):
-            leftGlyphs = [left]
-            rightGlyphs = [right]
-
             if enum:
                 # shorthand for single pairs
                 for combo in self.allCombinations(left, right):
@@ -147,10 +114,6 @@ class KernFeatureReader(object):
             else:
                 for combo in self.allCombinations(left, right):
                     self.classKerningPairs[combo] = value
-
-            # if self.convertGlyphNames:
-            #     leftGlyphs = [self.glyphNameDict.get(gName) for gName in leftGlyphs]
-            #     rightGlyphs = [self.glyphNameDict.get(gName) for gName in rightGlyphs]
 
 
         allKerningPairs.update(self.classKerningPairs)
@@ -180,7 +143,7 @@ if len(sys.argv) > 1:
         # print len(kfr.singleKerningPairs)
         # print len(kfr.classKerningPairs)
 
-        print '\n'.join(kfr.outputlist)
+        print '\n'.join(kfr.output)
         print len(kfr.allKerningPairs)
 
     else:
