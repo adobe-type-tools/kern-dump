@@ -1,5 +1,4 @@
 import os, sys
-#import inspect
 from fontTools import ttLib
 
 '''
@@ -59,6 +58,7 @@ class Analyze(object):
         self.font = ttLib.TTFont(fontPath)
         self.kerningPairs = {}
         self.singlePairs = {}
+        self.classPairs = {}
         self.pairPosList = []
         self.allLeftClasses = {}
         self.allRightClasses = {}
@@ -258,6 +258,11 @@ class Analyze(object):
                                 continue # skip the rest
                             
                             if kernValue != 0:
+                                leftClassName = 'class_%s_%s'  % (loop, leftClasses[record_l].class1Record)
+                                rightClassName = 'class_%s_%s' % (loop, rightClasses[record_r].class2Record)
+                                                                
+                                self.classPairs[(leftClassName, rightClassName)] = kernValue
+
                                 for l in leftClasses[record_l].glyphs:
                                     for r in rightClasses[record_r].glyphs:
                                         if (l, r) in self.kerningPairs:
