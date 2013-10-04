@@ -2,26 +2,15 @@ import os, sys
 from fontTools import ttLib
 
 '''
+
 Gets all possible kerning pairs within font.
 Supports RTL.
 
-2013-01-22:
-Working with Bickham Script pro 3 and its many subtables, it was discovered that 
-the script reports many more pairs than actually exist. Investigate!
-
-2013-09-25
-Above problem resolved.
-Still remaining to find out what happens with class1Record 0 (comment # this was the crucial line.)
-
-2013-09-29
-Finally all is fixed. Seems to work.
 '''
 
 kKernFeatureTag = 'kern'
 kGPOStableName = 'GPOS'
 finalList = []
-# AFMlist = []
-
 
 
 class myLeftClass:
@@ -30,12 +19,10 @@ class myLeftClass:
         self.class1Record = 0
 
 
-
 class myRightClass:
     def __init__(self):
         self.glyphs = []
         self.class2Record = 0
-
 
 
 def collectUniqueKernLookupListIndexes(featureRecord):
@@ -53,7 +40,8 @@ def collectUniqueKernLookupListIndexes(featureRecord):
     return uniqueKernLookupIndexList
 
 
-class Analyze(object):
+class ReadKerning(object):
+
     def __init__(self, fontPath):
         self.font = ttLib.TTFont(fontPath)
         self.kerningPairs = {}
@@ -67,15 +55,16 @@ class Analyze(object):
             print "The font has no %s table" % kGPOStableName
             self.goodbye()
 
-        self.analyzeFont()
-        self.findKerningLookups()
-        self.getPairPos()
-        self.getSinglePairs()
-        self.getClassPairs()
+        else:
+            self.analyzeFont()
+            self.findKerningLookups()
+            self.getPairPos()
+            self.getSinglePairs()
+            self.getClassPairs()
 
 
     def goodbye(self):
-        print 'Aborted.'
+        print 'The fun ends here.'
         return
 
 
@@ -95,7 +84,7 @@ class Analyze(object):
 
     def findKerningLookups(self):
         if not len(self.uniqueKernLookupIndexList):
-            print "The font has no %s feature" % kKernFeatureTag
+            print "The font has no %s feature." % kKernFeatureTag
             self.goodbye()
 
         'LookupList:'
@@ -148,13 +137,13 @@ class Analyze(object):
 
                 # if pairPos.Coverage.Format not in [1, 2]:
                 if pairPos.Coverage.Format not in [1, 2]:
-                    print "WARNING: Coverage format %d is not yet supported" % pairPos.Coverage.Format
+                    print "WARNING: Coverage format %d is not yet supported." % pairPos.Coverage.Format
                 
                 if pairPos.ValueFormat1 not in [0, 4, 5]:
-                    print "WARNING: ValueFormat1 format %d is not yet supported" % pairPos.ValueFormat1
+                    print "WARNING: ValueFormat1 format %d is not yet supported." % pairPos.ValueFormat1
                 
                 if pairPos.ValueFormat2 not in [0]:
-                    print "WARNING: ValueFormat2 format %d is not yet supported" % pairPos.ValueFormat2
+                    print "WARNING: ValueFormat2 format %d is not yet supported." % pairPos.ValueFormat2
 
 
                 self.pairPosList.append(pairPos)
@@ -283,10 +272,12 @@ class Analyze(object):
 
 
 if __name__ == "__main__":
+
     if len(sys.argv) == 2:
-        if os.path.exists(sys.argv[1]):
+        assumedFontPath = sys.argv[1]
+        if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
             fontPath = sys.argv[1]
-            f = Analyze(fontPath)
+            f = ReadKerning(fontPath)
 
             finalList = []
             for pair, value in f.kerningPairs.items():
@@ -301,5 +292,7 @@ if __name__ == "__main__":
             # for i in sorted(f.allLeftClasses):
             #     print i, f.allLeftClasses[i]
 
+        else:
+            print 'That is not a valid font.'
     else:
-        print "No valid font provided."
+        print 'Please provide a valid font.'

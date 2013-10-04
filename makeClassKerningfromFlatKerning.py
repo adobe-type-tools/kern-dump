@@ -6,7 +6,6 @@ import operator
 
 __doc__ ='''\
 	
-	Was used to export a 'safe' kern feature from Adobe Devanagari.
 	This script makes classes for a font which does only have flat kerning pairs (for whatever reason that may be).
 	
 	Usage:
@@ -240,35 +239,36 @@ def test(fontPath, singlePairsList):
 
 if __name__ == "__main__":
 	startTime = time.time()
-	
-	option = sys.argv[1]
+	if len(sys.argv) > 1:
+		option = sys.argv[1]
 
-	if option == '-font':
-		if os.path.exists(sys.argv[2]):
+		if option == '-font':
+			if os.path.exists(sys.argv[2]):
+				fontPath = sys.argv[2]
+				singlePairsList = getSinglePairs(fontPath)
+				classes = makeKerningClasses(singlePairsList)
+		   		makeSafeKernFeature(fontPath, singlePairsList, classes)
+			else:
+				print "No valid font provided."
+
+		elif option == '-file':
+			fontPath = sys.argv[2]
+			filePath = sys.argv[3]
+			singlePairsList = getSinglePairs(fontPath)
+			classes = readKerningClasses(filePath)
+			makeExperimentalKernFeature(fontPath, singlePairsList, classes)
+			
+		elif option == '-test':
 			fontPath = sys.argv[2]
 			singlePairsList = getSinglePairs(fontPath)
-			classes = makeKerningClasses(singlePairsList)
-	   		makeSafeKernFeature(fontPath, singlePairsList, classes)
-		else:
-			print "No valid font provided."
+			test(fontPath, singlePairsList)
 
-	elif option == '-file':
-		fontPath = sys.argv[2]
-		filePath = sys.argv[3]
-		singlePairsList = getSinglePairs(fontPath)
-		classes = readKerningClasses(filePath)
-		makeExperimentalKernFeature(fontPath, singlePairsList, classes)
 		
-	elif option == '-test':
-		fontPath = sys.argv[2]
-		singlePairsList = getSinglePairs(fontPath)
-		test(fontPath, singlePairsList)
-
+		else:
+			print 'no option used'
 	
 	else:
-		print 'no option used'
-	
-	
+		print __doc__	
 	# if len(sys.argv) == 2:
 
 	endTime = round(time.time() - startTime, 2)
