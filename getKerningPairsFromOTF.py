@@ -288,6 +288,7 @@ if __name__ == "__main__":
             output = '\n'.join(finalList)
             print output
 
+            print '\nTotal number of kerning pairs:'
             print len(f.kerningPairs)
             # for i in sorted(f.allLeftClasses):
             #     print i, f.allLeftClasses[i]
@@ -295,4 +296,4 @@ if __name__ == "__main__":
         else:
             print 'That is not a valid font.'
     else:
-        print 'Please provide a valid font.'
+        print 'Please provide a font.'

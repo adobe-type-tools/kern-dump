@@ -15,6 +15,15 @@ python getKerningPairsFromFeatureFile.py <path to kern feature file>
 python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> <path to kern feature file>
 
 
+To do: make givenKerningPairs work with lines like this:
+
+enum pos [ x x x ] [ x x x ] xx; 
+enum pos x [ x x x ] xx; 
+enum pos [ x x x ] x xx; 
+
+enum pos glyph @class xx;
+enum pos @class [ glyph glyph glyph ] xx;
+
 '''
 
 
@@ -30,23 +39,24 @@ class KernFeatureReader(object):
 
         self.featureFilePath = self.options[-1]
 
-        self.featureData = self.readFile(self.featureFilePath)
-        self.kernClasses = self.readKernClasses()
+        self.rawFeatureData = self.readFile(self.featureFilePath)
+        self.featureData = self.cleanData(self.rawFeatureData)
+        # self.kernClasses = self.readKernClasses()
 
-        self.singleKerningPairs = {}
-        self.classKerningPairs = {}
-        self.allKerningPairs = self.makePairDicts()
+        # self.singleKerningPairs = {}
+        # self.classKerningPairs = {}
+        # self.allKerningPairs = self.makePairDicts()
 
-        if self.goadbPath:
-            self.glyphNameDict = {}
-            self.readGOADB()
-            self.allKerningPairs = self.convertNames(self.allKerningPairs)
+        # if self.goadbPath:
+        #     self.glyphNameDict = {}
+        #     self.readGOADB()
+        #     self.allKerningPairs = self.convertNames(self.allKerningPairs)
 
 
-        self.output = []
-        for (left, right), value in self.allKerningPairs.items():
-            self.output.append('/%s /%s %s' % (left, right, value))
-        self.output.sort()
+        # self.output = []
+        # for (left, right), value in self.allKerningPairs.items():
+        #     self.output.append('/%s /%s %s' % (left, right, value))
+        # self.output.sort()
 
 
 
@@ -54,13 +64,28 @@ class KernFeatureReader(object):
         # reads raw file, removes commented lines
         lineList = []
         inputfile = open(filePath, 'r')
-        for line in inputfile:
-            if not line.strip().startswith('#'):
-                lineList.append(line)
-        fileLinesString = '\n'.join(lineList)
-        
+        data = inputfile.read().splitlines()
         inputfile.close()
-        return fileLinesString
+        for line in data:
+            if '#' in line: 
+                line = line.split('#')[0]
+            if line:
+                lineList.append(line)
+
+        lineString = '\n'.join(lineList)
+        return lineString
+
+
+    def cleanData(self, rawData):
+        dataList = rawData.splitlines()
+        # for line in lineList:
+        #     if 'enum' and '[' in line:
+        #         splitline = re.split(r'[\[\]]', line) # split line by brackets
+        #         print line
+        #         print splitline
+        #         print
+        # print lineList
+        # print dataList
 
 
     def convertNames(self, pairDict):
@@ -100,8 +125,14 @@ class KernFeatureReader(object):
 
 
     def makePairDicts(self):
-        givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
+        # givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
+        givenKerningPairs = re.findall(r"\s*(enum )?pos (\[?.+?\]?) (\[?.+?\]?) (-?\d+?);", self.featureData)
+        print self.featureData
+        enumPairs = re.findall(r'enum pos .+;' , self.featureData)
+
+        # print givenKerningPairs
         allKerningPairs = {}
+
         for loop, (enum, left, right, value) in enumerate(givenKerningPairs):
             if enum:
                 # shorthand for single pairs
@@ -143,8 +174,8 @@ if len(sys.argv) > 1:
         # print len(kfr.singleKerningPairs)
         # print len(kfr.classKerningPairs)
 
-        print '\n'.join(kfr.output)
-        print len(kfr.allKerningPairs)
+        # print '\n'.join(kfr.output)
+        # print len(kfr.allKerningPairs)
 
     else:
         print "No valid kern feature file provided."

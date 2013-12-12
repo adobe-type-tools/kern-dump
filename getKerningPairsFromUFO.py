@@ -59,23 +59,20 @@ class UFOkernReader(object):
 
 def run(font):
     ukr = UFOkernReader(font)
+    scrap = os.popen('pbcopy', 'w')
+    output = '\n'.join(ukr.output)
+    scrap.write(output)
+    scrap.close()
 
     if inRF:
-        print 'you are in RF'
-        print len(ukr.output)
-        scrap = os.popen('pbcopy', 'w')
-        output = '\n'.join(ukr.output)
-        scrap.write(output)
-        scrap.close()
-        print ukr.totalKerning
-        print ukr.absoluteKerning*0.352777778
-        print ukr.absoluteKerning/72
-        print 'done'
+        pass        
+        # print 'Total length of kerning:', ukr.totalKerning
 
     if inCL:
-        print 'you are on the command line'
-        print '\n'.join(ukr.output)
-        print len(ukr.output)
+        print '\n'.join(ukr.output), '\n'
+
+    print 'Total amount of kerning pairs:', len(ukr.output)
+    print 'List of kerning pairs copied to clipboard.'
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
-.gitignore
 *.pyc
 *.txt
 testFiles/*
+featureFiles/*
 obsolete/*
+rewrite/*
