@@ -12,7 +12,7 @@ class KernInfoWindow(object):
         self.amountOfPairs = len(self.u.allKerningPairs)
 
 
-        self.textString = 'The font has %s kerning pairs.\nAt %s points, the absolute amount of kerning would cover the distance of %s.'
+        self.textString = 'The font has %s flat kerning pairs.\nSet at %s points, the absolute amount\nof kerning would cover the distance of\n%s.'
 
         width = 300
         height = 250

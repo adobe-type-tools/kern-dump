@@ -37,9 +37,8 @@ python getKerningPairsFromUFO.py font.ufo
 
 ## getKerningPairsFromFeatureFile.py
 Extract a list of all kerning pairs that would be created from a feature file.  
-In development, ‘compact’ line notation is not yet fully supported.  
-Compact line notation is something like:  
-pos \[ a adieresis aacute \] \[ v w \] -1000;
+This script is still in development, ‘compact’ notation within a single line is not yet fully supported.  
+Compact notation example: `pos [ a adieresis aacute ] [ v w ] -1000;`
 
 __Dependency:__ None  
 __Environment:__ command line  
@@ -49,10 +48,10 @@ python getKerningPairsFromFeatureFile.py kern.fea
 ```
 
 ## kernInfoWindow.py
-Visualization of absolute kerning distance.  
+(Silly) visualization of absolute kerning distance.  
 Example of making use of the above `getKerningPairsFromUFO.py` from within Robofont.  
 
 __Dependency:__ `getKerningPairsFromUFO.py` (above)  
 __Environment:__ Robofont
 
-![alt text](kernInfoWindow.png)
+<img src="kernInfoWindow.png" width="412" height="384" alt="Kern Info Window" />
