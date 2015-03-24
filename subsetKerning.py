@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 from plistlib import writePlist
 from defcon import Font
