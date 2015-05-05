@@ -16,11 +16,12 @@ else:
 	print 'No UFO file provided.'
 	sys.exit()
 
-filePath = GetFile("Pick UFO...")
-
+# filePath = GetFile("Pick UFO...")
+kerningGroups = [groupName for groupName in font.groups.keys() if '@MMK_' in groupName]
+otherGroups = [groupName for groupName in font.groups.keys() if not groupName in kerningGroups]
 	
 def getKeyGlyph(groupName):
-	if groupName in font.groups.keys():
+	if groupName in kerningGroups:
 		if alt_mode:
 			# this is for groups named 'LAT_LC_a', 'CYR_LC_a.cyr' etc.
 	
@@ -53,14 +54,14 @@ def getKeyGlyph(groupName):
 
 
 def getOtherGlyphs(groupName):
-	if groupName in font.groups.keys():
+	if groupName in kerningGroups:
 		glyphlist = font.groups[groupName]
 		glyphlist.remove(getKeyGlyph(groupName))
 		return sorted(glyphlist)
 
 
 def getFlag(groupName):
-	if groupName in font.groups.keys():
+	if groupName in kerningGroups:
 		return groupName.split('_')[1]
 
 
@@ -114,9 +115,9 @@ alt_mode = False  # this is the alternate mode, for groups named 'LAT_LC_a', 'CY
 
 rex = r'(LAT|CYR|GRK)_(LC|UC)'
 counter = 0
-for g in font.groups.keys():
+for g in kerningGroups:
 	if re.search(rex, g): counter += 1
-if counter > len(font.groups.keys())/2:
+if counter > len(kerningGroups)/2:
 	alt_mode = False
 
 
@@ -138,7 +139,10 @@ if counter > len(font.groups.keys())/2:
 
 print '%%FONTLAB CLASSES\n'
 
-for groupName in sorted(font.groups.keys()):
+for groupName in sorted(kerningGroups):
 #	groupName = '_%s' % groupName[1:]
 	print writeFLclass(groupName)
 
+if otherGroups:
+	print '#' * 50
+	print 'The follwing groups are not kerning groups,\nand were therefore not exported:\n\n%s' % '\n'.join(otherGroups)

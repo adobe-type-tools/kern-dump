@@ -7,8 +7,10 @@ import itertools
 
 __doc__ = '''\
 
-Prints a list of all kerning pairs to be expected from a kern feature file; which has to be passed to the script as an argument.
-Has the ability to use a GlyphOrderAndAliasDB file for translation of working glyph names to final glyph names.
+Prints a list of all kerning pairs to be expected from a kern feature file; 
+which has to be passed to the script as an argument. 
+Has the ability to use a GlyphOrderAndAliasDB file for translation of working 
+glyph names to final glyph names.
 
 Usage:
 ------

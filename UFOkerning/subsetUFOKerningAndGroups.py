@@ -5,16 +5,15 @@ from defcon import Font
 
 
 __doc__ = '''
-Subset kerning in UFO given a list of glyphs provided.
+Subset kerning and groups in a UFO given a list of glyphs provided.
 Will export new plist files that can be swapped into the UFO.
 
 Usage:
-python subsetKerning.py subsetList font.ufo
+python subsetUFOKerningAndGroups.py subsetList font.ufo
 '''
 
 
 class SubsetKerning(object):
-    """docstring for SubsetKerning"""
     def __init__(self, font, subsetFile):
         self.font = Font(font)
         self.subsetFile = subsetFile
