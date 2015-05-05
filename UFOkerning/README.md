@@ -1,5 +1,5 @@
-# kernDump 
-More specific scripts for specialized, kerning-related operations workflow  
+# UFOkerning 
+More specific scripts for UFO kerning-related operations.  
 
 ---
 
@@ -16,7 +16,7 @@ python convertFEAtoMMG.py kern.fea
 ---
 
 ### `exportFLCfromUFO.py`
-Dumps a FontLab Classes file (FLC) from a UFO.
+Dumps a FontLab Classes file (FLC) from a UFO.  
 Assumes MetricsMachine-built class names.
 
 __Dependencies:__ [defcon](https://github.com/typesupply/defcon)  
@@ -29,7 +29,7 @@ python exportFLCfromUFO.py font.ufo
 ---
 
 ### `subsetUFOKerningAndGroups.py`
-Subset kerning and groups in a UFO given a list of glyphs provided.
+Subset kerning and groups in a UFO given a list of glyphs provided.  
 Will export new plist files that can be swapped into the UFO.
 
 __Dependencies:__ [defcon](https://github.com/typesupply/defcon)  
