@@ -43,23 +43,28 @@ class KernFeatureReader(object):
         self.featureFilePath = self.options[-1]
 
         self.rawFeatureData = self.readFile(self.featureFilePath)
-        self.featureData = self.cleanData(self.rawFeatureData)
-        # self.kernClasses = self.readKernClasses()
+        # self.featureData = self.cleanData(self.rawFeatureData)
+        # The self.cleanData function is intended to 'clean' lines with compact notation (see above)
+        # Not yet implemented.
 
-        # self.singleKerningPairs = {}
-        # self.classKerningPairs = {}
-        # self.allKerningPairs = self.makePairDicts()
+        # For now:
+        self.featureData = self.rawFeatureData 
+        self.kernClasses = self.readKernClasses()
 
-        # if self.goadbPath:
-        #     self.glyphNameDict = {}
-        #     self.readGOADB()
-        #     self.allKerningPairs = self.convertNames(self.allKerningPairs)
+        self.singleKerningPairs = {}
+        self.classKerningPairs = {}
+        self.allKerningPairs = self.makePairDicts()
+
+        if self.goadbPath:
+            self.glyphNameDict = {}
+            self.readGOADB()
+            self.allKerningPairs = self.convertNames(self.allKerningPairs)
 
 
-        # self.output = []
-        # for (left, right), value in self.allKerningPairs.items():
-        #     self.output.append('/%s /%s %s' % (left, right, value))
-        # self.output.sort()
+        self.output = []
+        for (left, right), value in self.allKerningPairs.items():
+            self.output.append('/%s /%s %s' % (left, right, value))
+        self.output.sort()
 
 
 
@@ -80,6 +85,7 @@ class KernFeatureReader(object):
 
 
     def cleanData(self, rawData):
+        # See commend above
         dataList = rawData.splitlines()
         # for line in lineList:
         #     if 'enum' and '[' in line:
@@ -130,7 +136,6 @@ class KernFeatureReader(object):
     def makePairDicts(self):
         # givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
         givenKerningPairs = re.findall(r"\s*(enum )?pos (\[?.+?\]?) (\[?.+?\]?) (-?\d+?);", self.featureData)
-        print self.featureData
         enumPairs = re.findall(r'enum pos .+;' , self.featureData)
 
         # print givenKerningPairs
@@ -173,12 +178,14 @@ if len(sys.argv) > 1:
     if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
         kfr=KernFeatureReader(options)
 
+        # print kfr
         # print kfr.allKerningPairs
         # print len(kfr.singleKerningPairs)
         # print len(kfr.classKerningPairs)
 
-        # print '\n'.join(kfr.output)
-        # print len(kfr.allKerningPairs)
+        print '\n'.join(kfr.output)
+        print '\nTotal number of kerning pairs:'
+        print len(kfr.allKerningPairs)
 
     else:
         print "No valid kern feature file provided."
