@@ -20,10 +20,10 @@ python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file>
 '''
 
 # Regular expressions for parsing individual kerning commands:
-x_range_range = re.compile(r'\s*(enum)?\s+?pos\s*\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?);')
-x_range_glyph = re.compile(r'\s*(enum)?\s+?pos\s*\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?);')
-x_glyph_range = re.compile(r'\s*(enum)?\s+?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?);')        
-x_item_item = re.compile(r'\s*(enum)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?);')
+x_range_range = re.compile(r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+x_range_glyph = re.compile(r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?)\s*;')
+x_glyph_range = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+x_item_item = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
 expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
@@ -150,7 +150,6 @@ class KernFeatureReader(object):
                     foundKerningPairs.append([match.group(1),match.group(2),match.group(3),match.group(4)])
                     break
                 else:
-                    # a line that is not found by any of the expressions
                     continue
         return foundKerningPairs
 
@@ -196,12 +195,10 @@ if len(sys.argv) > 1:
     if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
         kfr=KernFeatureReader(options)
 
-        # print kfr.flatKerningPairs
-
         print '\n'.join(kfr.output)
-        print
-        print 'single kerning pairs:', len(kfr.singleKerningPairs)
-        print ' class kerning pairs:', len(kfr.classKerningPairs)
+        # print
+        # print 'single kerning pairs:', len(kfr.singleKerningPairs)
+        # print ' class kerning pairs:', len(kfr.classKerningPairs)
         print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
 
     else:
