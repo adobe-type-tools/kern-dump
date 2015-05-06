@@ -181,10 +181,15 @@ class KernFeatureReader(object):
 
     def readGOADB(self):
         goadbData = self.readFile(self.goadbPath)
-        allNamePairs = re.findall(r"(\S+?)\t(\S+?)(\t\S+?)?\n", goadbData)
-
-        for finalName, workingName, override in allNamePairs:
-            self.glyphNameDict[workingName] = finalName
+        goadbList = self.readFile(self.goadbPath).splitlines()
+        
+        for line in goadbList:
+            splitLine = line.split()
+            if len(splitLine) < 2:
+                print 'Something is wrong with this GOADB line:\n', line
+            else:
+                finalName, workingName = splitLine[0], splitLine[1]
+                self.glyphNameDict[workingName] = finalName
 
 
 if len(sys.argv) > 1:
