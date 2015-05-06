@@ -9,7 +9,7 @@ __doc__ = '''\
 
 Prints a list of all kerning pairs to be expected from a kern feature file; 
 which has to be passed to the script as an argument. 
-Has the ability to use a GlyphOrderAndAliasDB file for translation of working 
+Has the ability to use a GlyphOrderAndAliasDB file for translation of "friendly" 
 glyph names to final glyph names.
 
 Usage:
@@ -17,17 +17,15 @@ Usage:
 python getKerningPairsFromFeatureFile.py <path to kern feature file>
 python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> <path to kern feature file>
 
-
-To do: make givenKerningPairs work with lines like this:
-
-enum pos [ x x x ] [ x x x ] xx; 
-enum pos x [ x x x ] xx; 
-enum pos [ x x x ] x xx; 
-
-enum pos glyph @class xx;
-enum pos @class [ glyph glyph glyph ] xx;
-
 '''
+
+# Regular expressions for parsing individual kerning commands:
+x_range_range = re.compile(r'\s*(enum)?\s+?pos\s*\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?);')
+x_range_glyph = re.compile(r'\s*(enum)?\s+?pos\s*\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?);')
+x_glyph_range = re.compile(r'\s*(enum)?\s+?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?);')        
+x_item_item = re.compile(r'\s*(enum)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?);')
+expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
+
 
 
 class KernFeatureReader(object):
@@ -42,30 +40,25 @@ class KernFeatureReader(object):
 
         self.featureFilePath = self.options[-1]
 
-        self.rawFeatureData = self.readFile(self.featureFilePath)
-        # self.featureData = self.cleanData(self.rawFeatureData)
-        # The self.cleanData function is intended to 'clean' lines with compact notation (see above)
-        # Not yet implemented.
-
-        # For now:
-        self.featureData = self.rawFeatureData 
+        self.featureData = self.readFile(self.featureFilePath)
         self.kernClasses = self.readKernClasses()
 
         self.singleKerningPairs = {}
         self.classKerningPairs = {}
-        self.allKerningPairs = self.makePairDicts()
+
+        self.foundKerningPairs = self.parseKernLines()
+        self.flatKerningPairs = self.makeFlatPairs()
 
         if self.goadbPath:
             self.glyphNameDict = {}
             self.readGOADB()
-            self.allKerningPairs = self.convertNames(self.allKerningPairs)
+            self.flatKerningPairs = self.convertNames(self.flatKerningPairs)
 
 
         self.output = []
-        for (left, right), value in self.allKerningPairs.items():
+        for (left, right), value in self.flatKerningPairs.items():
             self.output.append('/%s /%s %s' % (left, right, value))
         self.output.sort()
-
 
 
     def readFile(self, filePath):
@@ -82,19 +75,6 @@ class KernFeatureReader(object):
 
         lineString = '\n'.join(lineList)
         return lineString
-
-
-    def cleanData(self, rawData):
-        # See commend above
-        dataList = rawData.splitlines()
-        # for line in lineList:
-        #     if 'enum' and '[' in line:
-        #         splitline = re.split(r'[\[\]]', line) # split line by brackets
-        #         print line
-        #         print splitline
-        #         print
-        # print lineList
-        # print dataList
 
 
     def convertNames(self, pairDict):
@@ -126,39 +106,78 @@ class KernFeatureReader(object):
 
 
     def allCombinations(self, left, right):
-        leftGlyphs = self.kernClasses.get(left, [left])
-        rightGlyphs = self.kernClasses.get(right, [right])
+        if len(left.split()) > 1:
+            # The left kerning object is something like [ a b c ] or [ a @MMK_x c ]:
+            leftGlyphs = []
+            leftItems = left.split()
+            for item in leftItems:
+                classFound = self.kernClasses.get(item, None)
+                if classFound:
+                    leftGlyphs.extend(classFound)
+                else:
+                    leftGlyphs.append(item)
+
+        else:
+            # The left kerning object is something like x or @MMK_x:
+            leftGlyphs = self.kernClasses.get(left, [left])
         
+        if len(right.split()) > 1:
+            # The right kerning object is something like [ a b c ] or [ a @MMK_x c ]:
+            rightGlyphs = []
+            rightItems = right.split()
+            for item in rightItems:
+                classFound = self.kernClasses.get(item, None)
+                if classFound:
+                    rightGlyphs.extend(classFound)
+                else:
+                    rightGlyphs.append(item)
+        else:
+            # The right kerning object is something like x or @MMK_x:
+            rightGlyphs = self.kernClasses.get(right, [right])
+        
+
         combinations = list(itertools.product(leftGlyphs, rightGlyphs))
         return combinations
 
 
-    def makePairDicts(self):
-        # givenKerningPairs = re.findall(r"\s*(enum )?pos (.+?) (.+?) (-?\d+?);", self.featureData)
-        givenKerningPairs = re.findall(r"\s*(enum )?pos (\[?.+?\]?) (\[?.+?\]?) (-?\d+?);", self.featureData)
-        enumPairs = re.findall(r'enum pos .+;' , self.featureData)
+    def parseKernLines(self):
+        featureLines = self.featureData.splitlines()
+        foundKerningPairs = []
+        for line in featureLines:
+            for expression in expressions:
+                match = re.match(expression, line) 
+                if match:
+                    foundKerningPairs.append([match.group(1),match.group(2),match.group(3),match.group(4)])
+                    break
+                else:
+                    # a line that is not found by any of the expressions
+                    continue
+        return foundKerningPairs
 
-        # print givenKerningPairs
-        allKerningPairs = {}
 
-        for loop, (enum, left, right, value) in enumerate(givenKerningPairs):
+    def makeFlatPairs(self):
+        flatKerningPairs = {}
+
+        for enum, left, right, value in self.foundKerningPairs:
             if enum:
-                # shorthand for single pairs
+                # shorthand for enumerating a single line into multiple single pairs
                 for combo in self.allCombinations(left, right):
                     self.singleKerningPairs[combo] = value
 
             elif not '@' in left and not '@' in right:
+                # glyph-to-glyph kerning
                 self.singleKerningPairs[(left, right)] = value
 
             else:
+                # class-to-class, class-to-glyph, or glyph-to-class kerning
                 for combo in self.allCombinations(left, right):
                     self.classKerningPairs[combo] = value
 
 
-        allKerningPairs.update(self.classKerningPairs)
-        allKerningPairs.update(self.singleKerningPairs) # overwrites any given class kern values with exceptions.
+        flatKerningPairs.update(self.classKerningPairs)
+        flatKerningPairs.update(self.singleKerningPairs) # overwrites any given class kern values with exceptions.
 
-        return allKerningPairs
+        return flatKerningPairs
 
 
     def readGOADB(self):
@@ -169,7 +188,6 @@ class KernFeatureReader(object):
             self.glyphNameDict[workingName] = finalName
 
 
-
 if len(sys.argv) > 1:
 
     options = sys.argv[1:]
@@ -178,14 +196,13 @@ if len(sys.argv) > 1:
     if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
         kfr=KernFeatureReader(options)
 
-        # print kfr
-        # print kfr.allKerningPairs
-        # print len(kfr.singleKerningPairs)
-        # print len(kfr.classKerningPairs)
+        # print kfr.flatKerningPairs
 
         print '\n'.join(kfr.output)
-        print '\nTotal number of kerning pairs:'
-        print len(kfr.allKerningPairs)
+        print
+        print 'single kerning pairs:', len(kfr.singleKerningPairs)
+        print ' class kerning pairs:', len(kfr.classKerningPairs)
+        print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
 
     else:
         print "No valid kern feature file provided."

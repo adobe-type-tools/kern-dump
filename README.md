@@ -20,14 +20,17 @@ python dumpKernFeatureFromOTF.py font.ttf
 
 ### `getKerningPairsFromFeatureFile.py`
 Extract a list of all kerning pairs that would be created from a feature file.  
-This script is still in development, ‘compact’ notation within a single line 
-is not yet fully supported. (Compact notation example: `pos [ a adieresis aacute ] [ v w ] -1000;`)
+Has the ability to use a GlyphOrderAndAliasDB file for translation of 
+“friendly” glyph names to final glyph names (for comparison with the output of 
+`getKerningPairsFromOTF.py`)  
 
 __Dependencies:__ None  
 __Environment:__ command line  
 
 ```
 python getKerningPairsFromFeatureFile.py kern.fea
+python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> kern.fea
+
 ```
 
 ---
