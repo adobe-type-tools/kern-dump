@@ -12,8 +12,8 @@ __doc__ ='''\
     This script extracts a viable kern feature file from a compiled OTF.
     It requires the script 'getKerningPairsFromOTF.py'; which is distributed in the same folder.
 
-    usage: 
-    python getKerning font.otf > outputfile
+    usage:
+    python dumpKernFeatureFromOTF.py font.otf > outputfile
 
     '''
 
@@ -23,7 +23,7 @@ compressSinglePairs = True
 
 
 def sortGlyphs(glyphlist):
-    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs starting with 'uni' names do not get to be key (first) glyphs. 
+    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs starting with 'uni' names do not get to be key (first) glyphs.
     # An infinite loop is avoided, in case there are only glyphs matching above mentioned properties.
     exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
 
@@ -38,7 +38,7 @@ def sortGlyphs(glyphlist):
 
 
 def nameClass(glyphlist, flag):
-    glyphs = sortGlyphs(glyphlist)    
+    glyphs = sortGlyphs(glyphlist)
     if len(glyphs) == 0:
         name = 'error!!!'
     else:
@@ -52,7 +52,7 @@ def nameClass(glyphlist, flag):
         case = ''
 
     flag = flag
-    
+
     return '@%s%s%s' % (name, flag, case)
 
 
@@ -62,9 +62,9 @@ def buildOutputList(sourceList, outputList, headlineString):
     if len(sourceList):
         headline = headlineString
         decoration = '-'*len(headline)
-        
-        outputList.append('# ' + headline)            
-        outputList.append('# ' + decoration)            
+
+        outputList.append('# ' + headline)
+        outputList.append('# ' + decoration)
 
         for item in sourceList:
            outputList.append(item)
@@ -127,11 +127,11 @@ def makeKernFeature(fontPath):
 
 
         # Compress the single pairs to a more space-saving notation.
-        # First, dictionaries for each left glyph are created. 
+        # First, dictionaries for each left glyph are created.
         # If the kerning value to any right glyph happens to be equal, those right glyphs are merged into a 'class'.
 
         for (left, right), value in singlePairsList:
-            leftGlyph = left 
+            leftGlyph = left
             # leftGlyphsDict.setdefault(leftGlyph, {}).setdefault(value, []).append(right) # shorter
             leftGlyphsDict.setdefault(leftGlyph, {})
             kernValueDict = leftGlyphsDict[leftGlyph]
@@ -142,7 +142,7 @@ def makeKernFeature(fontPath):
                 right = leftGlyphsDict[left][value]
                 right = sortGlyphs(right)
                 compressedLeft.append((left, right, value))
-                    
+
         # Same happens for the right side; including classes that have been compressed before.
 
         for left, right, value in compressedLeft:
@@ -211,7 +211,7 @@ def makeKernFeature(fontPath):
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
-    
+
         if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
             fontPath = sys.argv[1]
             makeKernFeature(fontPath)
