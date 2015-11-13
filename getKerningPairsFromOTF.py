@@ -29,7 +29,7 @@ class myRightClass:
 def collectUniqueKernLookupListIndexes(featureRecord):
     uniqueKernLookupIndexList = []
     for featRecItem in featureRecord:
-        # print featRecItem.FeatureTag  
+        # print featRecItem.FeatureTag
         # GPOS feature tags (e.g. kern, mark, mkmk, size) of each ScriptRecord
         if featRecItem.FeatureTag == kKernFeatureTag:
             feature = featRecItem.Feature
@@ -37,7 +37,7 @@ def collectUniqueKernLookupListIndexes(featureRecord):
             for featLookupItem in feature.LookupListIndex:
                 if featLookupItem not in uniqueKernLookupIndexList:
                     uniqueKernLookupIndexList.append(featLookupItem)
-    
+
     return uniqueKernLookupIndexList
 
 
@@ -113,7 +113,7 @@ class ReadKerning(object):
             if lookup.LookupType not in [2, 9]:
                 print '''
                 Info: GPOS LookupType %s found.
-                This type is neither a pair adjustment positioning lookup (GPOS LookupType 2), 
+                This type is neither a pair adjustment positioning lookup (GPOS LookupType 2),
                 nor using an extension table (GPOS LookupType 9), which are the only supported ones.
                 ''' % lookup.LookupType
                 continue
@@ -133,22 +133,21 @@ class ReadKerning(object):
                         continue
                     elif subtableItem.ExtensionLookupType == 2:
                         pairPos = subtableItem.ExtSubTable
-                
-                # print pairPos, pairPos.Format, pairPos.Coverage.Format 
+
 
                 # if pairPos.Coverage.Format not in [1, 2]:
-                if pairPos.Coverage.Format not in [1, 2]:
+                if pairPos.Format not in [1, 2]:
                     print "WARNING: Coverage format %d is not yet supported." % pairPos.Coverage.Format
-                
+
                 if pairPos.ValueFormat1 not in [0, 4, 5]:
                     print "WARNING: ValueFormat1 format %d is not yet supported." % pairPos.ValueFormat1
-                
+
                 if pairPos.ValueFormat2 not in [0]:
                     print "WARNING: ValueFormat2 format %d is not yet supported." % pairPos.ValueFormat2
 
 
                 self.pairPosList.append(pairPos)
-                
+
                 # Each glyph in this list will have a corresponding PairSet which will
                 # contain all the second glyphs and the kerning value in the form of PairValueRecord(s)
                 # self.firstGlyphsList.extend(pairPos.Coverage.glyphs)
@@ -156,7 +155,7 @@ class ReadKerning(object):
 
     def getSinglePairs(self):
         for pairPos in self.pairPosList:
-            if pairPos.Format == 1: 
+            if pairPos.Format == 1:
                 # single pair adjustment
 
                 firstGlyphsList = pairPos.Coverage.glyphs
@@ -177,14 +176,14 @@ class ReadKerning(object):
                         else:
                             print "\tValueFormat1 = %d" % valueFormat
                             continue # skip the rest
-                        
+
                         self.kerningPairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
                         self.singlePairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
 
 
     def getClassPairs(self):
         for loop, pairPos in enumerate(self.pairPosList):
-            if pairPos.Format == 2: 
+            if pairPos.Format == 2:
 
                 leftClasses = {}
                 rightClasses = {}
@@ -192,10 +191,10 @@ class ReadKerning(object):
 
                 # # Find left class with the Class1Record index="0".
                 # # This first class is mixed into the "Coverage" table (e.g. all left glyphs)
-                # # and has no class="X" property, that is why we have to find the glyphs in that way. 
-                
+                # # and has no class="X" property, that is why we have to find the glyphs in that way.
+
                 lg0 = myLeftClass()
-                
+
                 allLeftGlyphs = pairPos.Coverage.glyphs # list of all glyphs kerned to the left of a pair
                 allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys() # list of all glyphs contained within left-sided kerning classes:
 
@@ -218,7 +217,7 @@ class ReadKerning(object):
                 # Find all the remaining left classes:
                 for leftGlyph in pairPos.ClassDef1.classDefs:
                     class1Record = pairPos.ClassDef1.classDefs[leftGlyph]
-                    
+
                     if class1Record != 0: # this was the crucial line.
                         lg = myLeftClass()
                         lg.class1Record = class1Record
@@ -226,7 +225,7 @@ class ReadKerning(object):
                         self.allLeftClasses.setdefault("class_%s_%s" % (loop, lg.class1Record), lg.glyphs)
 
                 # Same for the right classes:
-                for rightGlyph in pairPos.ClassDef2.classDefs:                    
+                for rightGlyph in pairPos.ClassDef2.classDefs:
                     class2Record = pairPos.ClassDef2.classDefs[rightGlyph]
                     rg = myRightClass()
                     rg.class2Record = class2Record
@@ -238,7 +237,7 @@ class ReadKerning(object):
                     for record_r in rightClasses:
                         if pairPos.Class1Record[record_l].Class2Record[record_r]:
                             valueFormat = pairPos.ValueFormat1
-                            
+
                             if valueFormat in [4, 5]:
                                 kernValue = pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance
                             elif valueFormat == 0: # valueFormat zero is caused by a value of <0 0 0 0> on a class-class pair; skip these
@@ -246,11 +245,11 @@ class ReadKerning(object):
                             else:
                                 print "\tValueFormat1 = %d" % valueFormat
                                 continue # skip the rest
-                            
+
                             if kernValue != 0:
                                 leftClassName = 'class_%s_%s'  % (loop, leftClasses[record_l].class1Record)
                                 rightClassName = 'class_%s_%s' % (loop, rightClasses[record_r].class2Record)
-                                                                
+
                                 self.classPairs[(leftClassName, rightClassName)] = kernValue
 
                                 for l in leftClasses[record_l].glyphs:
@@ -261,10 +260,10 @@ class ReadKerning(object):
                                         else:
                                             if valueFormat == 5: # RTL kerning
                                                 kernValue = "<%d 0 %d 0>" % (pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XPlacement, pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance)
-                                            
+
 
                                             self.kerningPairs[(l, r)] = kernValue
-                            
+
                         else:
                             print 'ERROR'
 
