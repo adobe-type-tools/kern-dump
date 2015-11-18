@@ -2,20 +2,22 @@
 import os
 import sys
 import string
+import subprocess
+from defcon import Font
 from fontTools import ttLib
 
 import getKerningPairsFromOTF
-reload(getKerningPairsFromOTF)
+# reload(getKerningPairsFromOTF)
 
 __doc__ ='''\
 
     This script extracts kerning and groups from a compiled OTF and injects
-    them into a UFO file.
+    them into a new UFO file (which is created via tx).
     It requires the script 'getKerningPairsFromOTF.py'; which is distributed
     in the same folder.
 
     usage:
-    python dumpKernObjectFromOTF.py font.otf font.ufo
+    python dumpKernObjectFromOTF.py font.otf
 
     '''
 
@@ -44,6 +46,7 @@ def nameClass(glyphlist, flag):
     glyphs = sortGlyphs(glyphlist)
     if len(glyphs) == 0:
         name = 'error!!!'
+        print 'Found empty class.'
     else:
         name = glyphs[0]
 
@@ -54,24 +57,7 @@ def nameClass(glyphlist, flag):
     else:
         case = ''
 
-    flag = flag
-
     return '@MMK%s%s%s' % (flag, name, case)
-
-
-
-def buildOutputList(sourceList, outputList, headlineString):
-    # Basically just a function to create a nice headline before each chunk of kerning data.
-    if len(sourceList):
-        headline = headlineString
-        decoration = '-'*len(headline)
-
-        outputList.append('# ' + headline)
-        outputList.append('# ' + decoration)
-
-        for item in sourceList:
-           outputList.append(item)
-        outputList.append('')
 
 
 
@@ -106,16 +92,59 @@ def makeKernObjects(fontPath):
     return groups, kerning
 
 
-def injectKerningIntoUFO(ufoPath, groups, kerning):
-    from defcon import Font
+def injectKerningToUFO(ufoPath, groups, kerning):
     ufo = Font(ufoPath)
     ufo.kerning.clear()
     ufo.groups.clear()
 
-    print 'Injecting groups and kerning into %s ...' % ufoPath
+    print 'Injecting OTF groups and kerning into %s ...' % ufoPath
     ufo.groups.update(groups)
     ufo.kerning.update(kerning)
     ufo.save()
+
+
+def injectOS2TableToUFO(otfPath, ufoPath):
+    otfFont = ttLib.TTFont(otfPath)
+    os2Table = otfFont['OS/2']
+    ufo = Font(ufoPath)
+
+    print 'Injecting OS/2 table into %s ...' % ufoPath
+
+    ufo.info.ascender = os2Table.sTypoAscender
+    ufo.info.capHeight = os2Table.sCapHeight
+    ufo.info.descender = os2Table.sTypoDescender
+    ufo.info.xHeight = os2Table.sxHeight
+
+    ufo.info.openTypeOS2VendorID = os2Table.achVendID
+    ufo.info.openTypeOS2TypoAscender = os2Table.sTypoAscender
+    ufo.info.openTypeOS2TypoDescender = os2Table.sTypoDescender
+    ufo.info.openTypeOS2TypoLineGap = os2Table.sTypoLineGap
+    ufo.info.openTypeOS2StrikeoutPosition = os2Table.yStrikeoutPosition
+    ufo.info.openTypeOS2StrikeoutSize = os2Table.yStrikeoutSize
+    ufo.info.openTypeOS2SubscriptXOffset = os2Table.ySubscriptXOffset
+    ufo.info.openTypeOS2SubscriptXSize = os2Table.ySubscriptXSize
+    ufo.info.openTypeOS2SubscriptYOffset = os2Table.ySubscriptYOffset
+    ufo.info.openTypeOS2SubscriptYSize = os2Table.ySubscriptYSize
+    ufo.info.openTypeOS2SuperscriptXOffset = os2Table.ySuperscriptXOffset
+    ufo.info.openTypeOS2SuperscriptXSize = os2Table.ySuperscriptXSize
+    ufo.info.openTypeOS2SuperscriptYOffset = os2Table.ySuperscriptYOffset
+    ufo.info.openTypeOS2SuperscriptYSize = os2Table.ySuperscriptYSize
+    ufo.save()
+
+
+def convertOTFtoUFO(otfPath):
+    ufoPath = '%s.ufo' % os.path.splitext(otfPath)[0]
+    print 'Creating %s from %s ...' % (ufoPath, otfPath)
+    txCommand = 'tx -ufo %s %s' % (otfPath, otfPath.replace('otf', 'ufo'))
+    txProcess = subprocess.Popen(txCommand.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output,errors = txProcess.communicate()
+
+    if errors:
+        print errors
+        sys.exit()
+
+    return ufoPath
+
 
 
 errorMessage = '''\
@@ -124,23 +153,25 @@ ERROR:
 No valid font and/or UFO provided.
 The script is used like this:
 
-python %s font.otf font.ufo
+python %s font.otf
 ''' % os.path.basename(__file__)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        assumedFontPath = sys.argv[1]
-        assumedUFOPath = sys.argv[2]
-        assumedUFOPath = assumedUFOPath.replace('/', '')
 
-        if  os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf'] and \
-            os.path.exists(assumedUFOPath) and os.path.splitext(assumedUFOPath)[1].lower() in ['.ufo']:
+if __name__ == "__main__":
+
+    if len(sys.argv) == 2:
+        assumedFontPath = sys.argv[1]
+
+        if  os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
 
             fontPath = assumedFontPath
-            ufoPath = assumedUFOPath
             groups, kerning = makeKernObjects(fontPath)
-            injectKerningIntoUFO(ufoPath, groups, kerning)
+
+            ufoPath = convertOTFtoUFO(fontPath)
+            injectKerningToUFO(ufoPath, groups, kerning)
+            injectOS2TableToUFO(fontPath, ufoPath)
+
             print 'done'
 
         else:
