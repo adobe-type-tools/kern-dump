@@ -9,8 +9,10 @@ class UFOkernReader(object):
 
     def __init__(self, font):
         self.f = font
-        self.classKerningPairs = {}
-        self.singleKerningPairs = {}
+        self.group_group_pairs = {}
+        self.group_glyph_pairs = {}
+        self.glyph_group_pairs = {}
+        self.glyph_glyph_pairs = {}
 
         self.allKerningPairs = self.makePairDicts()
         self.output = []
@@ -35,18 +37,37 @@ class UFOkernReader(object):
 
         for (left, right), value in self.f.kerning.items():
 
-            if not '@' in left and not '@' in right:
-                self.singleKerningPairs[(left, right)] = value
+            if '@' in left and '@' in right:
+                # group-to-group-pair
+                for combo in self.allCombinations(left, right):
+                    self.group_group_pairs[combo] = value
+
+
+            elif '@' in left and not '@' in right:
+                # group-to-glyph-pair
+                for combo in self.allCombinations(left, right):
+                    self.group_glyph_pairs[combo] = value
+
+
+            elif not '@' in left and '@' in right:
+                # glyph-to-group-pair
+                for combo in self.allCombinations(left, right):
+                    self.glyph_group_pairs[combo] = value
 
             else:
-                for combo in self.allCombinations(left, right):
-                    self.classKerningPairs[combo] = value
-
-        kerningPairs.update(self.classKerningPairs)
-        kerningPairs.update(self.singleKerningPairs) # overwrites any given class kern values with exceptions.
+                # glyph-to-glyph-pair a.k.a. single pair
+                self.glyph_glyph_pairs[(left, right)] = value
 
 
-        # delete any kerning values == 0. 
+        # The updates occur from the most general pairs to the most specific.
+        # This means that any given class kerning values are overwritten with
+        # the intended exceptions.
+        kerningPairs.update(self.group_group_pairs)
+        kerningPairs.update(self.group_glyph_pairs)
+        kerningPairs.update(self.glyph_group_pairs)
+        kerningPairs.update(self.glyph_glyph_pairs)
+
+        # delete any kerning values == 0.
         # This cannot be done in the loop, since exceptions might undo a previously set kerning pair to be 0.
 
         cleanKerningPairs = dict(kerningPairs)
@@ -66,7 +87,7 @@ def run(font):
     scrap.close()
 
     if inRF:
-        pass        
+        pass
         # print 'Total length of kerning:', ukr.totalKerning
 
     if inCL:
@@ -80,7 +101,7 @@ if __name__ == '__main__':
     inRF = False
     inCL = False
 
-    try: 
+    try:
         import mojo
         inRF = True
         f = CurrentFont()
