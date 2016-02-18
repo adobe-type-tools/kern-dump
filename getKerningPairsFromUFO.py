@@ -15,6 +15,7 @@ class UFOkernReader(object):
         self.glyph_glyph_pairs = {}
 
         self.allKerningPairs = self.makePairDicts()
+        self.allKerningPairs_zero = self.makePairDicts(includeZero=True)
         self.output = []
 
         for (left, right), value in self.allKerningPairs.items():
@@ -32,7 +33,7 @@ class UFOkernReader(object):
         return combinations
 
 
-    def makePairDicts(self):
+    def makePairDicts(self, includeZero=False):
         kerningPairs = {}
 
         for (left, right), value in self.f.kerning.items():
@@ -67,15 +68,18 @@ class UFOkernReader(object):
         kerningPairs.update(self.glyph_group_pairs)
         kerningPairs.update(self.glyph_glyph_pairs)
 
-        # delete any kerning values == 0.
-        # This cannot be done in the loop, since exceptions might undo a previously set kerning pair to be 0.
 
-        cleanKerningPairs = dict(kerningPairs)
-        for pair in kerningPairs:
-            if kerningPairs[pair] == 0:
-                del cleanKerningPairs[pair]
+        if includeZero == False:
+            # delete any kerning values == 0.
+            # This cannot be done in the loop, since exceptions might undo a previously set kerning pair to be 0.
+            cleanKerningPairs = dict(kerningPairs)
+            for pair in kerningPairs:
+                if kerningPairs[pair] == 0:
+                    del cleanKerningPairs[pair]
+            return cleanKerningPairs
 
-        return cleanKerningPairs
+        else:
+            return kerningPairs
 
 
 
