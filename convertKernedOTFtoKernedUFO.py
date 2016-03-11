@@ -9,27 +9,30 @@ from fontTools import ttLib
 import getKerningPairsFromOTF
 # reload(getKerningPairsFromOTF)
 
-__doc__ ='''\
+__doc__ = '''\
 
     This script extracts kerning and groups from a compiled OTF and injects
-    them into a new UFO file (which is created via tx).
+    them into a new UFO file (which is created via `tx`).
     It requires the script 'getKerningPairsFromOTF.py'; which is distributed
     in the same folder.
 
     usage:
-    python dumpKernObjectFromOTF.py font.otf
+    python convertKernedOTFtoKernedUFO.py font.otf
 
     '''
 
 
 kKernFeatureTag = 'kern'
 compressSinglePairs = True
-# Switch to control if single pairs shall be written plainly, or in a more space-saving notation (using enum).
+# Switch to control if single pairs shall be written plainly,
+# or in a more space-saving notation (using enum).
 
 
 def sortGlyphs(glyphlist):
-    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs starting with 'uni' names do not get to be key (first) glyphs.
-    # An infinite loop is avoided, in case there are only glyphs matching above mentioned properties.
+    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs
+    # starting with 'uni' names do not get to be key (first) glyphs.
+    # An infinite loop is avoided, in case there are only glyphs matching
+    # above mentioned properties.
     exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
 
     glyphs = sorted(glyphlist)
@@ -60,7 +63,6 @@ def nameClass(glyphlist, flag):
     return '@MMK%s%s%s' % (flag, name, case)
 
 
-
 def makeKernObjects(fontPath):
     f = getKerningPairsFromOTF.ReadKerning(fontPath)
 
@@ -77,7 +79,6 @@ def makeKernObjects(fontPath):
         className = nameClass(glyphs, '_R_')
         groups.setdefault(className, glyphs)
 
-
     for (leftClass, rightClass), value in sorted(f.classPairs.items()):
         leftGlyphs = sortGlyphs(f.allLeftClasses[leftClass])
         leftClassName = nameClass(leftGlyphs, '_L_')
@@ -86,7 +87,6 @@ def makeKernObjects(fontPath):
         rightClassName = nameClass(rightGlyphs, '_R_')
 
         kerning[(leftClassName, rightClassName)] = value
-
 
     kerning.update(f.singlePairs)
     return groups, kerning
@@ -136,15 +136,17 @@ def convertOTFtoUFO(otfPath):
     ufoPath = '%s.ufo' % os.path.splitext(otfPath)[0]
     print 'Creating %s from %s ...' % (ufoPath, otfPath)
     txCommand = 'tx -ufo %s %s' % (otfPath, otfPath.replace('otf', 'ufo'))
-    txProcess = subprocess.Popen(txCommand.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output,errors = txProcess.communicate()
+    txProcess = subprocess.Popen(
+        txCommand.split(),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    output, errors = txProcess.communicate()
 
     if errors:
         print errors
         sys.exit()
 
     return ufoPath
-
 
 
 errorMessage = '''\
@@ -157,13 +159,12 @@ python %s font.otf
 ''' % os.path.basename(__file__)
 
 
-
 if __name__ == "__main__":
 
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
 
-        if  os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
+        if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
 
             fontPath = assumedFontPath
             groups, kerning = makeKernObjects(fontPath)
