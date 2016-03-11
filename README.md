@@ -17,7 +17,20 @@ python convertKernedOTFtoKernedUFO.py font.otf
 
 ---
 
-### `getKerningPairsFromFeatureFile.py`
+### `dumpKerning.py`
+Just van Rossum wrote this script. It imports all of the `getKerningPairsFromXXX` scripts, and therefore can dump kerning from all kinds of formats. Results in a `.kerndump` file at the location of the input file.  
+
+__Dependencies:__ `getKerningPairsFromFEA.py`, `getKerningPairsFromOTF.py`, `getKerningPairsFromUFO.py` (same repo)  
+__Environment:__ command line  
+```
+python dumpKerning.py font.otf
+python dumpKerning.py font.ufo
+python dumpKerning.py kern.fea
+```
+
+---
+
+### `getKerningPairsFromFEA.py`
 Extract a list of all kerning pairs that would be created from a feature file.  
 Has the ability to use a GlyphOrderAndAliasDB file for translation of 
 “friendly” glyph names to final glyph names (for comparison with the output of 
@@ -27,8 +40,8 @@ __Dependencies:__ None
 __Environment:__ command line  
 
 ```
-python getKerningPairsFromFeatureFile.py kern.fea
-python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> kern.fea
+python getKerningPairsFromFEA.py kern.fea
+python getKerningPairsFromFEA.py -go <path to GlyphOrderAndAliasDB file> kern.fea
 
 ```
 
