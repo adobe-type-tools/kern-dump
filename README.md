@@ -2,18 +2,17 @@
 Various scripts for analyzing, reading and writing kerning information. These 
 can be helpful for analyzing kerning (and the loss thereof) through various 
 stages of font production.  
-As Presented at [ATypI Amsterdam 2013](http://www.atypi.org/past-conferences/atypi-amsterdam-2013/amsterdam-programme/activity?a=265). 
+Some of these tools have been presented at [ATypI Amsterdam 2013](http://www.atypi.org/past-conferences/atypi-amsterdam-2013/amsterdam-programme/activity?a=265). 
 
 ---
 
-### `dumpKernFeatureFromOTF.py`
-Dump a viable kern feature interpreted from the GPOS table found in a compiled font. 
+### `convertKernedOTFtoKernedUFO.py`
+Extracts kerning and groups from a compiled OTF and injects them into a new UFO file (which is created via `tx`).  
 
-__Dependencies:__ `getKerningPairsFromOTF.py` (same repo), [fontTools](http://sourceforge.net/projects/fonttools/)  
+__Dependencies:__ `getKerningPairsFromOTF.py` (same repo), [fontTools](https://github.com/behdad/fonttools), `tx` (Part of the Adobe FDK)  
 __Environment:__ command line  
 ```
-python dumpKernFeatureFromOTF.py font.otf
-python dumpKernFeatureFromOTF.py font.ttf
+python convertKernedOTFtoKernedUFO.py font.otf
 ```
 
 ---
@@ -39,7 +38,7 @@ python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file>
 Extract a list of all (flat) GPOS kerning pairs in a font, and report the 
 absolute number of pairs.  
 
-__Dependencies:__ [fontTools](http://sourceforge.net/projects/fonttools/)  
+__Dependencies:__ [fontTools](https://github.com/behdad/fonttools)  
 __Environment:__ command line
 
 ```
