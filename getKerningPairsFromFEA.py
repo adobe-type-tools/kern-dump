@@ -192,23 +192,23 @@ class KernFeatureReader(object):
                 self.glyphNameDict[workingName] = finalName
 
 
-if len(sys.argv) > 1:
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
 
-    options = sys.argv[1:]
-    kernFile = options[-1]
+        options = sys.argv[1:]
+        kernFile = options[-1]
 
-    if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
-        kfr=KernFeatureReader(options)
+        if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
+            kfr=KernFeatureReader(options)
 
-        print '\n'.join(kfr.output)
-        # print
-        # print 'single kerning pairs:', len(kfr.singleKerningPairs)
-        # print ' class kerning pairs:', len(kfr.classKerningPairs)
-        print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
+            print '\n'.join(kfr.output)
+            # print
+            # print 'single kerning pairs:', len(kfr.singleKerningPairs)
+            # print ' class kerning pairs:', len(kfr.classKerningPairs)
+            print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
+
+        else:
+            print "No valid kern feature file provided."
 
     else:
         print "No valid kern feature file provided."
-
-else:
-    print "No valid kern feature file provided."
-
