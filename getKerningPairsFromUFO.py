@@ -16,22 +16,24 @@ class UFOkernReader(object):
 
         self.allKerningPairs = self.makePairDicts()
         self.allKerningPairs_zero = self.makePairDicts(includeZero=True)
-        self.output = []
-
-        for (left, right), value in self.allKerningPairs.items():
-            self.output.append('/%s /%s %s' % (left, right, value))
-        self.output.sort()
+        self.output = self.makeOutput(self.allKerningPairs)
+        # self.output = self.makeOutput(self.allKerningPairs_zero)
 
         self.totalKerning = sum(self.allKerningPairs.values())
         self.absoluteKerning = sum([abs(value) for value in self.allKerningPairs.values()])
 
+    def makeOutput(self, kerningDict):
+        output = []
+        for (left, right), value in kerningDict.items():
+            output.append('/%s /%s %s' % (left, right, value))
+        output.sort()
+        return output
 
     def allCombinations(self, left, right):
         leftGlyphs = self.f.groups.get(left, [left])
         rightGlyphs = self.f.groups.get(right, [right])
         combinations = list(itertools.product(leftGlyphs, rightGlyphs))
         return combinations
-
 
     def makePairDicts(self, includeZero=False):
         kerningPairs = {}
@@ -43,14 +45,12 @@ class UFOkernReader(object):
                 for combo in self.allCombinations(left, right):
                     self.group_group_pairs[combo] = value
 
-
-            elif '@' in left and not '@' in right:
+            elif '@' in left and '@' not in right:
                 # group-to-glyph-pair
                 for combo in self.allCombinations(left, right):
                     self.group_glyph_pairs[combo] = value
 
-
-            elif not '@' in left and '@' in right:
+            elif '@' not in left and '@' in right:
                 # glyph-to-group-pair
                 for combo in self.allCombinations(left, right):
                     self.glyph_group_pairs[combo] = value
@@ -58,7 +58,6 @@ class UFOkernReader(object):
             else:
                 # glyph-to-glyph-pair a.k.a. single pair
                 self.glyph_glyph_pairs[(left, right)] = value
-
 
         # The updates occur from the most general pairs to the most specific.
         # This means that any given class kerning values are overwritten with
@@ -68,10 +67,10 @@ class UFOkernReader(object):
         kerningPairs.update(self.glyph_group_pairs)
         kerningPairs.update(self.glyph_glyph_pairs)
 
-
-        if includeZero == False:
+        if includeZero is False:
             # delete any kerning values == 0.
-            # This cannot be done in the loop, since exceptions might undo a previously set kerning pair to be 0.
+            # This cannot be done in the previous loop, since exceptions
+            # might set a previously established kerning pair to be 0.
             cleanKerningPairs = dict(kerningPairs)
             for pair in kerningPairs:
                 if kerningPairs[pair] == 0:
@@ -80,7 +79,6 @@ class UFOkernReader(object):
 
         else:
             return kerningPairs
-
 
 
 def run(font):
@@ -126,6 +124,4 @@ if __name__ == '__main__':
                 print 'No UFO file given.'
         except ImportError:
             print u'You don’t have Defcon installed. \U0001F625'
-
-
 
