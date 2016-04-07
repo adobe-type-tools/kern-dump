@@ -7,10 +7,10 @@ import itertools
 
 __doc__ = '''\
 
-Prints a list of all kerning pairs to be expected from a kern feature file; 
-which has to be passed to the script as an argument. 
-Has the ability to use a GlyphOrderAndAliasDB file for translation of "friendly" 
-glyph names to final glyph names.
+Prints a list of all kerning pairs to be expected from a kern feature file;
+which has to be passed to the script as an argument. Has the ability to use
+a GlyphOrderAndAliasDB file for translating "friendly" glyph names to final
+glyph names.
 
 Usage:
 ------
@@ -27,16 +27,15 @@ x_item_item = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
 expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
-
 class KernFeatureReader(object):
 
     def __init__(self, options):
-        
+
         self.goadbPath = None
         self.options = options
 
         if "-go" in self.options:
-            self.goadbPath =  self.options[self.options.index('-go')+1]
+            self.goadbPath = self.options[self.options.index('-go')+1]
 
         self.featureFilePath = self.options[-1]
 
@@ -54,12 +53,10 @@ class KernFeatureReader(object):
             self.readGOADB()
             self.flatKerningPairs = self.convertNames(self.flatKerningPairs)
 
-
         self.output = []
         for (left, right), value in self.flatKerningPairs.items():
             self.output.append('/%s /%s %s' % (left, right, value))
         self.output.sort()
-
 
     def readFile(self, filePath):
         # reads raw file, removes commented lines
@@ -68,14 +65,13 @@ class KernFeatureReader(object):
         data = inputfile.read().splitlines()
         inputfile.close()
         for line in data:
-            if '#' in line: 
+            if '#' in line:
                 line = line.split('#')[0]
             if line:
                 lineList.append(line)
 
         lineString = '\n'.join(lineList)
         return lineString
-
 
     def convertNames(self, pairDict):
         newPairDict = {}
@@ -88,12 +84,11 @@ class KernFeatureReader(object):
                 newLeft = left
             if not newRight:
                 newRight = right
-            
+
             newPair = (newLeft, newRight)
             newPairDict[newPair] = value
 
         return newPairDict
-
 
     def readKernClasses(self):
         allClassesList = re.findall(r"(@\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", self.featureData)
@@ -104,10 +99,10 @@ class KernFeatureReader(object):
 
         return classes
 
-
     def allCombinations(self, left, right):
         if len(left.split()) > 1:
-            # The left kerning object is something like [ a b c ] or [ a @MMK_x c ]:
+            # The left kerning object is an ad-hoc group
+            # like [ a b c ] or [ a @MMK_x c ]:
             leftGlyphs = []
             leftItems = left.split()
             for item in leftItems:
@@ -120,9 +115,10 @@ class KernFeatureReader(object):
         else:
             # The left kerning object is something like x or @MMK_x:
             leftGlyphs = self.kernClasses.get(left, [left])
-        
+
         if len(right.split()) > 1:
-            # The right kerning object is something like [ a b c ] or [ a @MMK_x c ]:
+            # The right kerning object is an ad-hoc group
+            # like [ a b c ] or [ a @MMK_x c ]:
             rightGlyphs = []
             rightItems = right.split()
             for item in rightItems:
@@ -134,36 +130,38 @@ class KernFeatureReader(object):
         else:
             # The right kerning object is something like x or @MMK_x:
             rightGlyphs = self.kernClasses.get(right, [right])
-        
 
         combinations = list(itertools.product(leftGlyphs, rightGlyphs))
         return combinations
-
 
     def parseKernLines(self):
         featureLines = self.featureData.splitlines()
         foundKerningPairs = []
         for line in featureLines:
             for expression in expressions:
-                match = re.match(expression, line) 
+                match = re.match(expression, line)
                 if match:
-                    foundKerningPairs.append([match.group(1),match.group(2),match.group(3),match.group(4)])
+                    foundKerningPairs.append([
+                        match.group(1),
+                        match.group(2),
+                        match.group(3),
+                        match.group(4)])
                     break
                 else:
                     continue
         return foundKerningPairs
-
 
     def makeFlatPairs(self):
         flatKerningPairs = {}
 
         for enum, left, right, value in self.foundKerningPairs:
             if enum:
-                # shorthand for enumerating a single line into multiple single pairs
+                # shorthand for enumerating a single-line
+                # command into multiple single pairs
                 for combo in self.allCombinations(left, right):
                     self.singleKerningPairs[combo] = value
 
-            elif not '@' in left and not '@' in right:
+            elif '@'not in left and '@' not in right:
                 # glyph-to-glyph kerning
                 self.singleKerningPairs[(left, right)] = value
 
@@ -172,17 +170,15 @@ class KernFeatureReader(object):
                 for combo in self.allCombinations(left, right):
                     self.classKerningPairs[combo] = value
 
-
         flatKerningPairs.update(self.classKerningPairs)
-        flatKerningPairs.update(self.singleKerningPairs) # overwrites any given class kern values with exceptions.
+        flatKerningPairs.update(self.singleKerningPairs)
+        # overwrites any given class kern values with exceptions.
 
         return flatKerningPairs
 
-
     def readGOADB(self):
-        goadbData = self.readFile(self.goadbPath)
         goadbList = self.readFile(self.goadbPath).splitlines()
-        
+
         for line in goadbList:
             splitLine = line.split()
             if len(splitLine) < 2:
@@ -199,7 +195,7 @@ if __name__ == "__main__":
         kernFile = options[-1]
 
         if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
-            kfr=KernFeatureReader(options)
+            kfr = KernFeatureReader(options)
 
             print '\n'.join(kfr.output)
             # print
