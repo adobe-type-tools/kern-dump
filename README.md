@@ -18,7 +18,7 @@ python convertKernedOTFtoKernedUFO.py font.otf
 ---
 
 ### `dumpKerning.py`
-Just van Rossum wrote this script. It imports all of the `getKerningPairsFromXXX` scripts, and therefore can dump kerning from all kinds of formats. Results in a `.kerndump` file at the location of the input file.  
+Just van Rossum wrote this script. It imports all of the `getKerningPairsFromXXX` scripts (except VFB), and therefore can dump kerning from all kinds of formats (except VFB). Results in a `.kerndump` file at the location of the input file.  
 
 __Dependencies:__ `getKerningPairsFromFEA.py`, `getKerningPairsFromOTF.py`, `getKerningPairsFromUFO.py` (same repo)  
 __Environment:__ command line  
@@ -71,6 +71,15 @@ __Environment:__ command line or Robofont
 ```
 python getKerningPairsFromUFO.py font.ufo
 ```
+
+---
+
+### `getKerningPairsFromVFB.py`
+Extract a list of all (flat) kerning pairs from a VFB’s kern object, and 
+report the absolute number of pairs. Run as a FontLab script.  
+
+__Dependencies:__ [FontLab 5](http://old.fontlab.com/font-editor/fontlab-studio/)  
+__Environment:__ FontLab
 
 ---
 
