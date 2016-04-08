@@ -7,10 +7,10 @@ import itertools
 
 __doc__ = '''\
 
-Prints a list of all kerning pairs to be expected from a kern feature file;
-which has to be passed to the script as an argument. Has the ability to use
-a GlyphOrderAndAliasDB file for translating "friendly" glyph names to final
-glyph names.
+Prints a list of all kerning pairs to be expected from a kern feature file.
+The feature file has to be passed to the script as an argument.
+This script has the ability to use a GlyphOrderAndAliasDB file for translating
+"friendly" glyph names to final glyph names (for comparison with OTF).
 
 Usage:
 ------
@@ -27,6 +27,16 @@ x_item_item = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
 expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
+class KerningPair(object):
+    'Storing a flattened kerning pair'
+
+    def __init__(self, pair, pairList, value):
+
+        self.pair = pair
+        self.value = value
+        self.pairList = pairList
+
+
 class KernFeatureReader(object):
 
     def __init__(self, options):
@@ -41,9 +51,6 @@ class KernFeatureReader(object):
 
         self.featureData = self.readFile(self.featureFilePath)
         self.kernClasses = self.readKernClasses()
-
-        self.singleKerningPairs = {}
-        self.classKerningPairs = {}
 
         self.foundKerningPairs = self.parseKernLines()
         self.flatKerningPairs = self.makeFlatPairs()
@@ -141,38 +148,43 @@ class KernFeatureReader(object):
             for expression in expressions:
                 match = re.match(expression, line)
                 if match:
-                    foundKerningPairs.append([
-                        match.group(1),
-                        match.group(2),
-                        match.group(3),
-                        match.group(4)])
+                    enum = match.group(1)
+                    pair = (match.group(2), match.group(3))
+                    value = match.group(4)
+                    foundKerningPairs.append([enum, pair, value])
                     break
                 else:
                     continue
         return foundKerningPairs
 
     def makeFlatPairs(self):
+        indexedPairs = {}
         flatKerningPairs = {}
 
-        for enum, left, right, value in self.foundKerningPairs:
+        for pIndex, (enum, pair, value) in enumerate(self.foundKerningPairs):
+            left = pair[0]
+            right = pair[1]
+
             if enum:
-                # shorthand for enumerating a single-line
+                # `enum` is shorthand for breaking down a one-line
                 # command into multiple single pairs
-                for combo in self.allCombinations(left, right):
-                    self.singleKerningPairs[combo] = value
+                pairList = self.allCombinations(left, right)
 
             elif '@'not in left and '@' not in right:
                 # glyph-to-glyph kerning
-                self.singleKerningPairs[(left, right)] = value
+                pairList = [pair]
 
             else:
                 # class-to-class, class-to-glyph, or glyph-to-class kerning
-                for combo in self.allCombinations(left, right):
-                    self.classKerningPairs[combo] = value
+                pairList = self.allCombinations(left, right)
 
-        flatKerningPairs.update(self.classKerningPairs)
-        flatKerningPairs.update(self.singleKerningPairs)
-        # overwrites any given class kern values with exceptions.
+            indexedPairs[pIndex] = KerningPair(pair, pairList, value)
+
+        # Iterate through the kerning pairs in reverse order to
+        # overwrite less specific pairs with more specific ones:
+        for pIndex, kerningPair in sorted(indexedPairs.items(), reverse=True):
+            for pair in kerningPair.pairList:
+                flatKerningPairs[pair] = kerningPair.value
 
         return flatKerningPairs
 
@@ -198,9 +210,6 @@ if __name__ == "__main__":
             kfr = KernFeatureReader(options)
 
             print '\n'.join(kfr.output)
-            # print
-            # print 'single kerning pairs:', len(kfr.singleKerningPairs)
-            # print ' class kerning pairs:', len(kfr.classKerningPairs)
             print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
 
         else:
