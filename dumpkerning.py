@@ -22,8 +22,8 @@ def extractKerning(path):
         otfKern = OTFKernReader(path)
         return otfKern.kerningPairs
     elif ext == ".ufo":
-        ufoKern = UFOkernReader(defcon.Font(path))
-        return ufoKern.allKerningPairs_zero
+        ufoKern = UFOkernReader(defcon.Font(path), includeZero=True)
+        return ufoKern.allKerningPairs
     else:
         # assume .fea
         feaOrgKern = FeaKernReader([path])

@@ -7,17 +7,15 @@ import itertools
 
 class UFOkernReader(object):
 
-    def __init__(self, font):
+    def __init__(self, font, includeZero=False):
         self.f = font
         self.group_group_pairs = {}
         self.group_glyph_pairs = {}
         self.glyph_group_pairs = {}
         self.glyph_glyph_pairs = {}
 
-        self.allKerningPairs = self.makePairDicts()
-        self.allKerningPairs_zero = self.makePairDicts(includeZero=True)
+        self.allKerningPairs = self.makePairDicts(includeZero)
         self.output = self.makeOutput(self.allKerningPairs)
-        # self.output = self.makeOutput(self.allKerningPairs_zero)
 
         self.totalKerning = sum(self.allKerningPairs.values())
         self.absoluteKerning = sum([abs(value) for value in self.allKerningPairs.values()])
@@ -35,7 +33,7 @@ class UFOkernReader(object):
         combinations = list(itertools.product(leftGlyphs, rightGlyphs))
         return combinations
 
-    def makePairDicts(self, includeZero=False):
+    def makePairDicts(self, includeZero):
         kerningPairs = {}
 
         for (left, right), value in self.f.kerning.items():
@@ -82,7 +80,7 @@ class UFOkernReader(object):
 
 
 def run(font):
-    ukr = UFOkernReader(font)
+    ukr = UFOkernReader(font, includeZero=True)
     scrap = os.popen('pbcopy', 'w')
     output = '\n'.join(ukr.output)
     scrap.write(output)
@@ -116,7 +114,7 @@ if __name__ == '__main__':
         try:
             import defcon
             inCL = True
-            path = sys.argv[-1].rstrip(os.sep)
+            path = os.path.normpath(sys.argv[-1])
             if os.path.splitext(path)[-1] in ['.ufo', '.UFO']:
                 f = defcon.Font(path)
                 run(f)
@@ -124,4 +122,3 @@ if __name__ == '__main__':
                 print 'No UFO file given.'
         except ImportError:
             print u'You don’t have Defcon installed. \U0001F625'
-
