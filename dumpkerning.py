@@ -2,8 +2,8 @@
 
 import os
 import defcon
-from getKerningPairsFromFEA import KernFeatureReader as FeaKernReader
-from getKerningPairsFromOTF import ReadKerning as OTFKernReader
+from getKerningPairsFromFEA import FEAKernReader
+from getKerningPairsFromOTF import OTFKernReader
 from getKerningPairsFromUFO import UFOkernReader
 
 
@@ -26,7 +26,7 @@ def extractKerning(path):
         return ufoKern.allKerningPairs
     else:
         # assume .fea
-        feaOrgKern = FeaKernReader([path])
+        feaOrgKern = FEAKernReader([path])
         return feaOrgKern.flatKerningPairs
 
 

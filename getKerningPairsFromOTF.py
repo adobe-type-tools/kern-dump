@@ -46,7 +46,7 @@ def collectUniqueKernLookupListIndexes(featureRecord):
     return uniqueKernLookupIndexList
 
 
-class ReadKerning(object):
+class OTFKernReader(object):
 
     def __init__(self, fontPath):
         self.font = ttLib.TTFont(fontPath)
@@ -282,7 +282,7 @@ if __name__ == "__main__":
         assumedFontPath = sys.argv[1]
         if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
             fontPath = sys.argv[1]
-            f = ReadKerning(fontPath)
+            f = OTFKernReader(fontPath)
 
             finalList = []
             for pair, value in f.kerningPairs.items():

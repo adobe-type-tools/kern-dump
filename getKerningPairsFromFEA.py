@@ -37,7 +37,7 @@ class KerningPair(object):
         self.pairList = pairList
 
 
-class KernFeatureReader(object):
+class FEAKernReader(object):
 
     def __init__(self, options):
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
         kernFile = options[-1]
 
         if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
-            kfr = KernFeatureReader(options)
+            kfr = FEAKernReader(options)
 
             print '\n'.join(kfr.output)
             print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
