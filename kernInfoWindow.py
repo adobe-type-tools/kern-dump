@@ -3,46 +3,69 @@ from vanilla import *
 import getKerningPairsFromUFO
 import os
 
+
 class KernInfoWindow(object):
 
     def __init__(self):
         self.f = CurrentFont()
-        self.u = getKerningPairsFromUFO.UFOkernReader(self.f)        
+        self.u = getKerningPairsFromUFO.UFOkernReader(self.f)
         self.absKerning = int(self.u.absoluteKerning)
         self.amountOfPairs = len(self.u.allKerningPairs)
 
+        self.textString = (
+            'The font has %s flat kerning pairs.\n'
+            'Set at %s points, the absolute amount\n'
+            'of kerning would cover the distance of\n%s.')
 
-        self.textString = 'The font has %s flat kerning pairs.\nSet at %s points, the absolute amount\nof kerning would cover the distance of\n%s.'
+        wWidth = 300
+        wHeight = 250
 
-        width = 300
-        height = 250
         if self.amountOfPairs:
             message = u'CONGRATULATIONS! \U0001F600'
         else:
             message = u'Bummer. \U0001F622'
 
-        self.w = Window((width, height), message)
-        middle = width/2
+        self.w = Window((wWidth, wHeight), message)
 
-        self.w.measurementSystem = RadioGroup((20, 15, -10, 20), ["Metric", "Imperial"], callback=self.parametersChanged, isVertical=False)
+        self.w.measurementSystem = RadioGroup(
+            (20, 15, -10, 20),
+            ["Metric", "Imperial"],
+            callback=self.parametersChanged,
+            isVertical=False)
 
-        self.w._pointSize = TextBox((20, 145, -30, 17), 'Point size:')
-        self.w.pointSize = Slider((100, 145, -30, 17), minValue=0, maxValue=1000, callback=self.parametersChanged, value=12)
+        self.w._pointSize = TextBox(
+            (20, 145, -30, 17),
+            'Point size:')
+
+        self.w.pointSize = Slider(
+            (100, 145, -30, 17),
+            minValue=0,
+            maxValue=1000,
+            callback=self.parametersChanged,
+            value=12)
 
         pointSize = int(self.w.pointSize.get())
-        absKerning = int(self.absKerning * (pointSize / self.f.info.unitsPerEm))
+        absKerning = int(
+            self.absKerning * (pointSize / self.f.info.unitsPerEm))
 
-        self.w.text = TextBox((20, 45, -20, 85), self.textString % (self.amountOfPairs, int(self.w.pointSize.get()), self.convertToMetric(absKerning)))
-        self.w.button =  Button((20, -40, -30, 20), "Copy kerning pairs to clipboard", callback=self.button)
+        self.w.text = TextBox(
+            (20, 45, -20, 85),
+            self.textString % (
+                self.amountOfPairs,
+                int(self.w.pointSize.get()),
+                self.convertToMetric(absKerning)))
+
+        self.w.button = Button(
+            (20, -40, -30, 20),
+            "Copy kerning pairs to clipboard",
+            callback=self.button)
 
         self.w.open()
 
-
     def convertToImperial(self, number):
-        origninalNumber = number
         remainderList = []
 
-        if number >= 72: 
+        if number >= 72:
             # points to inches:
             number, remainder = divmod(number, 72)
             remainderList.insert(0, remainder)
@@ -73,21 +96,18 @@ class KernInfoWindow(object):
             if number == 0:
                 remainderList.insert(0, number)
 
-
         remainderList.insert(0, number)
         while len(remainderList) < 4:
             remainderList.insert(0, 0)
 
         remainderList = [int(round(number)) for number in remainderList]
 
-
         unitsList = ['miles', 'feet', 'inches', 'points']
         singularUnits = {
-                        'miles': 'mile',
-                        'feet': 'foot',
-                        'inches': 'inch',
-                        'points': 'point',
-                        }
+            'miles': 'mile',
+            'feet': 'foot',
+            'inches': 'inch',
+            'points': 'point'}
 
         combinedList = zip(remainderList, unitsList)
         sentenceList = []
@@ -95,9 +115,11 @@ class KernInfoWindow(object):
         for (number, unit) in combinedList:
             if int(number) != 0:
                 if int(number) == 1:
-                    sentenceList.append(u'%s\u00A0%s' % (number, singularUnits[unit]))
+                    sentenceList.append(
+                        u'%s\u00A0%s' % (number, singularUnits[unit]))
                 else:
-                    sentenceList.append(u'%s\u00A0%s' % (number, unit))
+                    sentenceList.append(
+                        u'%s\u00A0%s' % (number, unit))
 
         if len(sentenceList) == 0:
             sentenceList = ['absolutely zero']
@@ -109,7 +131,6 @@ class KernInfoWindow(object):
         sentence = sentence.replace(', and,', ' and')
 
         return sentence
-
 
     def convertToMetric(self, number):
         # ps point assumed
@@ -142,7 +163,6 @@ class KernInfoWindow(object):
             if number == 0:
                 remainderList.insert(0, number)
 
-
         remainderList.insert(0, number)
         remainderList = [int(round(number)) for number in remainderList]
 
@@ -168,11 +188,10 @@ class KernInfoWindow(object):
 
         return sentence
 
-
     def parametersChanged(self, sender=None):
 
         measurementSystem = self.w.measurementSystem.get()
-        pointSize = int(self.w.pointSize.get()/4.0)*4
+        pointSize = int(self.w.pointSize.get() / 4.0) * 4
         absKerning = int(self.absKerning * pointSize / self.f.info.unitsPerEm)
 
         if measurementSystem == 0:
@@ -180,8 +199,8 @@ class KernInfoWindow(object):
         else:
             absKerning = self.convertToImperial(absKerning)
 
-        self.w.text.set(self.textString % (self.amountOfPairs, pointSize, absKerning))
-
+        self.w.text.set(
+            self.textString % (self.amountOfPairs, pointSize, absKerning))
 
     def button(self, sender=None):
 
@@ -190,8 +209,6 @@ class KernInfoWindow(object):
         scrap.write(output)
         scrap.close()
 
-
-   
 
 if CurrentFont():
     KernInfoWindow()
