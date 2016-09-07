@@ -1,15 +1,18 @@
+#!/usr/bin/python
 # coding: utf-8
+
 from __future__ import division
 import os
 import sys
-import pprint
 import itertools
 import getKerningPairsFromUFO
 from collections import defaultdict
 from robofab.world import RFont as Font
 from robofab import ufoLib
 import time
-# from defcon import Font # ufo 3 defcon would write proper glif names,
+
+# from defcon import Font
+# ufo 3 defcon would write proper glif names,
 # but creates a huge kerning plist. (why?)
 
 reload(getKerningPairsFromUFO)
@@ -20,6 +23,11 @@ startTime = time.time()
 2016/03/11 12:47:07
 # XXX This script works, but is not beautiful.
 # XXX I consider it to be a work in progress.
+
+2016/09/01
+# XXX Big problem: This script changes start points in the target UFO.
+# XXX At this point, it seems easier to just revert the change in the
+# XXX .glif files via git than re-writing the script.
 
 
 Transfer group structure from source UFO to (kerned) target UFO.
@@ -289,7 +297,7 @@ def transferGroups(f_source, f_target):
         # if len(newGlyphList) != len(glyphList):
         #     print group
         #     print set(newGlyphList) - set(glyphList)
-        newGroups[group] = list(set(glyphList) & targetGlyphs)
+        newGroups[group] = sorted(list(set(glyphList) & targetGlyphs))
 
     f_target.groups.update(newGroups)
 
@@ -452,7 +460,7 @@ outputFileName = inputFileName.replace('.ufo', '_mod.ufo')
 outputPath = os.path.join(inputDirName, outputFileName)
 
 flatTargetPairsDict = getKerningPairsFromUFO.UFOkernReader(
-    f_target).allKerningPairs_zero
+    f_target, includeZero=True).allKerningPairs
 organizedSourceGroups = organizeGroups(f_source)
 newKerning = analyzeKerning(
     f_source, f_target, flatTargetPairsDict, organizedSourceGroups)
