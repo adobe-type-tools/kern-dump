@@ -64,7 +64,7 @@ def nameClass(glyphlist, flag):
 
 
 def makeKernObjects(fontPath):
-    f = getKerningPairsFromOTF.ReadKerning(fontPath)
+    f = getKerningPairsFromOTF.OTFKernReader(fontPath)
 
     groups = {}
     kerning = {}
@@ -164,7 +164,8 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
 
-        if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
+        if (os.path.exists(assumedFontPath) and
+            os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']):
 
             fontPath = assumedFontPath
             groups, kerning = makeKernObjects(fontPath)
