@@ -2,6 +2,7 @@
 import os
 import sys
 import string
+import shutil
 import subprocess
 import argparse
 from argparse import RawTextHelpFormatter
@@ -134,8 +135,16 @@ def injectOS2TableToUFO(otfPath, ufoPath):
     ufo.save()
 
 
-def convertOTFtoUFO(otfPath):
+def convertOTFtoUFO(otfPath, overwrite, ignore_errors):
     ufoPath = '%s.ufo' % os.path.splitext(otfPath)[0]
+    if os.path.exists(ufoPath):
+        if overwrite is True:
+            shutil.rmtree(ufoPath)
+        else:
+            print
+            print '%s already exists.' % ufoPath
+            print 'Use the -o flag to overwrite the existing file.'
+            sys.exit()
     print 'Creating %s from %s ...' % (ufoPath, otfPath)
     txCommand = ['tx', '-ufo', otfPath, ufoPath]
     txProcess = subprocess.Popen(
@@ -145,8 +154,14 @@ def convertOTFtoUFO(otfPath):
     output, errors = txProcess.communicate()
 
     if errors:
-        print errors
-        sys.exit()
+        if ignore_errors:
+            return ufoPath
+        else:
+            print errors
+            print 'A UFO file may now exist, but since tx complained,'
+            print 'no further steps were taken.'
+            print 'Use the -i flag to retry ignoring tx errors.'
+            sys.exit()
 
     return ufoPath
 
@@ -165,17 +180,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=RawTextHelpFormatter)
-    parser.add_argument('fontfile', help='Input OTF file.')
+    parser.add_argument('fontfile', help='input OTF file')
+    parser.add_argument(
+        '-i', '--ignore_tx', action='store_true',
+        help='ignore TX errors')
+    parser.add_argument(
+        '-o', '--overwrite', action='store_true',
+        help='overwrite existing UFO')
     args = parser.parse_args()
     assumedFontPath = args.fontfile
+    ignore_errors = args.ignore_tx
+    overwrite = args.overwrite
 
     if (os.path.exists(assumedFontPath) and
         os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']):
 
         fontPath = assumedFontPath
         groups, kerning = makeKernObjects(fontPath)
-
-        ufoPath = convertOTFtoUFO(fontPath)
+        ufoPath = convertOTFtoUFO(fontPath, overwrite, ignore_errors)
         injectKerningToUFO(ufoPath, groups, kerning)
         injectOS2TableToUFO(fontPath, ufoPath)
 
