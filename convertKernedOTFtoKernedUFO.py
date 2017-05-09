@@ -3,6 +3,8 @@ import os
 import sys
 import string
 import subprocess
+import argparse
+from argparse import RawTextHelpFormatter
 from defcon import Font
 from fontTools import ttLib
 
@@ -13,8 +15,8 @@ __doc__ = '''\
 
     This script extracts kerning and groups from a compiled OTF and injects
     them into a new UFO file (which is created via `tx`).
-    It requires the script 'getKerningPairsFromOTF.py'; which is distributed
-    in the same folder.
+    It requires the Adobe FDK (tx) to be installed, as well as the module
+    `getKerningPairsFromOTF.py`; which is distributed in the same folder.
 
     usage:
     python convertKernedOTFtoKernedUFO.py font.otf
@@ -135,9 +137,9 @@ def injectOS2TableToUFO(otfPath, ufoPath):
 def convertOTFtoUFO(otfPath):
     ufoPath = '%s.ufo' % os.path.splitext(otfPath)[0]
     print 'Creating %s from %s ...' % (ufoPath, otfPath)
-    txCommand = 'tx -ufo %s %s' % (otfPath, otfPath.replace('otf', 'ufo'))
+    txCommand = ['tx', '-ufo', otfPath, ufoPath]
     txProcess = subprocess.Popen(
-        txCommand.split(),
+        txCommand,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     output, errors = txProcess.communicate()
@@ -149,35 +151,35 @@ def convertOTFtoUFO(otfPath):
     return ufoPath
 
 
-errorMessage = '''\
+errorMessage = '''
 
 ERROR:
 No valid font and/or UFO provided.
-The script is used like this:
+Use the script like this:
 
-python %s font.otf
+    python %s font.otf
 ''' % os.path.basename(__file__)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=RawTextHelpFormatter)
+    parser.add_argument('fontfile', help='Input OTF file.')
+    args = parser.parse_args()
+    assumedFontPath = args.fontfile
 
-    if len(sys.argv) == 2:
-        assumedFontPath = sys.argv[1]
+    if (os.path.exists(assumedFontPath) and
+        os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']):
 
-        if (os.path.exists(assumedFontPath) and
-            os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']):
+        fontPath = assumedFontPath
+        groups, kerning = makeKernObjects(fontPath)
 
-            fontPath = assumedFontPath
-            groups, kerning = makeKernObjects(fontPath)
+        ufoPath = convertOTFtoUFO(fontPath)
+        injectKerningToUFO(ufoPath, groups, kerning)
+        injectOS2TableToUFO(fontPath, ufoPath)
 
-            ufoPath = convertOTFtoUFO(fontPath)
-            injectKerningToUFO(ufoPath, groups, kerning)
-            injectOS2TableToUFO(fontPath, ufoPath)
-
-            print 'done'
-
-        else:
-            print errorMessage
+        print 'done'
 
     else:
         print errorMessage
