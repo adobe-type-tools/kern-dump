@@ -11,7 +11,7 @@ Supports RTL kerning.
 
 Usage:
 ------
-python getKerningPairsFromFeatureFile.py <path to font file>
+python getKerningPairsFromOTF.py <path to font file>
 
 '''
 
