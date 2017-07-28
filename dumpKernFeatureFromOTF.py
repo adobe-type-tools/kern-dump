@@ -73,7 +73,7 @@ def buildOutputList(sourceList, outputList, headlineString):
 
 
 def makeKernFeature(fontPath):
-    f = getKerningPairsFromOTF.ReadKerning(fontPath)
+    f = getKerningPairsFromOTF.OTFKernReader(fontPath)
     allClasses = {}
     classList = []
     output = []
