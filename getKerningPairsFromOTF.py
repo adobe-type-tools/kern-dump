@@ -128,34 +128,31 @@ class OTFKernReader(object):
         for lookup in self.lookups:
             for subtableItem in lookup.SubTable:
 
-                if subtableItem.LookupType == 2:  # normal case, not using extension table
-                    pairPos = subtableItem
-
-                elif subtableItem.LookupType == 9:  # extension table
+                if subtableItem.LookupType == 9:  # extension table
                     if subtableItem.ExtensionLookupType == 8:  # contextual
                         print('Contextual Kerning not (yet?) supported.', file=sys.stderr)
                         continue
                     elif subtableItem.ExtensionLookupType == 2:
-                        pairPos = subtableItem.ExtSubTable
+                        subtableItem = subtableItem.ExtSubTable
 
 
-                # if pairPos.Coverage.Format not in [1, 2]:  # previous fontTools
-                if pairPos.Format not in [1, 2]:
-                    print("WARNING: Coverage format %d is not yet supported." % pairPos.Coverage.Format, file=sys.stderr)
+                # if subtableItem.Coverage.Format not in [1, 2]:  # previous fontTools
+                if subtableItem.Format not in [1, 2]:
+                    print("WARNING: Coverage format %d is not yet supported." % subtableItem.Coverage.Format, file=sys.stderr)
 
-                if pairPos.ValueFormat1 not in [0, 4, 5]:
-                    print("WARNING: ValueFormat1 format %d is not yet supported." % pairPos.ValueFormat1, file=sys.stderr)
+                if subtableItem.ValueFormat1 not in [0, 4, 5]:
+                    print("WARNING: ValueFormat1 format %d is not yet supported." % subtableItem.ValueFormat1, file=sys.stderr)
 
-                if pairPos.ValueFormat2 not in [0]:
-                    print("WARNING: ValueFormat2 format %d is not yet supported." % pairPos.ValueFormat2, file=sys.stderr)
+                if subtableItem.ValueFormat2 not in [0]:
+                    print("WARNING: ValueFormat2 format %d is not yet supported." % subtableItem.ValueFormat2, file=sys.stderr)
 
 
-                self.pairPosList.append(pairPos)
+                self.pairPosList.append(subtableItem)
 
                 # Each glyph in this list will have a corresponding PairSet
                 # which will contain all the second glyphs and the kerning
                 # value in the form of PairValueRecord(s)
-                # self.firstGlyphsList.extend(pairPos.Coverage.glyphs)
+                # self.firstGlyphsList.extend(subtableItem.Coverage.glyphs)
 
 
     def getSinglePairs(self):
