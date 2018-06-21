@@ -88,13 +88,13 @@ def run(font):
 
     if inRF:
         pass
-        # print 'Total length of kerning:', ukr.totalKerning
+        # print('Total length of kerning:', ukr.totalKerning)
 
     if inCL:
-        print '\n'.join(ukr.output), '\n'
+        print('\n'.join(ukr.output), '\n')
 
-    print 'Total amount of kerning pairs:', len(ukr.output)
-    print 'List of kerning pairs copied to clipboard.'
+    print('Total amount of kerning pairs:', len(ukr.output))
+    print('List of kerning pairs copied to clipboard.')
 
 
 if __name__ == '__main__':
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         if f:
             run(f)
         else:
-            print u'You need to open a font first. \U0001F625'
+            print(u'You need to open a font first. \U0001F625')
 
     except ImportError:
         try:
@@ -119,6 +119,6 @@ if __name__ == '__main__':
                 f = defcon.Font(path)
                 run(f)
             else:
-                print 'No UFO file given.'
+                print('No UFO file given.')
         except ImportError:
-            print u'You don’t have Defcon installed. \U0001F625'
+            print(u'You don’t have Defcon installed. \U0001F625')

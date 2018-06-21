@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import print_function
 import sys
 import os
 import re
@@ -194,7 +195,7 @@ class FEAKernReader(object):
         for line in goadbList:
             splitLine = line.split()
             if len(splitLine) < 2:
-                print 'Something is wrong with this GOADB line:\n', line
+                print('Something is wrong with this GOADB line:\n', line)
             else:
                 finalName, workingName = splitLine[0], splitLine[1]
                 self.glyphNameDict[workingName] = finalName
@@ -209,11 +210,11 @@ if __name__ == "__main__":
         if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
             kfr = FEAKernReader(options)
 
-            print '\n'.join(kfr.output)
-            print '\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs)
+            print('\n'.join(kfr.output))
+            print('\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs))
 
         else:
-            print "No valid kern feature file provided."
+            print("No valid kern feature file provided.")
 
     else:
-        print "No valid kern feature file provided."
+        print("No valid kern feature file provided.")
