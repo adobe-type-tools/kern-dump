@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import os
 import defcon
 from getKerningPairsFromFEA import FEAKernReader
@@ -40,7 +40,7 @@ def main(args):
 
     args = parser.parse_args(args)
     for source in args.sourceFiles:
-        print "extracting kerning from", source
+        print("extracting kerning from %s" % source)
         kerning = extractKerning(source)
         output = os.path.normpath(source) + ".kerndump"
         if args.outputFolder:
