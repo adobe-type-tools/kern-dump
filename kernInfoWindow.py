@@ -1,5 +1,5 @@
 # coding: utf-8
-from vanilla import *
+from vanilla import Window, RadioGroup, TextBox, Slider, Button
 import getKerningPairsFromUFO
 import os
 
@@ -213,4 +213,4 @@ class KernInfoWindow(object):
 if CurrentFont():
     KernInfoWindow()
 else:
-    print 'No font is open.'
+    print('No font is open.')

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import os
 import sys
 import string
@@ -7,10 +7,11 @@ from fontTools import ttLib
 import getKerningPairsFromOTF
 reload(getKerningPairsFromOTF)
 
-__doc__ ='''\
+__doc__ = '''\
 
     This script extracts a viable kern feature file from a compiled OTF.
-    It requires the script 'getKerningPairsFromOTF.py'; which is distributed in the same folder.
+    It requires the script 'getKerningPairsFromOTF.py'; which is distributed
+    in the same folder.
 
     usage:
     python dumpKernFeatureFromOTF.py font.otf > outputfile
@@ -19,12 +20,15 @@ __doc__ ='''\
 
 kKernFeatureTag = 'kern'
 compressSinglePairs = True
-# Switch to control if single pairs shall be written plainly, or in a more space-saving notation (using enum).
+# Switch to control if single pairs shall be written plainly, or in a more
+# space-saving notation (using enum pos).
 
 
 def sortGlyphs(glyphlist):
-    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs starting with 'uni' names do not get to be key (first) glyphs.
-    # An infinite loop is avoided, in case there are only glyphs matching above mentioned properties.
+    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs
+    # starting with 'uni' names do not get to be key (first) glyphs.
+    # An infinite loop is avoided, in case there are only glyphs matching
+    # above mentioned properties.
     exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
 
     glyphs = sorted(glyphlist)
@@ -56,20 +60,17 @@ def nameClass(glyphlist, flag):
     return '@%s%s%s' % (name, flag, case)
 
 
-
 def buildOutputList(sourceList, outputList, headlineString):
-    # Basically just a function to create a nice headline before each chunk of kerning data.
     if len(sourceList):
         headline = headlineString
-        decoration = '-'*len(headline)
+        decoration = '-' * len(headline)
 
         outputList.append('# ' + headline)
         outputList.append('# ' + decoration)
 
         for item in sourceList:
-           outputList.append(item)
+            outputList.append(item)
         outputList.append('')
-
 
 
 def makeKernFeature(fontPath):
@@ -88,9 +89,7 @@ def makeKernFeature(fontPath):
         className = nameClass(glyphs, '_RIGHT')
         allClasses.setdefault(className, glyphs)
 
-
     singlePairsList = sorted(f.singlePairs.items())
-
 
     classPairsList = []
     for (leftClass, rightClass), value in sorted(f.classPairs.items()):
@@ -102,15 +101,14 @@ def makeKernFeature(fontPath):
 
         classPairsList.append(((leftClassName, rightClassName), value))
 
-
     for className in sorted(allClasses):
         glyphs = allClasses[className]
         classList.append('%s = [ %s ];' % (className, ' '.join(glyphs)))
 
-
-    buildOutputList([], output, 'kern feature dumped from %s' % os.path.basename(fontPath))
-    buildOutputList(classList, output, 'kerning classes')
-
+    buildOutputList(
+        [], output, 'kern feature dumped from %s' % os.path.basename(fontPath))
+    buildOutputList(
+        classList, output, 'kerning classes')
 
     if compressSinglePairs:
 
@@ -125,14 +123,13 @@ def makeKernFeature(fontPath):
         glyph_glyph = []
         exploding_class_class = []
 
-
         # Compress the single pairs to a more space-saving notation.
         # First, dictionaries for each left glyph are created.
-        # If the kerning value to any right glyph happens to be equal, those right glyphs are merged into a 'class'.
+        # If the kerning value to any right glyph happens to be equal,
+        # those right glyphs are merged into a 'class'.
 
         for (left, right), value in singlePairsList:
             leftGlyph = left
-            # leftGlyphsDict.setdefault(leftGlyph, {}).setdefault(value, []).append(right) # shorter
             leftGlyphsDict.setdefault(leftGlyph, {})
             kernValueDict = leftGlyphsDict[leftGlyph]
             kernValueDict.setdefault(value, []).append(right)
@@ -143,10 +140,11 @@ def makeKernFeature(fontPath):
                 right = sortGlyphs(right)
                 compressedLeft.append((left, right, value))
 
-        # Same happens for the right side; including classes that have been compressed before.
+        # Same happens for the right side; including classes that
+        # have been compressed before.
 
         for left, right, value in compressedLeft:
-            rightGlyph = ' '.join( right )
+            rightGlyph = ' '.join(right)
             rightGlyphsDict.setdefault(rightGlyph, {})
             kernValueDict = rightGlyphsDict[rightGlyph]
             kernValueDict.setdefault(value, []).append(left)
@@ -157,18 +155,22 @@ def makeKernFeature(fontPath):
                 left = sortGlyphs(left)
                 compressedBoth.append((left, right.split(), value))
 
-
-        # Splitting the compressed single-pair kerning into four different lists; organized by type:
+        # Splitting the compressed single-pair kerning into four different
+        # lists; organized by type:
 
         for left, right, value in compressedBoth:
             if len(left) != 1 and len(right) != 1:
-                exploding_class_class.append('enum pos [ %s ] [ %s ] %s;' % (' '.join(left), ' '.join(right), value))
+                exploding_class_class.append(
+                    'enum pos [ %s ] [ %s ] %s;' % (' '.join(left), ' '.join(right), value))
             elif len(left) != 1 and len(right) == 1:
-                class_glyph.append('enum pos [ %s ] %s %s;'        % (' '.join(left), ' '.join(right), value))
+                class_glyph.append(
+                    'enum pos [ %s ] %s %s;' % (' '.join(left), ' '.join(right), value))
             elif len(left) == 1 and len(right) != 1:
-                glyph_class.append('enum pos %s [ %s ] %s;'    % (' '.join(left), ' '.join(right), value))
+                glyph_class.append(
+                    'enum pos %s [ %s ] %s;' % (' '.join(left), ' '.join(right), value))
             elif len(left) == 1 and len(right) == 1:
-                glyph_glyph.append('pos %s %s %s;'                % (' '.join(left), ' '.join(right), value))
+                glyph_glyph.append(
+                    'pos %s %s %s;' % (' '.join(left), ' '.join(right), value))
             else:
                 print 'ERROR with (%s)' % (' '.join(left, right, value))
 
@@ -176,13 +178,10 @@ def makeKernFeature(fontPath):
         if len(compressedBoth) != len(class_glyph) + len(glyph_class) + len(glyph_glyph) + len(exploding_class_class):
             print 'ERROR - we lost some kerning pairs.'
 
-
         buildOutputList(glyph_glyph, output, 'glyph to glyph')
         buildOutputList(glyph_class, output, 'glyph to class')
         buildOutputList(class_glyph, output, 'class to glyph')
         buildOutputList(exploding_class_class, output, 'exploding class to exploding class')
-
-
 
     else:
         # Plain list of single pairs
@@ -192,27 +191,23 @@ def makeKernFeature(fontPath):
 
         buildOutputList(glyph_glyph, output, 'glyph to glyph')
 
-
-
     # List of class-to-class pairs
     class_class = []
     for (left, right), value in classPairsList:
         class_class.append('pos %s %s %s;' % (left, right, value))
 
     buildOutputList(class_class, output, 'class to class')
-
-
-
-    # output
     print '\n'.join(output)
-
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
 
-        if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
+        if (
+            os.path.exists(assumedFontPath) and
+            os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']
+        ):
             fontPath = sys.argv[1]
             makeKernFeature(fontPath)
         else:

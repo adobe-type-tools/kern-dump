@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-from __future__ import print_function
-import os
-import defcon
+#!/usr/bin/env python3
+
 from getKerningPairsFromFEA import FEAKernReader
 from getKerningPairsFromOTF import OTFKernReader
 from getKerningPairsFromUFO import UFOkernReader
+import defcon
+import os
 
 
 def dumpKerning(kernDict, fileName):
@@ -33,10 +33,21 @@ def extractKerning(path):
 def main(args):
     import argparse
 
-    parser = argparse.ArgumentParser(description='Extract (flat) kerning from ufo, ttf, otf or fea and write it to a text file.')
-    parser.add_argument('sourceFiles', nargs='+', metavar="SOURCE",
-                       help='source files to extract kerning from')
-    parser.add_argument('-o', '--output', dest='outputFolder')
+    parser = argparse.ArgumentParser(
+        description=(
+            'Extract (flat) kerning from ufo, ttf, '
+            'otf or fea and write it to a text file.')
+    )
+    parser.add_argument(
+        'sourceFiles',
+        nargs='+',
+        metavar="SOURCE",
+        help='source files to extract kerning from'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        dest='outputFolder'
+    )
 
     args = parser.parse_args(args)
     for source in args.sourceFiles:

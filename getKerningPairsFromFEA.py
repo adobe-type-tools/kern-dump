@@ -1,9 +1,8 @@
 #!/usr/bin/python
-from __future__ import print_function
-import sys
+import itertools
 import os
 import re
-import itertools
+import sys
 
 
 __doc__ = '''\
@@ -21,10 +20,14 @@ python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file>
 '''
 
 # Regular expressions for parsing individual kerning commands:
-x_range_range = re.compile(r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
-x_range_glyph = re.compile(r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?)\s*;')
-x_glyph_range = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
-x_item_item = re.compile(r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
+x_range_range = re.compile(
+    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+x_range_glyph = re.compile(
+    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?)\s*;')
+x_glyph_range = re.compile(
+    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+x_item_item = re.compile(
+    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
 expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
@@ -46,7 +49,7 @@ class FEAKernReader(object):
         self.options = options
 
         if "-go" in self.options:
-            self.goadbPath = self.options[self.options.index('-go')+1]
+            self.goadbPath = self.options[self.options.index('-go') + 1]
 
         self.featureFilePath = self.options[-1]
 
@@ -99,7 +102,8 @@ class FEAKernReader(object):
         return newPairDict
 
     def readKernClasses(self):
-        allClassesList = re.findall(r"(@\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", self.featureData)
+        allClassesList = re.findall(
+            r"(@\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", self.featureData)
 
         classes = {}
         for name, glyphs in allClassesList:
@@ -207,11 +211,17 @@ if __name__ == "__main__":
         options = sys.argv[1:]
         kernFile = options[-1]
 
-        if os.path.exists(kernFile) and os.path.splitext(kernFile)[-1] in ['.fea', '.kern']:
+        if (
+            os.path.exists(kernFile) and
+            os.path.splitext(kernFile)[-1] in ['.fea', '.kern']
+        ):
             kfr = FEAKernReader(options)
 
             print('\n'.join(kfr.output))
-            print('\nTotal number of kerning pairs:\n', len(kfr.flatKerningPairs))
+            print(
+                '\nTotal number of kerning pairs:\n',
+                len(kfr.flatKerningPairs)
+            )
 
         else:
             print("No valid kern feature file provided.")

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import os
 import sys
 import string
@@ -52,7 +52,7 @@ def nameClass(glyphlist, flag):
     glyphs = sortGlyphs(glyphlist)
     if len(glyphs) == 0:
         name = 'error!!!'
-        print 'Found empty class.'
+        print('Found empty class.')
     else:
         name = glyphs[0]
 
@@ -100,7 +100,7 @@ def injectKerningToUFO(ufoPath, groups, kerning):
     ufo.kerning.clear()
     ufo.groups.clear()
 
-    print 'Injecting OTF groups and kerning into %s ...' % ufoPath
+    print('Injecting OTF groups and kerning into %s ...' % ufoPath)
     ufo.groups.update(groups)
     ufo.kerning.update(kerning)
     ufo.save()
@@ -111,7 +111,7 @@ def injectOS2TableToUFO(otfPath, ufoPath):
     os2Table = otfFont['OS/2']
     ufo = Font(ufoPath)
 
-    print 'Injecting OS/2 table into %s ...' % ufoPath
+    print('Injecting OS/2 table into %s ...' % ufoPath)
 
     ufo.info.ascender = os2Table.sTypoAscender
     ufo.info.capHeight = os2Table.sCapHeight
@@ -141,11 +141,13 @@ def convertOTFtoUFO(otfPath, overwrite, ignore_errors):
         if overwrite is True:
             shutil.rmtree(ufoPath)
         else:
-            print
-            print '%s already exists.' % ufoPath
-            print 'Use the -o flag to overwrite the existing file.'
+            print()
+            print(
+                '%s already exists. '
+                'Use the -o flag to overwrite the existing file.' % ufoPath)
             sys.exit()
-    print 'Creating %s from %s ...' % (ufoPath, otfPath)
+    print(
+        'Creating %s from %s ...' % (ufoPath, otfPath))
     txCommand = ['tx', '-ufo', otfPath, ufoPath]
     txProcess = subprocess.Popen(
         txCommand,
@@ -157,10 +159,11 @@ def convertOTFtoUFO(otfPath, overwrite, ignore_errors):
         if ignore_errors:
             return ufoPath
         else:
-            print errors
-            print 'A UFO file may now exist, but since tx complained,'
-            print 'no further steps were taken.'
-            print 'Use the -i flag to retry ignoring tx errors.'
+            print(errors)
+            print(
+                'A UFO file may now exist, but since tx complained, '
+                'no further steps were taken. '
+                'Use the -i flag to retry ignoring tx errors.')
             sys.exit()
 
     return ufoPath
@@ -180,20 +183,27 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=RawTextHelpFormatter)
-    parser.add_argument('fontfile', help='input OTF file')
     parser.add_argument(
-        '-i', '--ignore_tx', action='store_true',
+        'fontfile',
+        help='input OTF file')
+    parser.add_argument(
+        '-i', '--ignore_tx',
+        action='store_true',
         help='ignore TX errors')
     parser.add_argument(
-        '-o', '--overwrite', action='store_true',
+        '-o', '--overwrite',
+        action='store_true',
         help='overwrite existing UFO')
+
     args = parser.parse_args()
     assumedFontPath = args.fontfile
     ignore_errors = args.ignore_tx
     overwrite = args.overwrite
 
-    if (os.path.exists(assumedFontPath) and
-        os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']):
+    if (
+        os.path.exists(assumedFontPath) and
+        os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']
+    ):
 
         fontPath = assumedFontPath
         groups, kerning = makeKernObjects(fontPath)
@@ -201,7 +211,7 @@ if __name__ == "__main__":
         injectKerningToUFO(ufoPath, groups, kerning)
         injectOS2TableToUFO(fontPath, ufoPath)
 
-        print 'done'
+        print('done')
 
     else:
-        print errorMessage
+        print(errorMessage)

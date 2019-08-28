@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-from __future__ import print_function
+#!/usr/bin/env python3
+from fontTools import ttLib
 import os
 import sys
-from fontTools import ttLib
 
 __doc__ = '''\
 
@@ -32,8 +31,8 @@ class myRightClass:
         self.class2Record = 0
 
 
-def collectUniqueKernLookupListIndexes(featureRecord):
-    uniqueKernLookupIndexList = []
+def collect_unique_kern_lookup_indexes(featureRecord):
+    unique_kern_lookups = []
     for featRecItem in featureRecord:
         # print(featRecItem.FeatureTag)
         # GPOS feature tags (e.g. kern, mark, mkmk, size) of each ScriptRecord
@@ -41,10 +40,10 @@ def collectUniqueKernLookupListIndexes(featureRecord):
             feature = featRecItem.Feature
 
             for featLookupItem in feature.LookupListIndex:
-                if featLookupItem not in uniqueKernLookupIndexList:
-                    uniqueKernLookupIndexList.append(featLookupItem)
+                if featLookupItem not in unique_kern_lookups:
+                    unique_kern_lookups.append(featLookupItem)
 
-    return uniqueKernLookupIndexList
+    return unique_kern_lookups
 
 
 class OTFKernReader(object):
@@ -75,27 +74,25 @@ class OTFKernReader(object):
 
     def analyzeFont(self):
         self.gposTable = self.font[kGPOStableName].table
-
-        'ScriptList:'
         self.scriptList = self.gposTable.ScriptList
-        'FeatureList:'
         self.featureList = self.gposTable.FeatureList
-
         self.featureCount = self.featureList.FeatureCount
         self.featureRecord = self.featureList.FeatureRecord
 
-        self.uniqueKernLookupIndexList = collectUniqueKernLookupListIndexes(self.featureRecord)
+        self.unique_kern_lookups = collect_unique_kern_lookup_indexes(
+            self.featureRecord)
 
     def findKerningLookups(self):
-        if not len(self.uniqueKernLookupIndexList):
-            print("The font has no %s feature." % kKernFeatureTag, file=sys.stderr)
+        if not len(self.unique_kern_lookups):
+            print(
+                "The font has no %s feature." % kKernFeatureTag,
+                file=sys.stderr)
             self.goodbye()
 
-        'LookupList:'
-        self.lookupList = self.gposTable.LookupList
+        self.lookup_list = self.gposTable.LookupList
         self.lookups = []
-        for kernLookupIndex in sorted(self.uniqueKernLookupIndexList):
-            lookup = self.lookupList.Lookup[kernLookupIndex]
+        for kern_lookup_index in sorted(self.unique_kern_lookups):
+            lookup = self.lookup_list.Lookup[kern_lookup_index]
 
             # Confirm this is a GPOS LookupType 2; or
             # using an extension table (GPOS LookupType 9):
@@ -123,29 +120,36 @@ class OTFKernReader(object):
                 continue
             self.lookups.append(lookup)
 
-
     def getPairPos(self):
         for lookup in self.lookups:
             for subtableItem in lookup.SubTable:
 
                 if subtableItem.LookupType == 9:  # extension table
                     if subtableItem.ExtensionLookupType == 8:  # contextual
-                        print('Contextual Kerning not (yet?) supported.', file=sys.stderr)
+                        print(
+                            'Contextual Kerning not (yet?) supported.',
+                            file=sys.stderr)
                         continue
                     elif subtableItem.ExtensionLookupType == 2:
                         subtableItem = subtableItem.ExtSubTable
 
-
-                # if subtableItem.Coverage.Format not in [1, 2]:  # previous fontTools
                 if subtableItem.Format not in [1, 2]:
-                    print("WARNING: Coverage format %d is not yet supported." % subtableItem.Coverage.Format, file=sys.stderr)
+                    print(
+                        'WARNING: Coverage format %d '
+                        'is not yet supported.' % subtableItem.Coverage.Format,
+                        file=sys.stderr)
 
                 if subtableItem.ValueFormat1 not in [0, 4, 5]:
-                    print("WARNING: ValueFormat1 format %d is not yet supported." % subtableItem.ValueFormat1, file=sys.stderr)
+                    print(
+                        'WARNING: ValueFormat1 format %d '
+                        'is not yet supported.' % subtableItem.ValueFormat1,
+                        file=sys.stderr)
 
                 if subtableItem.ValueFormat2 not in [0]:
-                    print("WARNING: ValueFormat2 format %d is not yet supported." % subtableItem.ValueFormat2, file=sys.stderr)
-
+                    print(
+                        'WARNING: ValueFormat2 format %d '
+                        'is not yet supported.' % subtableItem.ValueFormat2,
+                        file=sys.stderr)
 
                 self.pairPosList.append(subtableItem)
 
@@ -153,7 +157,6 @@ class OTFKernReader(object):
                 # which will contain all the second glyphs and the kerning
                 # value in the form of PairValueRecord(s)
                 # self.firstGlyphsList.extend(subtableItem.Coverage.glyphs)
-
 
     def getSinglePairs(self):
         for pairPos in self.pairPosList:
@@ -164,8 +167,8 @@ class OTFKernReader(object):
 
                 # This iteration is done by index so we have a way
                 # to reference the firstGlyphsList:
-                for pairSetIndex, pairSetInstance in enumerate(pairPos.PairSet):
-                    for pairValueRecordItem in pairPos.PairSet[pairSetIndex].PairValueRecord:
+                for ps_index, _ in enumerate(pairPos.PairSet):
+                    for pairValueRecordItem in pairPos.PairSet[ps_index].PairValueRecord:
                         secondGlyph = pairValueRecordItem.SecondGlyph
                         valueFormat = pairPos.ValueFormat1
 
@@ -178,11 +181,13 @@ class OTFKernReader(object):
                         elif valueFormat == 4:  # LTR kerning
                             kernValue = pairValueRecordItem.Value1.XAdvance
                         else:
-                            print("\tValueFormat1 = %d" % valueFormat, file=sys.stdout)
+                            print(
+                                "\tValueFormat1 = %d" % valueFormat,
+                                file=sys.stdout)
                             continue  # skip the rest
 
-                        self.kerningPairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
-                        self.singlePairs[(firstGlyphsList[pairSetIndex], secondGlyph)] = kernValue
+                        self.kerningPairs[(firstGlyphsList[ps_index], secondGlyph)] = kernValue
+                        self.singlePairs[(firstGlyphsList[ps_index], secondGlyph)] = kernValue
 
     def getClassPairs(self):
         for loop, pairPos in enumerate(self.pairPosList):
@@ -200,7 +205,7 @@ class OTFKernReader(object):
 
                 # list of all glyphs kerned to the left of a pair:
                 allLeftGlyphs = pairPos.Coverage.glyphs
-                # list of all glyphs contained within left-sided kerning classes:
+                # list of all glyphs contained in left-sided kerning classes:
                 # allLeftClassGlyphs = pairPos.ClassDef1.classDefs.keys()
 
                 singleGlyphs = []
@@ -211,9 +216,8 @@ class OTFKernReader(object):
                         singleGlyphs.append(gName)
                     else:
                         classGlyphs.append(gName)
-
-                # lg0.glyphs =  list(set(allLeftGlyphs) - set(allLeftClassGlyphs)) # coverage glyphs minus glyphs in a class (including class 0)
-                lg0.glyphs = list(set(allLeftGlyphs) - set(classGlyphs))  # coverage glyphs minus glyphs in real class (without class 0)
+                # coverage glyphs minus glyphs in real class (without class 0)
+                lg0.glyphs = list(set(allLeftGlyphs) - set(classGlyphs))
 
                 lg0.glyphs.sort()
                 leftClasses[lg0.class1Record] = lg0
@@ -227,16 +231,20 @@ class OTFKernReader(object):
                     if class1Record != 0:  # this was the crucial line.
                         lg = myLeftClass()
                         lg.class1Record = class1Record
-                        leftClasses.setdefault(class1Record, lg).glyphs.append(leftGlyph)
-                        self.allLeftClasses.setdefault("class_%s_%s" % (loop, lg.class1Record), lg.glyphs)
+                        leftClasses.setdefault(
+                            class1Record, lg).glyphs.append(leftGlyph)
+                        self.allLeftClasses.setdefault(
+                            "class_%s_%s" % (loop, lg.class1Record), lg.glyphs)
 
                 # Same for the right classes:
                 for rightGlyph in pairPos.ClassDef2.classDefs:
                     class2Record = pairPos.ClassDef2.classDefs[rightGlyph]
                     rg = myRightClass()
                     rg.class2Record = class2Record
-                    rightClasses.setdefault(class2Record, rg).glyphs.append(rightGlyph)
-                    self.allRightClasses.setdefault("class_%s_%s" % (loop, rg.class2Record), rg.glyphs)
+                    rightClasses.setdefault(
+                        class2Record, rg).glyphs.append(rightGlyph)
+                    self.allRightClasses.setdefault(
+                        "class_%s_%s" % (loop, rg.class2Record), rg.glyphs)
 
                 for record_l in leftClasses:
                     for record_r in rightClasses:
@@ -249,12 +257,16 @@ class OTFKernReader(object):
                                 # valueFormat zero is caused by a value of <0 0 0 0> on a class-class pair; skip these
                                 continue
                             else:
-                                print("\tValueFormat1 = %d" % valueFormat, file=sys.stdout)
+                                print(
+                                    "\tValueFormat1 = %d" % valueFormat,
+                                    file=sys.stdout)
                                 continue  # skip the rest
 
                             if kernValue != 0:
-                                leftClassName = 'class_%s_%s'  % (loop, leftClasses[record_l].class1Record)
-                                rightClassName = 'class_%s_%s' % (loop, rightClasses[record_r].class2Record)
+                                leftClassName = 'class_%s_%s' % (
+                                    loop, leftClasses[record_l].class1Record)
+                                rightClassName = 'class_%s_%s' % (
+                                    loop, rightClasses[record_r].class2Record)
 
                                 self.classPairs[(leftClassName, rightClassName)] = kernValue
 
@@ -264,9 +276,8 @@ class OTFKernReader(object):
                                             # if the kerning pair has already been assigned in pair-to-pair kerning
                                             continue
                                         else:
-                                            if valueFormat == 5: # RTL kerning
+                                            if valueFormat == 5:  # RTL kerning
                                                 kernValue = "<%d 0 %d 0>" % (pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XPlacement, pairPos.Class1Record[record_l].Class2Record[record_r].Value1.XAdvance)
-
 
                                             self.kerningPairs[(l, r)] = kernValue
 
@@ -278,13 +289,16 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
-        if os.path.exists(assumedFontPath) and os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']:
+        if(
+            os.path.exists(assumedFontPath) and
+            os.path.splitext(assumedFontPath)[1].lower() in ['.otf', '.ttf']
+        ):
             fontPath = sys.argv[1]
             f = OTFKernReader(fontPath)
 
             finalList = []
             for pair, value in f.kerningPairs.items():
-                finalList.append('/%s /%s %s' % ( pair[0], pair[1], value ))
+                finalList.append('/%s /%s %s' % (pair[0], pair[1], value))
 
             finalList.sort()
 
