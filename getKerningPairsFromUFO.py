@@ -9,7 +9,11 @@ class UFOkernReader(object):
     def __init__(self, font, includeZero=False):
         self.f = font
 
-        if f.ufoFormatVersion >= 3:
+        try:
+            format_version = self.f.ufoFormatVersion
+        except AttributeError:
+            format_version = self.f.naked().ufoFormatVersion
+        if format_version >= 3:
             self.group_indicator = 'public.'
         else:
             self.group_indicator = '@'
