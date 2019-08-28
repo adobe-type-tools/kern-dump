@@ -1,14 +1,19 @@
-#!/usr/bin/python
-# coding: utf-8
-import sys
-import os
+#!/usr/bin/env python3
 import itertools
+import os
+import sys
 
 
 class UFOkernReader(object):
 
     def __init__(self, font, includeZero=False):
         self.f = font
+
+        if f.ufoFormatVersion >= 3:
+            self.group_indicator = 'public.'
+        else:
+            self.group_indicator = '@'
+
         self.group_group_pairs = {}
         self.group_glyph_pairs = {}
         self.glyph_group_pairs = {}
@@ -18,7 +23,8 @@ class UFOkernReader(object):
         self.output = self.makeOutput(self.allKerningPairs)
 
         self.totalKerning = sum(self.allKerningPairs.values())
-        self.absoluteKerning = sum([abs(value) for value in self.allKerningPairs.values()])
+        self.absoluteKerning = sum(
+            [abs(value) for value in self.allKerningPairs.values()])
 
     def makeOutput(self, kerningDict):
         output = []
@@ -38,17 +44,26 @@ class UFOkernReader(object):
 
         for (left, right), value in self.f.kerning.items():
 
-            if '@' in left and '@' in right:
+            if (
+                self.group_indicator in left and
+                self.group_indicator in right
+            ):
                 # group-to-group-pair
                 for combo in self.allCombinations(left, right):
                     self.group_group_pairs[combo] = value
 
-            elif '@' in left and '@' not in right:
+            elif (
+                self.group_indicator in left and
+                self.group_indicator not in right
+            ):
                 # group-to-glyph-pair
                 for combo in self.allCombinations(left, right):
                     self.group_glyph_pairs[combo] = value
 
-            elif '@' not in left and '@' in right:
+            elif (
+                self.group_indicator not in left and
+                self.group_indicator in right
+            ):
                 # glyph-to-group-pair
                 for combo in self.allCombinations(left, right):
                     self.glyph_group_pairs[combo] = value
