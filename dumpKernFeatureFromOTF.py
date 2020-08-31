@@ -2,7 +2,7 @@
 import os
 import sys
 import string
-from fontTools import ttLib
+from importlib import reload
 
 import getKerningPairsFromOTF
 reload(getKerningPairsFromOTF)
@@ -172,11 +172,11 @@ def makeKernFeature(fontPath):
                 glyph_glyph.append(
                     'pos %s %s %s;' % (' '.join(left), ' '.join(right), value))
             else:
-                print 'ERROR with (%s)' % (' '.join(left, right, value))
+                print('ERROR with (%s)' % (' '.join(left, right, value)))
 
         # Making sure all the pairs made it through the process:
         if len(compressedBoth) != len(class_glyph) + len(glyph_class) + len(glyph_glyph) + len(exploding_class_class):
-            print 'ERROR - we lost some kerning pairs.'
+            print('ERROR - we lost some kerning pairs.')
 
         buildOutputList(glyph_glyph, output, 'glyph to glyph')
         buildOutputList(glyph_class, output, 'glyph to class')
@@ -197,7 +197,7 @@ def makeKernFeature(fontPath):
         class_class.append('pos %s %s %s;' % (left, right, value))
 
     buildOutputList(class_class, output, 'class to class')
-    print '\n'.join(output)
+    print('\n'.join(output))
 
 
 if __name__ == "__main__":
@@ -211,7 +211,7 @@ if __name__ == "__main__":
             fontPath = sys.argv[1]
             makeKernFeature(fontPath)
         else:
-            print "No valid font provided."
+            print("No valid font provided.")
 
     else:
-        print "No valid font provided."
+        print("No valid font provided.")
