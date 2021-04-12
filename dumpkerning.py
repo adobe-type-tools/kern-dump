@@ -4,7 +4,9 @@ from getKerningPairsFromFEA import FEAKernReader
 from getKerningPairsFromOTF import OTFKernReader
 from getKerningPairsFromUFO import UFOkernReader
 import defcon
+import argparse
 import os
+import sys
 
 
 def dumpKerning(kernDict, fileName):
@@ -30,8 +32,10 @@ def extractKerning(path):
         return feaOrgKern.flatKerningPairs
 
 
-def main(args):
-    import argparse
+def main(args=None):
+
+    if args is None:
+        args = sys.argv[1:]
 
     parser = argparse.ArgumentParser(
         description=(
@@ -60,5 +64,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    import sys
-    main(sys.argv[1:])
+    main()

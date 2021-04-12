@@ -200,7 +200,8 @@ def makeKernFeature(fontPath):
     print('\n'.join(output))
 
 
-if __name__ == "__main__":
+def main():
+
     if len(sys.argv) == 2:
         assumedFontPath = sys.argv[1]
 
@@ -215,3 +216,7 @@ if __name__ == "__main__":
 
     else:
         print("No valid font provided.")
+
+
+if __name__ == "__main__":
+    main()
