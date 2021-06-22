@@ -28,7 +28,7 @@ def extractKerning(path):
         return ufoKern.allKerningPairs
     else:
         # assume .fea
-        feaOrgKern = FEAKernReader([path])
+        feaOrgKern = FEAKernReader(path)
         return feaOrgKern.flatKerningPairs
 
 

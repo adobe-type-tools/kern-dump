@@ -1,23 +1,16 @@
-#!/usr/bin/python
-import itertools
-import os
-import re
-import sys
-
-
-__doc__ = '''\
-
+#!/usr/bin/env python3
+'''
 Prints a list of all kerning pairs to be expected from a kern feature file.
 The feature file has to be passed to the script as an argument.
 This script has the ability to use a GlyphOrderAndAliasDB file for translating
 "friendly" glyph names to final glyph names (for comparison with OTF).
-
-Usage:
-------
-python getKerningPairsFromFeatureFile.py <path to kern feature file>
-python getKerningPairsFromFeatureFile.py -go <path to GlyphOrderAndAliasDB file> <path to kern feature file>
-
 '''
+
+
+import argparse
+import itertools
+import re
+
 
 # Regular expressions for parsing individual kerning commands:
 x_range_range = re.compile(
@@ -43,30 +36,23 @@ class KerningPair(object):
 
 class FEAKernReader(object):
 
-    def __init__(self, options):
+    def __init__(self, fea_file, goadb_file=None):
 
-        self.goadbPath = None
-        self.options = options
-
-        if "-go" in self.options:
-            self.goadbPath = self.options[self.options.index('-go') + 1]
-
-        self.featureFilePath = self.options[-1]
-
-        self.featureData = self.readFile(self.featureFilePath)
+        self.featureData = self.readFile(fea_file)
         self.kernClasses = self.readKernClasses()
 
         self.foundKerningPairs = self.parseKernLines()
         self.flatKerningPairs = self.makeFlatPairs()
 
-        if self.goadbPath:
-            self.glyphNameDict = {}
-            self.readGOADB()
-            self.flatKerningPairs = self.convertNames(self.flatKerningPairs)
+        if goadb_file:
+            friendlyFinalDict = self.readGOADB(goadb_file)
+            self.flatKerningPairs = self.convertNames(
+                self.flatKerningPairs, friendlyFinalDict)
 
         self.output = []
         for (left, right), value in self.flatKerningPairs.items():
-            self.output.append('/%s /%s %s' % (left, right, value))
+            line = ' '.join([left, right, value])
+            self.output.append(line)
         self.output.sort()
 
     def readFile(self, filePath):
@@ -84,11 +70,11 @@ class FEAKernReader(object):
         lineString = '\n'.join(lineList)
         return lineString
 
-    def convertNames(self, pairDict):
+    def convertNames(self, pairDict, friendlyFinalDict):
         newPairDict = {}
         for (left, right), value in pairDict.items():
-            newLeft = self.glyphNameDict.get(left)
-            newRight = self.glyphNameDict.get(right)
+            newLeft = friendlyFinalDict.get(left)
+            newRight = friendlyFinalDict.get(right)
 
             # in case the glyphs are not in the GOADB:
             if not newLeft:
@@ -193,38 +179,47 @@ class FEAKernReader(object):
 
         return flatKerningPairs
 
-    def readGOADB(self):
-        goadbList = self.readFile(self.goadbPath).splitlines()
+    def readGOADB(self, goadbPath):
+        output = {}
+        goadbList = self.readFile(goadbPath).splitlines()
 
         for line in goadbList:
-            splitLine = line.split()
-            if len(splitLine) < 2:
-                print('Something is wrong with this GOADB line:\n', line)
-            else:
-                finalName, workingName = splitLine[0], splitLine[1]
-                self.glyphNameDict[workingName] = finalName
+            if not line.strip().startswith('#'):  # get rid of comments
+                splitLine = line.split()
+                if len(splitLine) < 2:
+                    print('Something is wrong with this GOADB line:\n', line)
+                else:
+                    finalName, friendlyName = splitLine[0], splitLine[1]
+                    output[friendlyName] = finalName
+        return output
+
+
+def get_options(args=None):
+
+    parser = argparse.ArgumentParser(
+        description=__doc__
+    )
+    parser.add_argument(
+        'files',
+        metavar='FILES',
+        nargs='+',
+        help='feature file, goadb file (optional)',
+    )
+    return parser.parse_args(args)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
+    args = get_options()
 
-        options = sys.argv[1:]
-        kernFile = options[-1]
-
-        if (
-            os.path.exists(kernFile) and
-            os.path.splitext(kernFile)[-1] in ['.fea', '.kern']
-        ):
-            kfr = FEAKernReader(options)
-
-            print('\n'.join(kfr.output))
-            print(
-                '\nTotal number of kerning pairs:\n',
-                len(kfr.flatKerningPairs)
-            )
-
-        else:
-            print("No valid kern feature file provided.")
-
+    goadb_file = None
+    if len(args.files) == 2:
+        fea_file, goadb_file = args.files
     else:
-        print("No valid kern feature file provided.")
+        fea_file = args.files[0]
+
+    kfr = FEAKernReader(fea_file, goadb_file)
+    print('\n'.join(kfr.output))
+    print(
+        '\nTotal number of kerning pairs:\n',
+        len(kfr.flatKerningPairs)
+    )
