@@ -10,10 +10,11 @@ class UFOkernReader(object):
         self.f = font
 
         try:
-            format_version = self.f.ufoFormatVersion
+            format_version = self.f.ufoFormatVersionTuple
         except AttributeError:
             format_version = self.f.naked().ufoFormatVersion
-        if format_version >= 3:
+
+        if int(format_version[0]) >= 3:
             self.group_indicator = 'public.'
         else:
             self.group_indicator = '@'
@@ -33,7 +34,7 @@ class UFOkernReader(object):
     def makeOutput(self, kerningDict):
         output = []
         for (left, right), value in kerningDict.items():
-            output.append('/%s /%s %s' % (left, right, value))
+            output.append('%s %s %s' % (left, right, value))
         output.sort()
         return output
 
@@ -100,20 +101,16 @@ class UFOkernReader(object):
 
 def run(font):
     ukr = UFOkernReader(font, includeZero=True)
-    scrap = os.popen('pbcopy', 'w')
     output = '\n'.join(ukr.output)
-    scrap.write(output)
-    scrap.close()
 
     if inRF:
         pass
         # print('Total length of kerning:', ukr.totalKerning)
 
     if inCL:
-        print('\n'.join(ukr.output), '\n')
+        print(output, '\n')
 
     print('Total amount of kerning pairs:', len(ukr.output))
-    print('List of kerning pairs copied to clipboard.')
 
 
 if __name__ == '__main__':
@@ -134,7 +131,7 @@ if __name__ == '__main__':
             import defcon
             inCL = True
             path = os.path.normpath(sys.argv[-1])
-            if os.path.splitext(path)[-1] in ['.ufo', '.UFO']:
+            if os.path.splitext(path)[-1].lower() == '.ufo':
                 f = defcon.Font(path)
                 run(f)
             else:

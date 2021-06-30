@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Prints a list of all kerning pairs to be expected from a kern feature file.
+Print a list of all kerning pairs to be expected from a kern feature file.
 The feature file has to be passed to the script as an argument.
 This script has the ability to use a GlyphOrderAndAliasDB file for translating
 "friendly" glyph names to final glyph names (for comparison with OTF).
@@ -218,8 +218,5 @@ if __name__ == "__main__":
         fea_file = args.files[0]
 
     kfr = FEAKernReader(fea_file, goadb_file)
-    print('\n'.join(kfr.output))
-    print(
-        '\nTotal number of kerning pairs:\n',
-        len(kfr.flatKerningPairs)
-    )
+    print('\n'.join(kfr.output), '\n')
+    print('Total amount of kerning pairs:', len(kfr.flatKerningPairs))

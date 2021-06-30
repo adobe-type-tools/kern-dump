@@ -5,7 +5,7 @@ import sys
 
 __doc__ = '''\
 
-Prints all possible kerning pairs within font.
+Print all possible kerning pairs within a font.
 Supports RTL kerning.
 
 Usage:
@@ -298,17 +298,14 @@ if __name__ == "__main__":
 
             finalList = []
             for pair, value in f.kerningPairs.items():
-                finalList.append('/%s /%s %s' % (pair[0], pair[1], value))
+                finalList.append('%s %s %s' % (pair[0], pair[1], value))
 
             finalList.sort()
 
             output = '\n'.join(finalList)
-            print(output, file=sys.stdout)
-
-            print('\nTotal number of kerning pairs:', file=sys.stdout)
-            print(len(f.kerningPairs), file=sys.stdout)
-            # for i in sorted(f.allLeftClasses):
-            #     print(i, f.allLeftClasses[i], file=sys.stdout)
+            amount = str(len(f.kerningPairs))
+            print(output + '\n', file=sys.stdout)
+            print('Total amount of kerning pairs: ' + amount, file=sys.stdout)
 
         else:
             print('That is not a valid font.', file=sys.stderr)
