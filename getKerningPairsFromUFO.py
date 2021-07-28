@@ -10,11 +10,11 @@ class UFOkernReader(object):
         self.f = font
 
         try:
-            format_version = self.f.ufoFormatVersionTuple
+            format_major = self.f.ufoFormatVersionTuple[0]
         except AttributeError:
-            format_version = self.f.naked().ufoFormatVersion
+            format_major = self.f.naked().ufoFormatVersionTuple[0]
 
-        if int(format_version[0]) >= 3:
+        if int(format_major) >= 3:
             self.group_indicator = 'public.'
         else:
             self.group_indicator = '@'
@@ -108,7 +108,7 @@ def run(font):
         # print('Total length of kerning:', ukr.totalKerning)
 
     if inCL:
-        print(output, '\n')
+        print(output + '\n')
 
     print('Total amount of kerning pairs:', len(ukr.output))
 

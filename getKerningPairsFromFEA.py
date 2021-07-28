@@ -218,5 +218,5 @@ if __name__ == "__main__":
         fea_file = args.files[0]
 
     kfr = FEAKernReader(fea_file, goadb_file)
-    print('\n'.join(kfr.output), '\n')
+    print('\n'.join(kfr.output) + '\n')
     print('Total amount of kerning pairs:', len(kfr.flatKerningPairs))

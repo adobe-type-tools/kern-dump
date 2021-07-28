@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+
+'''
+This script extracts kerning and groups from a compiled OTF and injects
+them into a new UFO file (which is created via `tx`).
+It requires the Adobe FDK (tx) to be installed, as well as the module
+`getKerningPairsFromOTF.py`; which is distributed in the same folder.
+
+usage:
+python convertKernedOTFtoKernedUFO.py font.otf
+
+'''
+
 import os
 import sys
 import string
@@ -10,20 +22,6 @@ from defcon import Font
 from fontTools import ttLib
 
 import getKerningPairsFromOTF
-# reload(getKerningPairsFromOTF)
-
-__doc__ = '''\
-
-    This script extracts kerning and groups from a compiled OTF and injects
-    them into a new UFO file (which is created via `tx`).
-    It requires the Adobe FDK (tx) to be installed, as well as the module
-    `getKerningPairsFromOTF.py`; which is distributed in the same folder.
-
-    usage:
-    python convertKernedOTFtoKernedUFO.py font.otf
-
-    '''
-
 
 kKernFeatureTag = 'kern'
 compressSinglePairs = True
@@ -32,10 +30,12 @@ compressSinglePairs = True
 
 
 def sortGlyphs(glyphlist):
-    # Sort glyphs in a way that glyphs from the exceptionList, or glyphs
-    # starting with 'uni' names do not get to be key (first) glyphs.
-    # An infinite loop is avoided, in case there are only glyphs matching
-    # above mentioned properties.
+    '''
+    Sort glyphs in a way that glyphs from the exceptionList, or glyphs
+    starting with 'uni' names do not get to be key (first) glyphs.
+    An infinite loop is avoided, in case there are only glyphs matching
+    above mentioned properties.
+    '''
     exceptionList = 'dotlessi dotlessj kgreenlandic ae oe AE OE uhorn'.split()
 
     glyphs = sorted(glyphlist)
