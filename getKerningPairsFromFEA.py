@@ -24,8 +24,21 @@ x_item_item = re.compile(
 expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
+def flatten_glyph_list(glyph_list, group_dict):
+    '''
+    flatten nested lists of items (containing glyph list references)
+    '''
+    while any([re.match(r'@.+?', item) for item in glyph_list]):
+        new_glyph_list = []
+        for item in glyph_list:
+            new_glyph_list.extend(group_dict.get(item, [item]))
+        glyph_list = new_glyph_list
+
+    return glyph_list
+
+
 class KerningPair(object):
-    'Storing a flattened kerning pair'
+    '''Storing a flattened kerning pair'''
 
     def __init__(self, pair, pairList, value):
 
@@ -89,12 +102,16 @@ class FEAKernReader(object):
 
     def readKernClasses(self):
         allClassesList = re.findall(
-            r"(@\S+)\s*=\s*\[([ A-Za-z0-9_.]+)\]\s*;", self.featureData)
+            r"(@\S+)\s*=\s*\[([ @A-Za-z0-9_.]+)\]\s*;", self.featureData)
 
         classes = {}
-        for name, glyphs in allClassesList:
-            classes[name] = glyphs.split()
+        for name, items in allClassesList:
+            # at this point, classes can still contain nested classes
+            classes[name] = items.split()
 
+        # flatten nested kerning classes
+        for className, itemList in classes.items():
+            classes[className] = flatten_glyph_list(itemList, classes)
         return classes
 
     def allCombinations(self, left, right):
