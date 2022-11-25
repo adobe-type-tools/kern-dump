@@ -21,7 +21,6 @@ x_glyph_range = re.compile(
     r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
 x_item_item = re.compile(
     r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
-expressions = [x_range_range, x_range_glyph, x_glyph_range, x_item_item]
 
 
 def flatten_glyph_list(glyph_list, group_dict):
@@ -76,7 +75,7 @@ class FEAKernReader(object):
         inputfile.close()
         for line in data:
             if '#' in line:
-                line = line.split('#')[0]
+                line = line.split('#')[0].strip()
             if line:
                 lineList.append(line)
 
@@ -152,17 +151,31 @@ class FEAKernReader(object):
     def parseKernLines(self):
         featureLines = self.featureData.splitlines()
         foundKerningPairs = []
-        for line in featureLines:
-            for expression in expressions:
-                match = re.match(expression, line)
+        for line_index, line in enumerate(featureLines):
+            if '[' in line:  # line contains a range
+                expressions = [x_range_range, x_range_glyph, x_glyph_range]
+                for expression in expressions:
+                    match = re.match(expression, line)
+                    if match:
+                        enum = match.group(1)
+                        pair = (match.group(2), match.group(3))
+                        value = match.group(4)
+                        pair_combos = itertools.product(
+                            pair[0].split(), pair[1].split())
+                        for combo in pair_combos:
+                            foundKerningPairs.append([enum, combo, value])
+                        break
+                    else:
+                        continue
+            else:  # normal item-item pair
+                match = re.match(x_item_item, line)
                 if match:
                     enum = match.group(1)
                     pair = (match.group(2), match.group(3))
                     value = match.group(4)
                     foundKerningPairs.append([enum, pair, value])
-                    break
                 else:
-                    continue
+                    print('XXX cannot match', line)
         return foundKerningPairs
 
     def makeFlatPairs(self):
