@@ -175,7 +175,10 @@ class FEAKernReader(object):
                     value = match.group(4)
                     foundKerningPairs.append([enum, pair, value])
                 else:
-                    print('XXX cannot match', line)
+                    if line == 'subtable;':
+                        pass
+                    else:
+                        print(f'cannot match line\n"{line}"', )
         return foundKerningPairs
 
     def makeFlatPairs(self):
