@@ -7,15 +7,16 @@ import sys
 import itertools
 import getKerningPairsFromUFO
 from collections import defaultdict
-from robofab.world import RFont as Font
-from robofab import ufoLib
+from fontParts.fontshell import RFont as Font
+from fontTools import ufoLib
 import time
+import argparse
 
 # from defcon import Font
 # ufo 3 defcon would write proper glif names,
 # but creates a huge kerning plist. (why?)
 
-reload(getKerningPairsFromUFO)
+# reload(getKerningPairsFromUFO)
 
 startTime = time.time()
 
@@ -112,7 +113,7 @@ def progressBar(totalCount, progressCount, increment=10, previousProgress=0):
     progress = '{:.0f}'.format(progressCount / totalCount * 100)
     if int(progress) % increment == 0 and not progress in loggedProgress:
         if int(progress) > 0:
-            print '{}% done'.format(progress)
+            print( '{}% done'.format(progress))
             loggedProgress.append(progress)
 
 
@@ -206,7 +207,7 @@ def consolidateExceptions(exceptionDict, organizedGroups):
     rightGlyphListToGroupName = make_glyphList_to_group_dict(
         'R', organizedGroups)
 
-    print 'consolidating exceptions ...'
+    print( 'consolidating exceptions ...')
     leftExceptionGlyphs = set([left for left, right in exceptionDict.keys()])
     for leftGlyphName in leftExceptionGlyphs:
         kernedAgainst = [
@@ -242,11 +243,11 @@ def makeValueDistribution(kerningPairData, verbatim=True):
     exceptions = {}
 
     if verbatim == True:
-        print 'verbatim mode'
+        print( 'verbatim mode')
     else:
-        print 'non-verbatim mode'
+        print( 'non-verbatim mode')
 
-    print 'analyzing value distribution and finding best standard kerning value ...'
+    print( 'analyzing value distribution and finding best standard kerning value ...')
     for pair, pairData in kerningPairData.items():
 
         if verbatim == True:
@@ -261,7 +262,7 @@ def makeValueDistribution(kerningPairData, verbatim=True):
                         pairData.flatPairValueDict, key=lambda x: len(pairData.flatPairValueDict[x]))
                     bestValue = maxOccurring
                 else:
-                    bestValue = pairData.flatPairValueDict.keys()[0]
+                    bestValue = list(pairData.flatPairValueDict.keys())[0]
 
                 best_value_pairs[pair] = bestValue
 
@@ -270,7 +271,7 @@ def makeValueDistribution(kerningPairData, verbatim=True):
                 for kernValue, pairList in pairData.flatPairValueDict.items():
                     for pair in pairList:
                         exceptions[pair] = kernValue
-                        print 'exception to unkerned class found: %s %s' % (' '.join(pair), kernValue)
+                        print('exception to unkerned class found: %s %s' % (' '.join(pair), kernValue))
         else:
             # this mode adds kerning pairs, removes exceptions.
             if pairData.variations > 1:
@@ -322,26 +323,26 @@ def analyzeKerning(f_source, f_target, flattenedPairDict, organizedSourceGroups)
     left_vs_exploded_pairs = []
     exploded_vs_right_pairs = []
 
-    print 'exploding all groups ...'
+    print( 'exploding all groups ...')
     for leftGroupList, rightGroupList in itertools.product(leftGroupsGlyphLists, rightGroupsGlyphLists):
         exploded_group_pairs.extend(
             itertools.product(leftGroupList, rightGroupList))
 
-    print 'exploding single glyphs vs right groups ...'
+    print( 'exploding single glyphs vs right groups ...')
     for rightGroupList in rightGroupsGlyphLists:
         left_vs_exploded_pairs.extend(
             itertools.product(singleGlyphsL, rightGroupList))
 
-    print 'exploding left groups vs single glyphs ...'
+    print( 'exploding left groups vs single glyphs ...')
     for leftGroupList in leftGroupsGlyphLists:
         exploded_vs_right_pairs.extend(
             itertools.product(leftGroupList, singleGlyphsR))
 
-    print 'analyzing all single pairs ...'
+    print( 'analyzing all single pairs ...')
     all_single_pairs = [
         pair for pair in itertools.product(singleGlyphsL, singleGlyphsR)]
 
-    print 'creating reverse group lookup dictionaries ...'
+    print( 'creating reverse group lookup dictionaries ...')
     leftG2GDict = make_glyph_to_group_dict(
         f_source, 'L', organizedSourceGroups)
     rightG2GDict = make_glyph_to_group_dict(
@@ -367,7 +368,7 @@ def analyzeKerning(f_source, f_target, flattenedPairDict, organizedSourceGroups)
     progressCount = 0
     totalCount = sum(map(len, [gr_gr_set, gl_gr_set, gr_gl_set, gl_gl_set]))
 
-    print 'iterating through all possible kerning combinations (%s) ...' % len(flattenedPairDict)
+    print( 'iterating through all possible kerning combinations (%s) ...' % len(flattenedPairDict))
 
     for (left, right) in gr_gr_set:
         progressCount += 1
@@ -416,7 +417,8 @@ def analyzeKerning(f_source, f_target, flattenedPairDict, organizedSourceGroups)
     best_value_pairs, flatExceptions = makeValueDistribution(
         kerningPairData, verbatim=True)
 
-    for (left, right), value in flattenedPairDict.items():
+    d = flattenedPairDict.copy()
+    for (left, right), value in d.items():
         leftItem = leftG2GDict.get(left, left)
         rightItem = rightG2GDict.get(right, right)
 
@@ -433,12 +435,12 @@ def analyzeKerning(f_source, f_target, flattenedPairDict, organizedSourceGroups)
                 if flatExceptions.get((left, right)) == value:
                     continue
                 else:
-                    print 'conflicting Exceptions:', left, right, value
+                    print( 'conflicting Exceptions:', left, right, value)
             del flattenedPairDict[(left, right)]
 
     exceptions = consolidateExceptions(flatExceptions, organizedSourceGroups)
 
-    print 'building new kerning object ...'
+    print( 'building new kerning object ...')
     newKerning = {}
     newKerning.update(best_value_pairs)
     # print len(best_value_pairs)
@@ -447,32 +449,62 @@ def analyzeKerning(f_source, f_target, flattenedPairDict, organizedSourceGroups)
     return newKerning
 
 
-ufoLib.UFOWriter = CustomWriter
-# subclassing UFO writer to use the writer contained in this script.
+def getArgs():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-s',
+        '--source',
+        metavar='SOURCE',
+        help='source ufo to take group info from'
+    )
 
-f_source = Font(sys.argv[-2])
-f_target = Font(sys.argv[-1])
-# if f_target.lib['org.unifiedfontobject.normalizer.modTimes']:
-#     del(f_target.lib['org.unifiedfontobject.normalizer.modTimes'])
+    parser.add_argument(
+        '-t',
+        '--target',
+        metavar='TARGET',
+        help='target ufo to put groups into'
+    )
 
-inputDirName, inputFileName = os.path.split(f_target.path.rstrip(os.sep))
-outputFileName = inputFileName.replace('.ufo', '_mod.ufo')
-outputPath = os.path.join(inputDirName, outputFileName)
 
-flatTargetPairsDict = getKerningPairsFromUFO.UFOkernReader(
-    f_target, includeZero=True).allKerningPairs
-organizedSourceGroups = organizeGroups(f_source)
-newKerning = analyzeKerning(
-    f_source, f_target, flatTargetPairsDict, organizedSourceGroups)
+    parser.parse_args
+    return parser.parse_args()
 
-transferGroups(f_source, f_target)
-f_target.kerning.clear()
-f_target.kerning.update(newKerning)
 
-f_target.lib['com.typesupply.MetricsMachine4.groupColors'] = f_source.lib[
-    'com.typesupply.MetricsMachine4.groupColors']
-f_target.save(outputPath)
+def main():
+    print("Comparing Groups Across Masters (K Version) \n")
+    args = getArgs()
 
-print 'done.'
-elapsedTime = time.time() - startTime
-print '{:.2f} seconds'.format(elapsedTime)
+    ufoLib.UFOWriter = CustomWriter
+    # subclassing UFO writer to use the writer contained in this script.
+
+    f_source = Font(args.source)
+    print(f_source)
+    f_target = Font(args.target)
+    print(f_target)
+    # if f_target.lib['org.unifiedfontobject.normalizer.modTimes']:
+    #     del(f_target.lib['org.unifiedfontobject.normalizer.modTimes'])
+
+    inputDirName, inputFileName = os.path.split(f_target.path.rstrip(os.sep))
+    outputFileName = inputFileName.replace('.ufo', '_mod.ufo')
+    outputPath = os.path.join(inputDirName, outputFileName)
+
+    flatTargetPairsDict = getKerningPairsFromUFO.UFOkernReader(
+        f_target, includeZero=True).allKerningPairs
+    organizedSourceGroups = organizeGroups(f_source)
+    newKerning = analyzeKerning(
+        f_source, f_target, flatTargetPairsDict, organizedSourceGroups)
+
+    transferGroups(f_source, f_target)
+    f_target.kerning.clear()
+    f_target.kerning.update(newKerning)
+
+    f_target.lib['com.typesupply.MetricsMachine4.groupColors'] = f_source.lib[
+        'com.typesupply.MetricsMachine4.groupColors']
+    f_target.save(outputPath)
+
+    print( 'done.')
+    elapsedTime = time.time() - startTime
+    print( '{:.2f} seconds'.format(elapsedTime))
+
+if __name__ == '__main__':
+    main()
