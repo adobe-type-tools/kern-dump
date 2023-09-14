@@ -1,6 +1,4 @@
 *.pyc
-*.txt
-testFiles/*
-featureFiles/*
-obsolete/*
-rewrite/*
+htmlcov/*
+.coverage
+coverage.xml
