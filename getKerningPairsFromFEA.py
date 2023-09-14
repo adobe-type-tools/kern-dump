@@ -14,13 +14,23 @@ import re
 
 # Regular expressions for parsing individual kerning commands:
 x_range_range = re.compile(
-    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?\[\s*(.+?)\s*\]\s+?<?(-?\d+?)( 0 \4 0>)?\s*;')
 x_range_glyph = re.compile(
-    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?(.+?)\s+?(-?\d+?)\s*;')
+    r'\s*(enum\s+?)?pos\s+?\[\s*(.+?)\s*\]\s+?(.+?)\s+?<?(-?\d+?)( 0 \4 0>)?\s*;')
 x_glyph_range = re.compile(
-    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?(-?\d+?)\s*;')
+    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?\[\s*(.+?)\s*\]\s+?<?(-?\d+?)( 0 \4 0>)?\s*;')
 x_item_item = re.compile(
-    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?(-?\d+?)\s*;')
+    r'\s*(enum\s+?)?pos\s+?(.+?)\s+?(.+?)\s+?<?(-?\d+?)( 0 \4 0>)?\s*;')
+
+
+x_lookup_start = re.compile(
+    r'\s*lookup .+? {\s*')
+x_lookup_flag = re.compile(
+    r'\s*lookupflag .+?')
+x_lookup_end = re.compile(
+    r'\s*} .+?;\s*')
+x_subtable_break = re.compile(
+    r'\s*subtable;')
 
 
 def flatten_glyph_list(glyph_list, group_dict):
@@ -150,12 +160,14 @@ class FEAKernReader(object):
 
     def parseKernLines(self):
         featureLines = self.featureData.splitlines()
+        rxs_ignore = [x_lookup_start, x_lookup_end, x_lookup_flag, x_subtable_break]
+        rxs_expression = [x_range_range, x_range_glyph, x_glyph_range]
+
         foundKerningPairs = []
         for line_index, line in enumerate(featureLines):
             if '[' in line:  # line contains a range
-                expressions = [x_range_range, x_range_glyph, x_glyph_range]
-                for expression in expressions:
-                    match = re.match(expression, line)
+                for rx_expression in rxs_expression:
+                    match = re.match(rx_expression, line)
                     if match:
                         enum = match.group(1)
                         pair = (match.group(2), match.group(3))
@@ -175,10 +187,10 @@ class FEAKernReader(object):
                     value = match.group(4)
                     foundKerningPairs.append([enum, pair, value])
                 else:
-                    if line == 'subtable;':
+                    if any([re.match(m, line) for m in rxs_ignore]):
                         pass
                     else:
-                        print(f'cannot match line\n"{line}"', )
+                        print(f'cannot match line\n"{line}"\n')
         return foundKerningPairs
 
     def makeFlatPairs(self):

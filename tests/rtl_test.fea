@@ -1,0 +1,11 @@
+@AIN_1ST_ARA = [arAin arGhain];
+@HEH_2ND_ARA = [arHeh arHehGoal arAe arTehMarbuta arHehYeh arHehGoalHamza arTehMarbutaGoal];
+
+lookup RTL_kerning {
+lookupflag RightToLeft IgnoreMarks;
+
+pos arColon arAlefHamzaBelow <-15 0 -15 0>;
+enum pos @AIN_1ST_ARA [arComma] <5 0 5 0>;
+pos @AIN_1ST_ARA @HEH_2ND_ARA <-5 0 -5 0>;
+
+} RTL_kerning;
