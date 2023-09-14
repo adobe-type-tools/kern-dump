@@ -1,0 +1,15 @@
+# comment
+  # comment
+
+asd # invalid line
+@GROUP = [ grouped_1 grouped_2 ];  # comment
+
+pos A [four.dnom] -42;
+pos [ a b c ] A -42;
+pos [ a b c ] @GROUP -42;
+pos @GROUP @GROUP -42;
+subtable;
+pos [ a b c ] [four.dnom] -42;
+pos [fraction divisionslash] [four.dnom] -42;
+pos [fraction divisionslash] [a b c] -42;
+pos [x y z] [x y z] 42;

@@ -1,0 +1,7 @@
+@GROUP = [ f g h ];
+
+pos [ a b c d e ] [ a b c d e ] -42;  # 25
+pos x [ a b c d e ] -42;  # 5
+pos [ a b c d e ] x -42;  # 5
+pos [ a b c ] @GROUP -42;  # 9
+pos @GROUP [ a b c ] -42;  # 9

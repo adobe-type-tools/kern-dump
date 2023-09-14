@@ -1,0 +1,5 @@
+@GROUP = [ x y z ];
+
+enum pos [ a b c ] d -42;  # 3
+enum pos [ d e f ] [ g h i ] -42;  # 9
+enum pos j [ k @GROUP ] -42;  # 4

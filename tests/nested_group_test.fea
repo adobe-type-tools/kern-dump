@@ -1,0 +1,5 @@
+@C_LC = [c ccedilla cacute ccaron];
+@L_LC = [l lslash lacute lcaron lcommaaccent];
+@L_LC_LEFT = [@L_LC ffl fl f_l];
+
+pos @L_LC_LEFT @C_LC -42;  # 32

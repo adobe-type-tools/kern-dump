@@ -1,0 +1,4 @@
+@GROUP_1 = [ a b c d e ];
+@GROUP_2 = [ a b c d e ];
+
+pos @GROUP_1 @GROUP_2 -42;
