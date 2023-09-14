@@ -3,32 +3,28 @@
 from getKerningPairsFromFEA import FEAKernReader
 from getKerningPairsFromOTF import OTFKernReader
 from getKerningPairsFromUFO import UFOkernReader
+from pathlib import Path
 import defcon
 import argparse
-import os
 import sys
 
 
 def dumpKerning(kernDict, fileName):
-    f = open(fileName, "w")
-    for (g1, g2), v in sorted(kernDict.items()):
-        f.write("%s %s %s\n" % (g1, g2, v))
-    f.close()
+    output = [f"{g_1} {g_2} {value}" for (g_1, g_2), value in sorted(kernDict.items())]
+    with open(fileName, "w") as blob:
+        blob.write('\n'.join(output))
 
 
-def extractKerning(path):
-    path = os.path.normpath(path)  # remove trailing slash for .ufo
-    base, ext = os.path.splitext(path)
-    ext = ext.lower()
-    if ext in [".ttf", ".otf"]:
-        otfKern = OTFKernReader(path)
+def extractKerning(input_file):
+    if input_file.suffix in [".ttf", ".otf"]:
+        otfKern = OTFKernReader(input_file)
         return otfKern.kerningPairs
-    elif ext == ".ufo":
-        ufoKern = UFOkernReader(defcon.Font(path), includeZero=True)
+    elif input_file.suffix == ".ufo":
+        ufoKern = UFOkernReader(defcon.Font(input_file), includeZero=True)
         return ufoKern.allKerningPairs
     else:
         # assume .fea
-        feaOrgKern = FEAKernReader(path)
+        feaOrgKern = FEAKernReader(input_file)
         return feaOrgKern.flatKerningPairs
 
 
@@ -50,17 +46,21 @@ def main(args=None):
     )
     parser.add_argument(
         '-o', '--output',
-        dest='outputFolder'
+        dest='outputDir'
     )
 
     args = parser.parse_args(args)
     for source in args.sourceFiles:
-        print("extracting kerning from %s" % source)
-        kerning = extractKerning(source)
-        output = os.path.normpath(source) + ".kerndump"
-        if args.outputFolder:
-            output = os.path.join(args.outputFolder, os.path.basename(output))
-        dumpKerning(kerning, output)
+        input_file = Path(source)
+        print(f"extracting kerning from {input_file.name}")
+        kerning = extractKerning(input_file)
+        output_file = input_file.with_suffix(".kerndump")
+        if args.outputDir:
+            output_dir = Path(args.outputDir)
+            output_dir.mkdir(exist_ok=True)
+            output_file = output_dir / output_file.name
+
+        dumpKerning(kerning, output_file)
 
 
 if __name__ == "__main__":
