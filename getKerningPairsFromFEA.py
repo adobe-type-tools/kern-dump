@@ -79,18 +79,18 @@ class FEAKernReader(object):
 
     def readFile(self, filePath):
         # reads raw file, removes commented lines
-        lineList = []
-        inputfile = open(filePath, 'r')
-        data = inputfile.read().splitlines()
-        inputfile.close()
+        filtered_lines = []
+        with open(filePath, 'r') as inputfile:
+            data = inputfile.read().splitlines()
+
         for line in data:
             if '#' in line:
+                # remove # and everything after -- supporting in-line comments
                 line = line.split('#')[0].strip()
             if line:
-                lineList.append(line)
+                filtered_lines.append(line)
 
-        lineString = '\n'.join(lineList)
-        return lineString
+        return '\n'.join(filtered_lines)
 
     def convertNames(self, pairDict, friendlyFinalDict):
         newPairDict = {}
@@ -203,43 +203,44 @@ class FEAKernReader(object):
         return flatKerningPairs
 
     def readGOADB(self, goadbPath):
-        output = {}
-        goadbList = self.readFile(goadbPath).splitlines()
+        goadb_dict = {}
+        goadb_list = self.readFile(goadbPath).splitlines()
 
-        for line in goadbList:
+        for line in goadb_list:
             if not line.strip().startswith('#'):  # get rid of comments
-                splitLine = line.split()
-                if len(splitLine) < 2:
-                    print('Something is wrong with this GOADB line:\n', line)
+                chunks = line.split()
+                if len(chunks) < 2:
+                    print(
+                        f'Something is wrong with this GOADB line:\n'
+                        f'"{line}"')
                 else:
-                    finalName, friendlyName = splitLine[0], splitLine[1]
-                    output[friendlyName] = finalName
-        return output
+                    final_name, friendly_name = chunks[0], chunks[1]
+                    goadb_dict[friendly_name] = final_name
+        return goadb_dict
 
 
-def get_options(args=None):
+def get_args(args=None):
 
     parser = argparse.ArgumentParser(
         description=__doc__
     )
     parser.add_argument(
-        'files',
-        metavar='FILES',
-        nargs='+',
-        help='feature file, goadb file (optional)',
+        'feature_file',
+        metavar='FEA',
+        help='feature file',
+    )
+    parser.add_argument(
+        'goadb_file',
+        metavar='GOADB',
+        nargs='?',
+        default=None,
+        help='goadb file (optional)',
     )
     return parser.parse_args(args)
 
 
 if __name__ == "__main__":
-    args = get_options()
-
-    goadb_file = None
-    if len(args.files) == 2:
-        fea_file, goadb_file = args.files
-    else:
-        fea_file = args.files[0]
-
-    kfr = FEAKernReader(fea_file, goadb_file)
+    args = get_args()
+    kfr = FEAKernReader(args.feature_file, args.goadb_file)
     print('\n'.join(kfr.output) + '\n')
     print('Total amount of kerning pairs:', len(kfr.flatKerningPairs))

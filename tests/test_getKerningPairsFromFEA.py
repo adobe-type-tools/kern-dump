@@ -20,6 +20,16 @@ def read_file(path):
     return data
 
 
+def test_get_args():
+    args = gkp.get_args(['dummy.fea'])  # args through argparse
+    assert(args.feature_file == 'dummy.fea')
+    assert(args.goadb_file is None)
+
+    args = gkp.get_args(['dummy.fea', 'my_godadb'])
+    assert(args.feature_file == 'dummy.fea')
+    assert(args.goadb_file == 'my_godadb')
+
+
 def test_group_group():
     input_file = TEST_DIR / 'group_group_test.fea'
     dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
