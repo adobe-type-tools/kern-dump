@@ -41,7 +41,7 @@ def test_enum():
     dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
-    assert len(kfr.output) == 16
+    assert len(kfr.output) == 52
 
 
 def test_nested_groups():

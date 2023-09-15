@@ -1,5 +1,7 @@
 @GROUP = [ x y z ];
+@OTHERGROUP = [ s t u ];
 
 enum pos [ a b c ] d -42;  # 3
 enum pos [ d e f ] [ g h i ] -42;  # 9
 enum pos j [ k @GROUP ] -42;  # 4
+enum pos [ @GROUP @OTHERGROUP ] [ @GROUP @OTHERGROUP ] -36;  # 36

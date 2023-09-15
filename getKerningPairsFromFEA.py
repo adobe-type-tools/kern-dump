@@ -124,41 +124,19 @@ class FEAKernReader(object):
         return classes
 
     def allCombinations(self, left, right):
-        if len(left.split()) > 1:
-            # The left kerning object is an ad-hoc group
-            # like [ a b c ] or [ a @MMK_x c ]:
-            leftGlyphs = []
-            leftItems = left.split()
-            for item in leftItems:
-                classFound = self.kernClasses.get(item, None)
-                if classFound:
-                    leftGlyphs.extend(classFound)
-                else:
-                    leftGlyphs.append(item)
-
-        else:
-            # The left kerning object is something like x or @MMK_x:
-            leftGlyphs = self.kernClasses.get(left, [left])
-
-        if len(right.split()) > 1:
-            # The right kerning object is an ad-hoc group
-            # like [ a b c ] or [ a @MMK_x c ]:
-            rightGlyphs = []
-            rightItems = right.split()
-            for item in rightItems:
-                classFound = self.kernClasses.get(item, None)
-                if classFound:
-                    rightGlyphs.extend(classFound)
-                else:
-                    rightGlyphs.append(item)
-        else:
-            # The right kerning object is something like x or @MMK_x:
-            rightGlyphs = self.kernClasses.get(right, [right])
+        leftGlyphs = self.kernClasses.get(left, [left])
+        rightGlyphs = self.kernClasses.get(right, [right])
 
         combinations = list(itertools.product(leftGlyphs, rightGlyphs))
         return combinations
 
     def parseKernLines(self):
+        '''
+        Read the individual lines of the kern feature, and break them down
+        into kerning pairs. This means (for example) that a line like
+        pos [ a b ] c -10;
+        will be broken down into the pairs a c and b c.
+        '''
         featureLines = self.featureData.splitlines()
         rxs_ignore = [x_lookup_start, x_lookup_end, x_lookup_flag, x_subtable_break]
         rxs_expression = [x_range_range, x_range_glyph, x_glyph_range]
@@ -206,7 +184,7 @@ class FEAKernReader(object):
                 # command into multiple single pairs
                 pairList = self.allCombinations(left, right)
 
-            elif '@'not in left and '@' not in right:
+            elif '@' not in left and '@' not in right:
                 # glyph-to-glyph kerning
                 pairList = [pair]
 
