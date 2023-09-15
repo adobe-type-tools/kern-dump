@@ -6,7 +6,6 @@ from getKerningPairsFromUFO import UFOkernReader
 from pathlib import Path
 import defcon
 import argparse
-import sys
 
 
 def dumpKerning(kernDict, fileName):
@@ -28,11 +27,7 @@ def extractKerning(input_file):
         return feaOrgKern.flatKerningPairs
 
 
-def main(args=None):
-
-    if args is None:
-        args = sys.argv[1:]
-
+def get_args(args=None):
     parser = argparse.ArgumentParser(
         description=(
             'Extract (flat) kerning from ufo, ttf, '
@@ -41,8 +36,8 @@ def main(args=None):
     parser.add_argument(
         'sourceFiles',
         nargs='+',
-        metavar="SOURCE",
-        help='source files to extract kerning from'
+        metavar='SOURCE',
+        help='source file(s) to extract kerning from'
     )
     parser.add_argument(
         '-o', '--output',
@@ -50,11 +45,17 @@ def main(args=None):
     )
 
     args = parser.parse_args(args)
+
+
+def main(args=None):
+
+    args = get_args()
     for source in args.sourceFiles:
         input_file = Path(source)
+        output_file = input_file.with_suffix(".kerndump")
+
         print(f"extracting kerning from {input_file.name}")
         kerning = extractKerning(input_file)
-        output_file = input_file.with_suffix(".kerndump")
         if args.outputDir:
             output_dir = Path(args.outputDir)
             output_dir.mkdir(exist_ok=True)
