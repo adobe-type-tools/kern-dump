@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<glyph name="Ydieresis" format="2">
+	<unicode hex="0178"/>
+	<advance width="633"/>
+	<outline>
+		<contour>
+			<point x="233" y="745" type="curve" smooth="yes"/>
+			<point x="265" y="745"/>
+			<point x="290" y="768"/>
+			<point x="290" y="800" type="curve" smooth="yes"/>
+			<point x="290" y="832"/>
+			<point x="265" y="855"/>
+			<point x="233" y="855" type="curve" smooth="yes"/>
+			<point x="202" y="855"/>
+			<point x="175" y="832"/>
+			<point x="175" y="800" type="curve" smooth="yes"/>
+			<point x="175" y="768"/>
+			<point x="202" y="745"/>
+		</contour>
+		<contour>
+			<point x="456" y="745" type="curve" smooth="yes"/>
+			<point x="487" y="745"/>
+			<point x="514" y="768"/>
+			<point x="514" y="800" type="curve" smooth="yes"/>
+			<point x="514" y="832"/>
+			<point x="487" y="855"/>
+			<point x="456" y="855" type="curve" smooth="yes"/>
+			<point x="424" y="855"/>
+			<point x="399" y="832"/>
+			<point x="399" y="800" type="curve" smooth="yes"/>
+			<point x="399" y="768"/>
+			<point x="424" y="745"/>
+		</contour>
+		<component base="Y"/>
+	</outline>
+	<lib>
+		<dict>
+			<key>public.markColor</key>
+			<string>0,1,0.8,0.2</string>
+		</dict>
+	</lib>
+</glyph>

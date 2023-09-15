@@ -1,0 +1,70 @@
+# PS Name: kern_example
+# MinKern: +/- 3 inclusive
+# exported from Defcon
+
+@MMK_L_LAT_A = [A Adieresis];
+@MMK_L_LAT_L = [L Lcaron];
+@MMK_L_LAT_O = [O Odieresis];
+@MMK_L_LAT_Y = [Y Ydieresis];
+@MMK_L_LAT_i = [i igrave];
+@MMK_L_LAT_v = [v w];
+@MMK_L_quotedbl = [quotesingle quotedbl];
+@MMK_R_LAT_A = [A Adieresis];
+@MMK_R_LAT_E = [L Lcaron];
+@MMK_R_LAT_O = [O Odieresis];
+@MMK_R_LAT_Y = [Y Ydieresis];
+@MMK_R_LAT_i = [i igrave];
+@MMK_R_LAT_v = [v w];
+@MMK_R_quotedbl = [quotesingle quotedbl];
+
+# glyph, glyph exceptions:
+pos Lcaron V -57;
+
+# glyph, group exceptions:
+enum pos Lcaron @MMK_R_LAT_Y -57;
+enum pos Lcaron @MMK_R_quotedbl -68;
+
+# group, glyph exceptions:
+enum pos @MMK_L_LAT_Y igrave -20;
+
+# glyph, group:
+pos V @MMK_R_LAT_A -120;
+pos V @MMK_R_LAT_O -50;
+pos V @MMK_R_LAT_i -30;
+pos V @MMK_R_LAT_v -41;
+
+# group, group/glyph:
+pos @MMK_L_LAT_A @MMK_R_LAT_A 10;
+pos @MMK_L_LAT_A @MMK_R_LAT_E -10;
+pos @MMK_L_LAT_A @MMK_R_LAT_O -39;
+pos @MMK_L_LAT_A @MMK_R_LAT_Y -90;
+pos @MMK_L_LAT_A @MMK_R_LAT_v -60;
+pos @MMK_L_LAT_A @MMK_R_quotedbl -60;
+pos @MMK_L_LAT_A V -119;
+pos @MMK_L_LAT_L @MMK_R_LAT_E -19;
+pos @MMK_L_LAT_L @MMK_R_LAT_O -20;
+pos @MMK_L_LAT_L @MMK_R_LAT_Y -108;
+pos @MMK_L_LAT_L @MMK_R_LAT_v -41;
+pos @MMK_L_LAT_L @MMK_R_quotedbl -110;
+pos @MMK_L_LAT_L V -119;
+pos @MMK_L_LAT_O @MMK_R_LAT_A -40;
+pos @MMK_L_LAT_O @MMK_R_LAT_E -24;
+pos @MMK_L_LAT_O @MMK_R_LAT_O 10;
+pos @MMK_L_LAT_O @MMK_R_LAT_Y -39;
+pos @MMK_L_LAT_O @MMK_R_quotedbl -29;
+pos @MMK_L_LAT_O V -40;
+pos @MMK_L_LAT_Y @MMK_R_LAT_A -90;
+pos @MMK_L_LAT_Y @MMK_R_LAT_O -50;
+pos @MMK_L_LAT_Y @MMK_R_LAT_i -40;
+pos @MMK_L_LAT_Y @MMK_R_LAT_v -69;
+pos @MMK_L_LAT_i @MMK_R_LAT_Y -20;
+pos @MMK_L_LAT_i @MMK_R_LAT_v -15;
+pos @MMK_L_LAT_i V -21;
+pos @MMK_L_LAT_v @MMK_R_LAT_A -71;
+pos @MMK_L_LAT_v @MMK_R_LAT_E -21;
+pos @MMK_L_LAT_v @MMK_R_LAT_Y -50;
+pos @MMK_L_LAT_v @MMK_R_LAT_v 10;
+pos @MMK_L_LAT_v V -50;
+pos @MMK_L_quotedbl @MMK_R_LAT_A -85;
+pos @MMK_L_quotedbl @MMK_R_LAT_O -29;
+pos @MMK_L_quotedbl @MMK_R_LAT_i 10;

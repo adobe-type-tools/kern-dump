@@ -28,7 +28,7 @@ def test_get_args():
 
 
 def test_catchall():
-    input_file = TEST_DIR / 'otf_kern_example.otf'
+    input_file = TEST_DIR / 'roundtrip' / 'otf_kern_example.otf'
     dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
     kfr = gkp.OTFKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
