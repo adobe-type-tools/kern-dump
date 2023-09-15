@@ -44,7 +44,7 @@ def get_args(args=None):
         dest='outputDir'
     )
 
-    args = parser.parse_args(args)
+    return parser.parse_args(args)
 
 
 def main(args=None):
@@ -52,7 +52,8 @@ def main(args=None):
     args = get_args()
     for source in args.sourceFiles:
         input_file = Path(source)
-        output_file = input_file.with_suffix(".kerndump")
+        new_suffix = input_file.suffix + ".kerndump"
+        output_file = input_file.with_suffix(new_suffix)
 
         print(f"extracting kerning from {input_file.name}")
         kerning = extractKerning(input_file)

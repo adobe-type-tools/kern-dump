@@ -32,7 +32,8 @@ def test_get_args():
 
 def test_group_group():
     input_file = TEST_DIR / 'fea_group_group_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
     assert len(kfr.output) == 5 * 5
@@ -40,7 +41,8 @@ def test_group_group():
 
 def test_ad_hoc_groups():
     input_file = TEST_DIR / 'fea_ad_hoc_group_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
     assert len(kfr.output) == 53
@@ -48,7 +50,8 @@ def test_ad_hoc_groups():
 
 def test_enum():
     input_file = TEST_DIR / 'fea_enum_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
     assert len(kfr.output) == 52
@@ -56,7 +59,8 @@ def test_enum():
 
 def test_nested_groups():
     input_file = TEST_DIR / 'fea_nested_group_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
     assert len(kfr.output) == 32
@@ -64,24 +68,27 @@ def test_nested_groups():
 
 def test_rtl():
     input_file = TEST_DIR / 'fea_rtl_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
 
 
 def test_goadb():
     input_file = TEST_DIR / 'fea_goadb_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
     goadb_file = TEST_DIR / 'goadb'
-    dump_file = REFERENCE_DIR / 'fea_goadb_test_converted.kerndump'
+    dump_file = REFERENCE_DIR / 'fea_goadb_test_converted.fea.kerndump'
     kfr = gkp.FEAKernReader(input_file, goadb_file=goadb_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
 
 
 def test_catchall():
     input_file = TEST_DIR / 'fea_catchall_test.fea'
-    dump_file = REFERENCE_DIR / input_file.with_suffix('.kerndump').name
+    new_suffix = input_file.suffix + '.kerndump'
+    dump_file = REFERENCE_DIR / input_file.with_suffix(new_suffix).name
     kfr = gkp.FEAKernReader(input_file)
     assert('\n'.join(kfr.output) == read_file(dump_file))
