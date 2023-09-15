@@ -73,7 +73,7 @@ class FEAKernReader(object):
 
         self.output = []
         for (left, right), value in self.flatKerningPairs.items():
-            line = ' '.join([left, right, value])
+            line = f'{left} {right} {value}'
             self.output.append(line)
         self.output.sort()
 
@@ -175,7 +175,7 @@ class FEAKernReader(object):
         indexedPairs = {}
         flatKerningPairs = {}
 
-        for pIndex, (enum, pair, value) in enumerate(self.foundKerningPairs):
+        for pIndex, (enum, pair, value_str) in enumerate(self.foundKerningPairs):
             left = pair[0]
             right = pair[1]
 
@@ -192,7 +192,7 @@ class FEAKernReader(object):
                 # class-to-class, class-to-glyph, or glyph-to-class kerning
                 pairList = self.allCombinations(left, right)
 
-            indexedPairs[pIndex] = KerningPair(pair, pairList, value)
+            indexedPairs[pIndex] = KerningPair(pair, pairList, int(value_str))
 
         # Iterate through the kerning pairs in reverse order to
         # overwrite less specific pairs with more specific ones:
