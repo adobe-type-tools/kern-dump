@@ -49,7 +49,7 @@ def get_args(args=None):
 
 def main(args=None):
 
-    args = get_args()
+    args = get_args(args)
     for source in args.sourceFiles:
         input_file = Path(source)
         new_suffix = input_file.suffix + ".kerndump"
