@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+import argparse
 import itertools
-import os
-import sys
+from pathlib import Path
 
 
 class UFOkernReader(object):
@@ -99,42 +99,50 @@ class UFOkernReader(object):
             return kerningPairs
 
 
-def run(font):
+def get_args(args=None):
+
+    parser = argparse.ArgumentParser(
+        description=__doc__
+    )
+
+    def check_suffix(file_name):
+        fn = Path(file_name)
+        if fn.suffix.lower() != '.ufo':
+            parser.error(f'{fn.name} is not a UFO file')
+        return file_name
+
+    parser.add_argument(
+        'ufo_file',
+        type=lambda f: check_suffix(f),
+        metavar='UFO',
+        help='UFO file',
+    )
+    return parser.parse_args(args)
+
+
+def run(font, print_list=False):
     ukr = UFOkernReader(font, includeZero=True)
     output = '\n'.join(ukr.output)
 
-    if inRF:
-        pass
-        # print('Total length of kerning:', ukr.totalKerning)
-
-    if inCL:
+    if print_list:
         print(output + '\n')
 
     print('Total amount of kerning pairs:', len(ukr.output))
 
 
 if __name__ == '__main__':
-    inRF = False
-    inCL = False
-
     try:
+        # inRF
         import mojo
-        inRF = True
         f = CurrentFont()
         if f:
             run(f)
         else:
-            print(u'You need to open a font first. \U0001F625')
+            print('You need to open a font first. 😥')
 
     except ImportError:
-        try:
-            import defcon
-            inCL = True
-            path = os.path.normpath(sys.argv[-1])
-            if os.path.splitext(path)[-1].lower() == '.ufo':
-                f = defcon.Font(path)
-                run(f)
-            else:
-                print('No UFO file given.')
-        except ImportError:
-            print(u'You don’t have Defcon installed. \U0001F625')
+        from defcon import Font
+        args = get_args()
+        ufo = args.ufo_file
+        f = Font(ufo)
+        run(f, print_list=True)
