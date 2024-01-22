@@ -81,7 +81,7 @@ Extract a list of all (flat) kerning pairs from a VFB’s kern object, and
 report the absolute number of pairs. Run as a FontLab script.
 
 __Dependencies:__ [FontLab 5](http://old.fontlab.com/font-editor/fontlab-studio/)  
-__Environment:__ FontLab 5
+__Environment:__ FontLab Studio 5
 
 ---
 

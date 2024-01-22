@@ -1,3 +1,8 @@
+'''
+Extract a list of all (flat) kerning pairs from a VFB’s kern object, and
+report the absolute number of pairs. Run as a FontLab script.
+
+'''
 import itertools
 from FL import fl
 f = fl.font
@@ -196,6 +201,7 @@ def run():
     dumpFile.close()
 
     print '\nList of kerning pairs written to\n{}'.format(dumpFileName)
+
 
 if __name__ == '__main__':
     run()

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+'''
+Wrapper script for all the getKerningPairsFromXXX scripts.
+
+'''
 
 from getKerningPairsFromFEA import FEAKernReader
 from getKerningPairsFromOTF import OTFKernReader

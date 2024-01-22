@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+'''
+This script extracts a viable kern feature file from a compiled OTF.
+It requires the script 'getKerningPairsFromOTF.py'; which is distributed
+in the same folder.
+
+usage:
+python dumpKernFeatureFromOTF.py font.otf > outputfile
+
+'''
+
 import argparse
 import os
 import string
@@ -8,20 +18,8 @@ from pathlib import Path
 import getKerningPairsFromOTF
 reload(getKerningPairsFromOTF)
 
-__doc__ = '''
-
-    This script extracts a viable kern feature file from a compiled OTF.
-    It requires the script 'getKerningPairsFromOTF.py'; which is distributed
-    in the same folder.
-
-    usage:
-    python dumpKernFeatureFromOTF.py font.otf > outputfile
-
-    '''
-
+# compress related single pairs into one line (using enum pos), or no?
 compressSinglePairs = True
-# Switch to control if single pairs shall be written plainly, or in a more
-# space-saving notation (using enum pos).
 
 
 def sortGlyphs(glyphlist):
@@ -124,9 +122,9 @@ def makeKernFeature(fontPath):
         exploding_class_class = []
 
         # Compress the single pairs to a more space-saving notation.
-        # First, dictionaries for each left glyph are created.
+        # First, create dictionaries for each left glyph.
         # If the kerning value to any right glyph happens to be equal,
-        # those right glyphs are merged into a 'class'.
+        # merge those right glyphs into a 'class'.
 
         for (left, right), value in singlePairsList:
             leftGlyph = left
@@ -155,7 +153,7 @@ def makeKernFeature(fontPath):
                 left = sortGlyphs(left)
                 compressedBoth.append((left, right.split(), value))
 
-        # Splitting the compressed single-pair kerning into four different
+        # Split the compressed single-pair kerning into four different
         # lists; organized by type:
 
         for left, right, value in compressedBoth:
@@ -176,7 +174,7 @@ def makeKernFeature(fontPath):
             else:
                 print(f'ERROR with ({" ".join(left, right, value)})')
 
-        # Making sure all the pairs made it through the process:
+        # Make sure all the pairs made it through the process:
         if len(compressedBoth) != (
             len(class_glyph) + len(glyph_class) +
             len(glyph_glyph) + len(exploding_class_class)

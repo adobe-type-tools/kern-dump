@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 '''
 This script extracts kerning and groups from a compiled OTF and injects
 them into a new UFO file (which is created via `tx`).
@@ -22,11 +21,6 @@ from defcon import Font
 from fontTools import ttLib
 
 import getKerningPairsFromOTF
-
-kKernFeatureTag = 'kern'
-compressSinglePairs = True
-# Switch to control if single pairs shall be written plainly,
-# or in a more space-saving notation (using enum).
 
 
 def sortGlyphs(glyphlist):
