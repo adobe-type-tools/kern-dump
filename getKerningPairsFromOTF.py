@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-from fontTools import ttLib
-from pathlib import Path
-import argparse
-import sys
+'''
+Extract a list of all (flat) GPOS kerning pairs in a font, and report the
+absolute number of pairs.
 
-__doc__ = '''\
-
-Print all possible kerning pairs within a font.
 Supports RTL kerning.
+Only GPOS kerning is considered.
 
 Usage:
 ------
 python getKerningPairsFromOTF.py <path to font file>
 
 '''
+
+from fontTools import ttLib
+from pathlib import Path
+import argparse
+import sys
 
 
 class LeftClass:

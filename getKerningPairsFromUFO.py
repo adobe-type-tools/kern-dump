@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+'''
+Extract a list of all (flat) kerning pairs in a UFO file’s kern object, and
+report the absolute number of pairs.
+
+'''
+
 import argparse
 import itertools
 from pathlib import Path

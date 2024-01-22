@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 '''
-Print a list of all kerning pairs to be expected from a kern feature file.
-The feature file has to be passed to the script as an argument.
+Print all kerning pairs to be expected from a kern feature file.
 This script has the ability to use a GlyphOrderAndAliasDB file for translating
 "friendly" glyph names to final glyph names (for comparison with OTF).
 '''
