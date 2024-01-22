@@ -38,7 +38,7 @@ jobs:
         echo 'Skipping flake8 temporarily'
     - name: Test with pytest and coverage
       run: |
-        python -m pytest tests --cov --cov-report='json'
+        python -m pytest tests --cov=dumpkerning --cov=getKerningPairsFromFEA --cov=getKerningPairsFromOTF --cov=getKerningPairsFromUFO --cov-report='json'
     - name: Coverage
       run: |
         export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
