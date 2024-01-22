@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/adobe-type-tools/kern-dump/graph/badge.svg?token=Rr15y2FSDB)](https://codecov.io/gh/adobe-type-tools/kern-dump)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/adobe-bot/116f9fefb73f6fcf9ffe8ce34d72efd7/raw/covbadge.json)](https://codecov.io/gh/adobe-type-tools/kern-dump)
 
 # kernDump
 Various scripts for analyzing, reading and writing kerning information. These

@@ -2,3 +2,4 @@
 htmlcov/*
 .coverage
 coverage.xml
+coverage.json
